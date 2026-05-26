@@ -1,0 +1,835 @@
+<!doctype html>
+<html class="scroll-smooth" lang="en" style="">
+    <head>
+        <meta charset="utf-8" />
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <title>Cork Vegans</title>
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;600;700&amp;display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+            rel="stylesheet"
+        />
+        <script id="tailwind-config">
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            "primary-container": "#417660",
+                            "surface-tint": "#336853",
+                            "surface-dim": "#ded9da",
+                            "surface-container-high": "#ece7e8",
+                            "on-secondary-fixed": "#410001",
+                            "surface-container-highest": "#e7e1e2",
+                            "on-primary": "#ffffff",
+                            outline: "#707974",
+                            "on-error": "#ffffff",
+                            "inverse-on-surface": "#f5eff0",
+                            "surface-variant": "#e7e1e2",
+                            "inverse-primary": "#9bd2b8",
+                            primary: "#275d49",
+                            "surface-container-low": "#f8f2f3",
+                            "on-tertiary-fixed-variant": "#683d00",
+                            "on-primary-fixed-variant": "#18503c",
+                            "secondary-fixed": "#ffdad5",
+                            error: "#ba1a1a",
+                            "tertiary-fixed": "#ffdcbc",
+                            "primary-fixed-dim": "#9bd2b8",
+                            "surface-container": "#f2eced",
+                            "on-primary-container": "#c2fbdf",
+                            "on-tertiary-container": "#ffebd9",
+                            "on-tertiary": "#ffffff",
+                            "on-secondary": "#ffffff",
+                            "on-surface-variant": "#404944",
+                            "surface-container-lowest": "#ffffff",
+                            "tertiary-fixed-dim": "#ffb86b",
+                            "on-error-container": "#93000a",
+                            "primary-fixed": "#b6efd4",
+                            "surface-bright": "#fef8f9",
+                            "secondary-container": "#e51b1d",
+                            "on-background": "#1d1b1c",
+                            "on-secondary-container": "#fffbff",
+                            "on-primary-fixed": "#002115",
+                            "on-surface": "#1d1b1c",
+                            surface: "#fef8f9",
+                            "inverse-surface": "#323031",
+                            "secondary-fixed-dim": "#ffb4aa",
+                            "outline-variant": "#c0c9c2",
+                            background: "#fef8f9",
+                            "tertiary-container": "#9c5d00",
+                            "on-tertiary-fixed": "#2c1700",
+                            tertiary: "#7a4800",
+                            secondary: "#bb000e",
+                            "on-secondary-fixed-variant": "#930008",
+                            "error-container": "#ffdad6",
+                        },
+                        borderRadius: {
+                            DEFAULT: "1rem",
+                            lg: "2rem",
+                            xl: "3rem",
+                            full: "9999px",
+                        },
+                        spacing: {
+                            lg: "24px",
+                            "margin-mobile": "16px",
+                            xs: "4px",
+                            xl: "40px",
+                            unit: "4px",
+                            sm: "8px",
+                            "margin-desktop": "64px",
+                            md: "16px",
+                            gutter: "20px",
+                        },
+                        fontFamily: {
+                            "label-bold": ["Karla"],
+                            "headline-lg-mobile": ["Karla"],
+                            "label-sm": ["Karla"],
+                            "body-md": ["Karla"],
+                            "body-lg": ["Karla"],
+                            "headline-lg": ["Karla"],
+                            "headline-md": ["Karla"],
+                            "display-lg": ["Karla"],
+                        },
+                        fontSize: {
+                            "label-bold": [
+                                "14px",
+                                { lineHeight: "20px", fontWeight: "700" },
+                            ],
+                            "headline-lg-mobile": [
+                                "28px",
+                                { lineHeight: "36px", fontWeight: "600" },
+                            ],
+                            "label-sm": [
+                                "12px",
+                                { lineHeight: "16px", fontWeight: "500" },
+                            ],
+                            "body-md": [
+                                "16px",
+                                { lineHeight: "24px", fontWeight: "400" },
+                            ],
+                            "body-lg": [
+                                "18px",
+                                { lineHeight: "28px", fontWeight: "400" },
+                            ],
+                            "headline-lg": [
+                                "32px",
+                                { lineHeight: "40px", fontWeight: "600" },
+                            ],
+                            "headline-md": [
+                                "24px",
+                                { lineHeight: "32px", fontWeight: "600" },
+                            ],
+                            "display-lg": [
+                                "48px",
+                                {
+                                    lineHeight: "56px",
+                                    letterSpacing: "-0.02em",
+                                    fontWeight: "700",
+                                },
+                            ],
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            .material-symbols-outlined {
+                font-variation-settings:
+                    "FILL" 0,
+                    "wght" 400,
+                    "GRAD" 0,
+                    "opsz" 24;
+            }
+            .pill-shadow {
+                box-shadow: 0 10px 30px -10px rgba(65, 118, 96, 0.3);
+            }
+            .asymmetric-shape {
+                border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            }
+            @keyframes float {
+                0% {
+                    transform: translateY(0px) rotate(0deg);
+                }
+                50% {
+                    transform: translateY(-10px) rotate(2deg);
+                }
+                100% {
+                    transform: translateY(0px) rotate(0deg);
+                }
+            }
+            .animate-float {
+                animation: float 4s ease-in-out infinite;
+            }
+            body {
+                min-height: max(884px, 100dvh);
+            }
+        </style>
+    </head>
+    <body
+        class="bg-background text-on-background font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container"
+    >
+        <!-- TopAppBar -->
+        <header
+            class="sticky top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm"
+        >
+            <div
+                class="flex justify-between items-center px-margin-mobile py-lg w-full max-w-7xl mx-auto rounded-b-2xl"
+            >
+                <div
+                    class="flex items-center gap-sm transition-transform duration-200 active:scale-95"
+                >
+                    <img
+                        alt="Cork vegans logo"
+                        class="w-auto object-contain h-[48px]"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz8YwpcBn9-HI8WyuHh1RzWCChM947OLIIO3V2LlnTkhoE-600BS9gmTTO5PWKfFw3BKlArTP6bwiQRE_Z23PSrcz9v8WROxUhX2Z77poqR-rVwuVyTbjs8SsMhATVZLUGrwgrjFLWRBfP3GC4KIgqU0glWR7VyQfDWIAaGZv6gvGR5ZA-IfzwLH_mV6QX9VM6iYJgMa_dMh7tEHCnFG0rN5Of2CXJlnPqa62F7uvsugnI-x3g9QWfkgtYFwHNV8uMtQt5uNI6im5T"
+                    />
+                </div>
+                <button
+                    class="bg-primary text-on-primary font-label-bold text-label-bold px-lg py-sm rounded-full hover:bg-surface-tint transition-all active:scale-95 shadow-sm"
+                >
+                    Community links
+                </button>
+            </div>
+        </header>
+        <main>
+            <!-- Hero Section -->
+            <section
+                class="relative min-h-[751px] flex items-center overflow-hidden"
+            >
+                <div class="absolute inset-0 z-0">
+                    <img
+                        alt="Hero background"
+                        class="w-full h-full object-cover"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQZJKQz7NMniFxeUIZXZbvs_3ashWeL1cL5UG0bOpeSVBLA-IUOjmODK-mWkS5R6B5MtY3bdDFr9FihehAQG2qYQFdODjZLOYlJDXOejBKdnXTgIsug1oRMCrP3JE8H_Ie4QP8atbf2j6S5pXqVEd-PC7Zv0SGCjgPqhtwXOyFd9WVlED7LXEuF420_JIqX3cSmni5wK2e5QAz39ikDuUwcsUpMCmEm8VDn-o9OaR2G8Q86B3Aw4kyM14Y40Kj88vw-tP8BIavypd8PZM"
+                    />
+                    <div class="absolute inset-0 bg-black/50"></div>
+                </div>
+                <div
+                    class="relative z-10 w-full max-w-7xl mx-auto px-margin-mobile flex flex-col items-start gap-lg"
+                >
+                    <h1
+                        class="font-display-lg text-display-lg text-white max-w-2xl leading-tight"
+                    >
+                        Welcome to Cork Vegans
+                    </h1>
+                    <p
+                        class="font-body-lg text-body-lg text-surface-variant max-w-lg"
+                    >
+                        Join Cork's vibrant vegan community. Whether you're a
+                        lifelong vegan or just curious about tofu and
+                        plant-based living, there's a seat for you at our table.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-md mt-md">
+                        <a
+                            class="bg-primary text-on-primary font-label-bold text-label-bold px-xl py-lg rounded-full pill-shadow flex items-center justify-center gap-sm hover:bg-surface-tint transition-all active:scale-95"
+                            href="#events"
+                        >
+                            Upcoming events
+                        </a>
+                        <button
+                            class="bg-white/10 backdrop-blur-lg border border-white/20 text-white font-label-bold text-label-bold px-xl py-lg rounded-full hover:bg-white/20 transition-all active:scale-95"
+                        >
+                            Community links
+                        </button>
+                    </div>
+                </div>
+                <!-- Floating Decoration -->
+                <div class="absolute bottom-0 right-0 p-xl hidden md:block">
+                    <div
+                        class="w-64 h-64 asymmetric-shape bg-primary opacity-20 animate-float"
+                    ></div>
+                </div>
+            </section>
+            <!-- About Section -->
+            <section class="pt-xl pb-md bg-surface">
+                <div class="max-w-7xl mx-auto px-margin-mobile">
+                    <div class="flex flex-col lg:flex-row items-center gap-xl">
+                        <div class="lg:w-1/2 relative">
+                            <div
+                                class="absolute -top-10 -left-10 w-40 h-40 asymmetric-shape bg-tertiary-container opacity-20 -z-10 animate-float"
+                            ></div>
+                            <img
+                                alt="Group of smiling vegans sharing a meal"
+                                class="rounded-xl shadow-2xl relative z-10 w-full aspect-[1.78] object-cover"
+                                src="https://lh3.googleusercontent.com/aida/ADBb0ujwIV_ZKnsj3rWDFzK8DQCWGtWO39-4DUx13evy6fcTXnK4_ZhB_BdrTrfE1EdZvf1V0nZl0Fb7zWB0BkBp0q2L52eS4ssgnk6g_yvFbXAiDsDkymKgg1vuScD9V5FfmPpRfjyQzL5S7-IPgcaM7TXsP0PUE7potV4FsCN21aeFrCTR7b64p5sC967YaTzCCLhvC9GNj90REB5EolE7yqPMRANcdWDTVFkpOX8Tb2PGYep9bamp5aYY8-z6"
+                            />
+                        </div>
+                        <div class="lg:w-1/2 flex flex-col gap-md">
+                            <h2
+                                class="font-headline-lg text-headline-lg text-on-surface"
+                            >
+                                Community first, <br /><span
+                                    class="text-secondary"
+                                    >plants always.</span
+                                >
+                            </h2>
+                            <p
+                                class="font-body-lg text-body-lg text-on-surface-variant"
+                            >
+                                Cork Vegans isn't just about what's on your
+                                plate - it's about who's in your circle. We host
+                                regular coffee meetups, dining events, potlucks,
+                                and outdoor adventures to bring the community
+                                together so we can build real and lasting
+                                connections.
+                            </p>
+                            <div class="grid grid-cols-2 gap-md mt-sm">
+                                <div
+                                    class="p-md rounded-lg bg-surface-container-low border border-surface-variant flex flex-col gap-xs"
+                                >
+                                    <span
+                                        class="material-symbols-outlined text-primary"
+                                        style="
+                                            font-variation-settings: &quot;FILL&quot;
+                                                1;
+                                        "
+                                        >restaurant</span
+                                    >
+                                    <p class="font-label-bold text-label-bold">
+                                        Dining and potlucks
+                                    </p>
+                                    <p
+                                        class="text-label-sm text-on-surface-variant"
+                                    >
+                                        Exploring Cork's best vegan-friendly
+                                        spots and get together.
+                                    </p>
+                                </div>
+                                <div
+                                    class="p-md rounded-lg bg-surface-container-low border border-surface-variant flex flex-col gap-xs"
+                                >
+                                    <span
+                                        class="material-symbols-outlined text-primary"
+                                        style="
+                                            font-variation-settings: &quot;FILL&quot;
+                                                1;
+                                        "
+                                        >hiking</span
+                                    >
+                                    <p class="font-label-bold text-label-bold">
+                                        Adventures
+                                    </p>
+                                    <p
+                                        class="text-label-sm text-on-surface-variant"
+                                    >
+                                        Day trips and outdoor walks for the
+                                        active souls.
+                                    </p>
+                                </div>
+                                <div
+                                    class="p-md rounded-lg bg-surface-container-low border border-surface-variant flex flex-col gap-xs"
+                                >
+                                    <span
+                                        class="material-symbols-outlined text-primary"
+                                        style="
+                                            font-variation-settings: &quot;FILL&quot;
+                                                1;
+                                        "
+                                        >volunteer_activism</span
+                                    >
+                                    <p class="font-label-bold text-label-bold">
+                                        Volunteering
+                                    </p>
+                                    <p
+                                        class="text-label-sm text-on-surface-variant"
+                                    >
+                                        Support local sanctuaries and help build
+                                        the community.
+                                    </p>
+                                </div>
+                                <div
+                                    class="p-md rounded-lg bg-surface-container-low border border-surface-variant flex flex-col gap-xs"
+                                >
+                                    <span
+                                        class="material-symbols-outlined text-primary"
+                                        style="
+                                            font-variation-settings: &quot;FILL&quot;
+                                                1;
+                                        "
+                                        >campaign</span
+                                    >
+                                    <p class="font-label-bold text-label-bold">
+                                        Activism
+                                    </p>
+                                    <p
+                                        class="text-label-sm text-on-surface-variant"
+                                    >
+                                        Support animal rights campaigns and
+                                        outreach.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Events Section -->
+            <section
+                class="pt-xl pb-md bg-surface-container-lowest"
+                id="events"
+            >
+                <div class="max-w-7xl mx-auto px-margin-mobile">
+                    <div
+                        class="flex flex-col items-center text-center gap-sm mb-xl"
+                    >
+                        <span
+                            class="font-label-bold text-label-sm uppercase tracking-[0.2em]"
+                            style="color: #f64060"
+                            >What's on</span
+                        >
+                        <h2
+                            class="font-headline-lg text-headline-lg text-on-surface"
+                        >
+                            Upcoming events
+                        </h2>
+                        <div
+                            class="h-1.5 w-20 rounded-full mt-xs"
+                            style="background-color: #f64060"
+                        ></div>
+                    </div>
+                    <div class="flex flex-col gap-lg">
+                        <!-- Event 1 -->
+                        <div
+                            class="group flex flex-col md:flex-row bg-surface border border-surface-variant rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                        >
+                            <div
+                                class="md:w-1/3 h-48 md:h-auto relative overflow-hidden"
+                            >
+                                <img
+                                    alt="Event cover image"
+                                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    src="https://lh3.googleusercontent.com/aida/ADBb0uhz5382g7mAQvh3pLydJ9Zt_ZCkyh8jVMBlp20gdnfqH_zT_2TLeodJATOHV8Ae99q1XpUtg_ixhpNl3zLIF21aCv6Stbe0-VG1y4ZulUZ1LNtDl72qjvEbtjLw6axqbEglB05yPW-TVUuHZCnxFSzpyWJS5h0lqB9krLxRrgPDwypglNnpTAQXqlQ-gAzvyAS25NVzKJ6HCaoWzQ33qgtOasBLI4cB0hmpL--5ibDU-2NYEDUjSoiQJ6tp"
+                                />
+                                <div
+                                    class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-md py-sm rounded-lg text-center shadow-md"
+                                >
+                                    <span
+                                        class="block font-label-bold text-label-sm text-secondary uppercase"
+                                        >Feb</span
+                                    >
+                                    <span
+                                        class="block font-headline-md text-headline-md text-on-surface"
+                                        >15</span
+                                    >
+                                </div>
+                            </div>
+                            <div
+                                class="md:w-2/3 p-lg flex flex-col justify-between"
+                            >
+                                <div>
+                                    <h3
+                                        class="font-headline-md text-headline-md text-on-surface mb-sm"
+                                    >
+                                        February coffee catch up
+                                    </h3>
+                                    <p
+                                        class="font-body-md text-body-md text-on-surface-variant mb-md"
+                                    >
+                                        Our monthly casual meet-up for coffee,
+                                        cakes, and chat. Perfect for newcomers
+                                        to say hi in a low-pressure environment!
+                                    </p>
+                                    <div class="flex items-center gap-lg">
+                                        <div
+                                            class="flex items-center gap-xs text-on-surface-variant"
+                                        >
+                                            <span
+                                                class="material-symbols-outlined text-[20px]"
+                                                >location_on</span
+                                            >
+                                            <span class="text-label-sm"
+                                                >Cork city centre</span
+                                            >
+                                        </div>
+                                        <div
+                                            class="flex items-center gap-xs text-on-surface-variant"
+                                        >
+                                            <span
+                                                class="material-symbols-outlined text-[20px]"
+                                                >group</span
+                                            >
+                                            <span class="text-label-sm"
+                                                >24 attending</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="mt-lg flex items-center justify-between"
+                                >
+                                    <span class="text-primary font-label-bold"
+                                        >Free</span
+                                    >
+                                    <button
+                                        class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold hover:bg-surface-tint transition-all active:scale-95"
+                                    >
+                                        Join on meetup
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Event 2 -->
+                        <div
+                            class="group flex flex-col md:flex-row bg-surface border border-surface-variant rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                        >
+                            <div
+                                class="md:w-1/3 h-48 md:h-auto relative overflow-hidden"
+                            >
+                                <img
+                                    alt="Event cover image"
+                                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    src="https://lh3.googleusercontent.com/aida/ADBb0ugGDyEPju61D8MeXb-v6SZolzPdl6N48RyfxKaQkem9rDYo3I4VfB49tUI_yx-OOK7BOhAxaf-ZOKJurgPYrcv4TNQkSq4ubr6LTY84sWQ1RFS8iJ9wBh4CVho3O4ZF3P4r8OMH3mmWMQKKumLUB8euSYjDjzZbQ2FbkNZAHqbgc3tcFBwOgziuAfkSwtTnIxll5WMWapEqZd2I315-Ooz0b-mq8yN8IGfdWxRPT6Y3Y10KAXPBOv7vr1I"
+                                />
+                                <div
+                                    class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-md py-sm rounded-lg text-center shadow-md"
+                                >
+                                    <span
+                                        class="block font-label-bold text-label-sm text-secondary uppercase"
+                                        >Feb</span
+                                    >
+                                    <span
+                                        class="block font-headline-md text-headline-md text-on-surface"
+                                        >22</span
+                                    >
+                                </div>
+                            </div>
+                            <div
+                                class="md:w-2/3 p-lg flex flex-col justify-between"
+                            >
+                                <div>
+                                    <h3
+                                        class="font-headline-md text-headline-md text-on-surface mb-sm"
+                                    >
+                                        Dublin day trip
+                                    </h3>
+                                    <p
+                                        class="font-body-md text-body-md text-on-surface-variant mb-md"
+                                    >
+                                        We're heading to the capital for the
+                                        annual vegan expo. Carpooling available!
+                                        Expect lots of free samples and
+                                        workshops.
+                                    </p>
+                                    <div class="flex items-center gap-lg">
+                                        <div
+                                            class="flex items-center gap-xs text-on-surface-variant"
+                                        >
+                                            <span
+                                                class="material-symbols-outlined text-[20px]"
+                                                >location_on</span
+                                            >
+                                            <span class="text-label-sm"
+                                                >Dublin RDS</span
+                                            >
+                                        </div>
+                                        <div
+                                            class="flex items-center gap-xs text-on-surface-variant"
+                                        >
+                                            <span
+                                                class="material-symbols-outlined text-[20px]"
+                                                >group</span
+                                            >
+                                            <span class="text-label-sm"
+                                                >12 attending</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="mt-lg flex items-center justify-between"
+                                >
+                                    <span class="text-primary font-label-bold"
+                                        >Ticket required</span
+                                    >
+                                    <button
+                                        class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold hover:bg-surface-tint transition-all active:scale-95"
+                                    >
+                                        Join on meetup
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Event 3 -->
+                        <div
+                            class="group flex flex-col md:flex-row bg-surface border border-surface-variant rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                        >
+                            <div
+                                class="md:w-1/3 h-48 md:h-auto relative overflow-hidden"
+                            >
+                                <img
+                                    alt="Event cover image"
+                                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    src="https://lh3.googleusercontent.com/aida/ADBb0ujUgrG3dGUmYCh0mLdfFpu_12Y0syVm4-zuqyGI5k-E6FwN7esoYEGbMpPjVW-VNQ6U9ihfx3LnkYPt6_U_1V3iqZyAPK6CobVE1P6TcIe1WQwrtjKWJcOtTS6QbVy2ovQm7B909egI-3lWPZbbimrbfdhTnA6Nbc4diDGvDqbQhlSK8MKJY71QD7hPaeVQpPP0K7ZoFg4idu7S3YmgR9PIm-AnCXkdjLfsrpE-IDA8n1ZiAT7oj8-BG28"
+                                />
+                                <div
+                                    class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-md py-sm rounded-lg text-center shadow-md"
+                                >
+                                    <span
+                                        class="block font-label-bold text-label-sm text-secondary uppercase"
+                                        >Mar</span
+                                    >
+                                    <span
+                                        class="block font-headline-md text-headline-md text-on-surface"
+                                        >02</span
+                                    >
+                                </div>
+                            </div>
+                            <div
+                                class="md:w-2/3 p-lg flex flex-col justify-between"
+                            >
+                                <div>
+                                    <h3
+                                        class="font-headline-md text-headline-md text-on-surface mb-sm"
+                                    >
+                                        Sustainable cooking workshop
+                                    </h3>
+                                    <p
+                                        class="font-body-md text-body-md text-on-surface-variant mb-md"
+                                    >
+                                        Learn how to cook nutritious plant-based
+                                        meals on a budget while minimizing
+                                        waste. Hosted at a local community
+                                        kitchen.
+                                    </p>
+                                    <div class="flex items-center gap-lg">
+                                        <div
+                                            class="flex items-center gap-xs text-on-surface-variant"
+                                        >
+                                            <span
+                                                class="material-symbols-outlined text-[20px]"
+                                                >location_on</span
+                                            >
+                                            <span class="text-label-sm"
+                                                >Ballincollig community
+                                                ctr</span
+                                            >
+                                        </div>
+                                        <div
+                                            class="flex items-center gap-xs text-on-surface-variant"
+                                        >
+                                            <span
+                                                class="material-symbols-outlined text-[20px]"
+                                                >group</span
+                                            >
+                                            <span class="text-label-sm"
+                                                >15 spots left</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="mt-lg flex items-center justify-between"
+                                >
+                                    <span class="text-primary font-label-bold"
+                                        >€10 entry</span
+                                    >
+                                    <button
+                                        class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold hover:bg-surface-tint transition-all active:scale-95"
+                                    >
+                                        Join on meetup
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Social Connect Section -->
+            <section
+                class="pt-xl pb-md relative overflow-hidden text-on-tertiary"
+                style="background-color: rgb(255, 220, 188)"
+            >
+                <div class="max-w-7xl mx-auto px-margin-mobile relative z-10">
+                    <div class="flex flex-col items-center text-center gap-lg">
+                        <h2
+                            class="font-headline-lg text-headline-lg font-extrabold text-on-surface"
+                        >
+                            Let's get social
+                        </h2>
+                        <p
+                            class="font-body-lg text-body-lg max-w-xl opacity-90 text-on-surface-variant"
+                        >
+                            Stay in the loop with daily updates, food pics, and
+                            community polls. Choose your favorite platform and
+                            jump in!
+                        </p>
+                        <div
+                            class="grid grid-cols-1 md:grid-cols-3 gap-md w-full mt-md max-w-5xl lg:grid-cols-5"
+                        >
+                            <a
+                                class="bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
+                                href="#"
+                            >
+                                <div
+                                    class="w-16 h-16 rounded-full bg-secondary flex items-center justify-center text-white mb-sm group-hover:rotate-12 transition-transform"
+                                    style="background-color: rgb(255, 74, 121)"
+                                >
+                                    <img
+                                        alt="Meetup"
+                                        class="w-[32px] h-[32px] object-contain"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1G8Qy-KFs5KdMuehNPjXamhQS-K8Q5xH9w71TMH9k0DXFZAeKm-BUrZQ4DnuGziZqQyIf1w6jvTxbgfF3ysk3z_RvQ8E8LyTP5qtEjYhkWhR_BJzrgrcVI9Ar269G7HeFOybzRNFw0B3LU92TuM35iPSWPwRTVoaiABWIaR4Hde3DWYwuRFxJuRPNaERfP6NCOI1A3cTHXZBM3YKZUf0eCU1ZzLIeq6eJm4fNwCAX_aTOkQi1dBfa2_YkLpso4Ez2XH_edMa5C5ty8_w"
+                                    />
+                                </div>
+                                <span
+                                    class="font-label-bold text-headline-md text-on-surface"
+                                    >Meetup</span
+                                >
+                                <span
+                                    class="text-label-sm text-on-surface-variant"
+                                    >Cork Vegans</span
+                                >
+                            </a>
+                            <a
+                                class="bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
+                                href="#"
+                            >
+                                <div
+                                    class="w-16 h-16 rounded-full bg-[#1877F2] flex items-center justify-center text-white mb-sm group-hover:rotate-12 transition-transform"
+                                >
+                                    <img
+                                        alt="Facebook"
+                                        class="w-[32px] h-[32px] object-contain"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBE-OUNSY3Kpm6XXYmEtoq6vjMJXh3FISA1iJ_cBkxydmARHJK_NxqZXUmwS_WPwnI99WTAoYI94Jt3UW7T-aRiLXQr9ZwoAf1p2ZaGuceNloTOPX1YrXZ38PiLJ5NEJ5oPuU1fmlX7G8_XYtOm4ivKbuwjvwEHB0QDFtv7fo-7Mq0b4xBQ4jK18b4imlDAuN8cLhGf5rJEVeXhn9RvGeyATPV6inHEE78PUjjXbkDyr8G179BvE74l2T4NNXL8vtMS33c1hfrYYujKHQI"
+                                    />
+                                </div>
+                                <span
+                                    class="font-label-bold text-headline-md text-on-surface"
+                                    >Facebook</span
+                                >
+                                <span
+                                    class="text-label-sm text-on-surface-variant"
+                                    >Cork Vegans</span
+                                >
+                            </a>
+                            <a
+                                class="bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
+                                href="#"
+                            >
+                                <div
+                                    class="w-16 h-16 rounded-full bg-[#25D366] flex items-center justify-center text-white mb-sm group-hover:rotate-12 transition-transform"
+                                >
+                                    <img
+                                        alt="WhatsApp"
+                                        class="w-[32px] h-[32px] object-contain"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhEoLzJJwHcnKtSGEs6NrHaZCAq1fQoWF6crP20Gaa0MWyS6QKZLyfJr_F0oQkKHFEJ20_yVsYk3G-Mvc0xS11mZVx8IwYuwBwXIOkH8EBdVfnmrGAZ8IPac6rFyWmz8nXfm1HeuWdYmslKwVRa913RqoSWfcF_y7sb0u05t6yo4RwmDz0FJ1h3Nj94KLI9ADdLEVU_Mfo1KMGqMKb6TD9yO6hxdWSirzMwmrXOzlfXgFrgpq2-ojSDnb8E-EzoXeovE7o1wCoGkle"
+                                    />
+                                </div>
+                                <span
+                                    class="font-label-bold text-headline-md text-on-surface"
+                                    >WhatsApp</span
+                                >
+                                <span
+                                    class="text-label-sm text-on-surface-variant"
+                                    >Cork Vegans Community</span
+                                >
+                            </a>
+                            <a
+                                class="bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
+                                href="#"
+                            >
+                                <div
+                                    class="w-16 h-16 rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] flex items-center justify-center text-white mb-sm group-hover:rotate-12 transition-transform"
+                                >
+                                    <img
+                                        alt="Instagram"
+                                        class="w-[32px] h-[32px] object-contain"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEKh4x5gYj3ylxCJDlscen-uOa9rSR7TH5ZFaOCh9zkq72OmX-yGsFSZytKeiop5yUGUyt_du9xbd_joh1aTlC0OwnHKSCJskHZo6K4LnPFp9KXcZtv0Kkivoui_9h_lC9G4mNaDu-PfeaZiVIWJ-BHhYqEH9r6f_AMzUjmG-Bwq8icTgoBWV3JlhAnvWmTLhMuFlU6wkEb1gXlM2OlEIXX5rLElBzWBYS7He3md60nu52xeJS5WKm1IWsOJALiHx6gvsPs1wE6Vqt"
+                                    />
+                                </div>
+                                <span
+                                    class="font-label-bold text-headline-md text-on-surface"
+                                    >Instagram</span
+                                >
+                                <span
+                                    class="text-label-sm text-on-surface-variant"
+                                    >@corkvegans</span
+                                >
+                            </a>
+                            <a
+                                class="bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
+                                href="#"
+                            >
+                                <div
+                                    class="w-16 h-16 rounded-full flex items-center justify-center text-white mb-sm group-hover:rotate-12 transition-transform"
+                                    style="background-color: #f05537"
+                                >
+                                    <img
+                                        alt="Eventbrite"
+                                        class="w-[32px] h-[32px] object-contain"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAK2vtUQFOvgGpyU9QXxtIjDTFZJ9y8qV704Ojz6nGQDW-WB50UpbD2O4jQFPcBYgNZo7dU_zG68hzPZA6Sz6dft-YuV8QXVVH0NQqkF1GOXi06_BQDlxyQIkkMSmFtVdYKuQXLW7j6JKpUIvv7kQ0o2qsES5m9FpRAhv-iKv9OfmLkVQaKY_zVz1fW9SxYQRlRYArY3OVnejx-ERvxLwGkSbp-TMtcLR4EGlpf4ZpQF6JqTwopRBYY5z4Yxwn9nffl8XEczoOSVMl6"
+                                    />
+                                </div>
+                                <span
+                                    class="font-label-bold text-headline-md text-on-surface"
+                                    >Eventbrite</span
+                                >
+                                <span
+                                    class="text-label-sm text-on-surface-variant"
+                                    >Cork Vegans</span
+                                >
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <!-- Footer -->
+        <footer
+            class="w-full shadow-lg !shadow-none !rounded-none pb-md rounded-t-[32px] pt-xl"
+            style="background-color: rgb(255, 220, 188)"
+        >
+            <div
+                class="flex flex-col md:flex-row items-center justify-between gap-md px-xl py-lg w-[calc(100%-2*theme(spacing.margin-mobile))] max-w-7xl mx-auto bg-primary text-on-primary shadow-lg mb-md rounded-lg"
+            >
+                <div class="flex items-center gap-sm">
+                    <img
+                        alt="Cork vegans logo"
+                        class="w-auto object-contain h-[48px] brightness-0 invert"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKex_8dLz3rzI4alE42gZC5fGcaDFjcq-kg-pthfUo5l9RqLU50Ls1kEkgmpphwCEXQqKuSQb9Z3o_QnZm4X4iVAlr898FveD9AxfQWRJZZWSklKdVas-4zWMVw9DVGCP9Yfk8wow2wo0etjSV5KkiUBbfC3I9LbXR8YzvkdReyR7okOwbqD-jBqt3LXpZQJITQJCHrQ9iBqkGTaUB_ZjjCXDLINxdA2fDB1OXP0q1cj34_UeSITVSJ2Uq67ze5tNF_F4yF6NqSqph"
+                    />
+                </div>
+                <nav class="flex flex-wrap justify-center gap-lg">
+                    <a
+                        class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors !text-on-primary/80 hover:!text-white"
+                        href="#"
+                        >Events</a
+                    >
+                    <a
+                        class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors !text-on-primary/80 hover:!text-white"
+                        href="#"
+                        >Community links</a
+                    >
+                </nav>
+                <div class="w-full h-px bg-outline-variant/30 hidden"></div>
+                <div class="flex flex-col items-center gap-sm">
+                    <p
+                        class="font-body-md text-body-md text-on-surface-variant opacity-70 !text-on-primary/60"
+                    >
+                        © 2026 Cork Vegans
+                    </p>
+                </div>
+            </div>
+        </footer>
+        <!-- Interactive Micro-interactions -->
+        <script>
+            // Smooth scroll for anchors
+            document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+                anchor.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(
+                        this.getAttribute("href"),
+                    );
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: "smooth",
+                        });
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
