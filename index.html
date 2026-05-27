@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="scroll-smooth" lang="en" style="">
+<html class="scroll-smooth" lang="en">
     <head>
         <meta charset="utf-8" />
         <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -168,6 +168,21 @@
                 min-height: max(884px, 100dvh);
             }
         </style>
+        <link
+            rel="icon"
+            type="image/png"
+            href="favicon/favicon-96x96.png"
+            sizes="96x96"
+        />
+        <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg" />
+        <link rel="shortcut icon" href="favicon/favicon.ico" />
+        <link
+            rel="apple-touch-icon"
+            sizes="180x180"
+            href="/apple-touch-icon.png"
+        />
+        <meta name="apple-mobile-web-app-title" content="Cork Vegans" />
+        <link rel="manifest" href="/site.webmanifest" />
     </head>
     <body
         class="bg-background text-on-background font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container"
@@ -182,17 +197,20 @@
                 <div
                     class="flex items-center gap-sm transition-transform duration-200 active:scale-95"
                 >
-                    <img
-                        alt="Cork vegans logo"
-                        class="w-auto object-contain h-[48px]"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz8YwpcBn9-HI8WyuHh1RzWCChM947OLIIO3V2LlnTkhoE-600BS9gmTTO5PWKfFw3BKlArTP6bwiQRE_Z23PSrcz9v8WROxUhX2Z77poqR-rVwuVyTbjs8SsMhATVZLUGrwgrjFLWRBfP3GC4KIgqU0glWR7VyQfDWIAaGZv6gvGR5ZA-IfzwLH_mV6QX9VM6iYJgMa_dMh7tEHCnFG0rN5Of2CXJlnPqa62F7uvsugnI-x3g9QWfkgtYFwHNV8uMtQt5uNI6im5T"
-                    />
+                    <a href="/">
+                        <img
+                            alt="Cork vegans logo"
+                            class="w-auto object-contain h-[48px]"
+                            src="images/logo.png"
+                        />
+                    </a>
                 </div>
-                <button
+                <a
                     class="bg-primary text-on-primary font-label-bold text-label-bold px-lg py-sm rounded-full hover:bg-surface-tint transition-all active:scale-95 shadow-sm"
+                    href="#communityLinks"
                 >
                     Community links
-                </button>
+                </a>
             </div>
         </header>
         <main>
@@ -204,7 +222,7 @@
                     <img
                         alt="Hero background"
                         class="w-full h-full object-cover"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQZJKQz7NMniFxeUIZXZbvs_3ashWeL1cL5UG0bOpeSVBLA-IUOjmODK-mWkS5R6B5MtY3bdDFr9FihehAQG2qYQFdODjZLOYlJDXOejBKdnXTgIsug1oRMCrP3JE8H_Ie4QP8atbf2j6S5pXqVEd-PC7Zv0SGCjgPqhtwXOyFd9WVlED7LXEuF420_JIqX3cSmni5wK2e5QAz39ikDuUwcsUpMCmEm8VDn-o9OaR2G8Q86B3Aw4kyM14Y40Kj88vw-tP8BIavypd8PZM"
+                        src="images/hero.jpg"
                     />
                     <div class="absolute inset-0 bg-black/50"></div>
                 </div>
@@ -230,11 +248,12 @@
                         >
                             Upcoming events
                         </a>
-                        <button
+                        <a
                             class="bg-white/10 backdrop-blur-lg border border-white/20 text-white font-label-bold text-label-bold px-xl py-lg rounded-full hover:bg-white/20 transition-all active:scale-95"
+                            href="#communityLinks"
                         >
                             Community links
-                        </button>
+                        </a>
                     </div>
                 </div>
                 <!-- Floating Decoration -->
@@ -255,7 +274,7 @@
                             <img
                                 alt="Group of smiling vegans sharing a meal"
                                 class="rounded-xl shadow-2xl relative z-10 w-full aspect-[1.78] object-cover"
-                                src="https://lh3.googleusercontent.com/aida/ADBb0ujwIV_ZKnsj3rWDFzK8DQCWGtWO39-4DUx13evy6fcTXnK4_ZhB_BdrTrfE1EdZvf1V0nZl0Fb7zWB0BkBp0q2L52eS4ssgnk6g_yvFbXAiDsDkymKgg1vuScD9V5FfmPpRfjyQzL5S7-IPgcaM7TXsP0PUE7potV4FsCN21aeFrCTR7b64p5sC967YaTzCCLhvC9GNj90REB5EolE7yqPMRANcdWDTVFkpOX8Tb2PGYep9bamp5aYY8-z6"
+                                src="images/bio.jpg"
                             />
                         </div>
                         <div class="lg:w-1/2 flex flex-col gap-md">
@@ -369,7 +388,7 @@
             </section>
             <!-- Events Section -->
             <section
-                class="pt-xl pb-md bg-surface-container-lowest"
+                class="pt-xl pb-xl bg-surface-container-lowest"
                 id="events"
             >
                 <div class="max-w-7xl mx-auto px-margin-mobile">
@@ -642,6 +661,7 @@
             <section
                 class="pt-xl pb-md relative overflow-hidden text-on-tertiary"
                 style="background-color: rgb(255, 220, 188)"
+                id="communityLinks"
             >
                 <div class="max-w-7xl mx-auto px-margin-mobile relative z-10">
                     <div class="flex flex-col items-center text-center gap-lg">
@@ -662,7 +682,8 @@
                         >
                             <a
                                 class="bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
-                                href="#"
+                                href="https://www.meetup.com/corkvegans/"
+                                target="_blank"
                             >
                                 <div
                                     class="w-16 h-16 rounded-full bg-secondary flex items-center justify-center text-white mb-sm group-hover:rotate-12 transition-transform"
@@ -671,7 +692,7 @@
                                     <img
                                         alt="Meetup"
                                         class="w-[32px] h-[32px] object-contain"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1G8Qy-KFs5KdMuehNPjXamhQS-K8Q5xH9w71TMH9k0DXFZAeKm-BUrZQ4DnuGziZqQyIf1w6jvTxbgfF3ysk3z_RvQ8E8LyTP5qtEjYhkWhR_BJzrgrcVI9Ar269G7HeFOybzRNFw0B3LU92TuM35iPSWPwRTVoaiABWIaR4Hde3DWYwuRFxJuRPNaERfP6NCOI1A3cTHXZBM3YKZUf0eCU1ZzLIeq6eJm4fNwCAX_aTOkQi1dBfa2_YkLpso4Ez2XH_edMa5C5ty8_w"
+                                        src="images/socials/meetup.png"
                                     />
                                 </div>
                                 <span
@@ -685,7 +706,8 @@
                             </a>
                             <a
                                 class="bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
-                                href="#"
+                                href="https://www.facebook.com/corkvegansandveggies/"
+                                target="_blank"
                             >
                                 <div
                                     class="w-16 h-16 rounded-full bg-[#1877F2] flex items-center justify-center text-white mb-sm group-hover:rotate-12 transition-transform"
@@ -693,7 +715,7 @@
                                     <img
                                         alt="Facebook"
                                         class="w-[32px] h-[32px] object-contain"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBE-OUNSY3Kpm6XXYmEtoq6vjMJXh3FISA1iJ_cBkxydmARHJK_NxqZXUmwS_WPwnI99WTAoYI94Jt3UW7T-aRiLXQr9ZwoAf1p2ZaGuceNloTOPX1YrXZ38PiLJ5NEJ5oPuU1fmlX7G8_XYtOm4ivKbuwjvwEHB0QDFtv7fo-7Mq0b4xBQ4jK18b4imlDAuN8cLhGf5rJEVeXhn9RvGeyATPV6inHEE78PUjjXbkDyr8G179BvE74l2T4NNXL8vtMS33c1hfrYYujKHQI"
+                                        src="images/socials/facebook.png"
                                     />
                                 </div>
                                 <span
@@ -707,7 +729,8 @@
                             </a>
                             <a
                                 class="bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
-                                href="#"
+                                href="https://chat.whatsapp.com/GLVQxJC9qCFK4xGSUafwo3"
+                                target="_blank"
                             >
                                 <div
                                     class="w-16 h-16 rounded-full bg-[#25D366] flex items-center justify-center text-white mb-sm group-hover:rotate-12 transition-transform"
@@ -715,7 +738,7 @@
                                     <img
                                         alt="WhatsApp"
                                         class="w-[32px] h-[32px] object-contain"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhEoLzJJwHcnKtSGEs6NrHaZCAq1fQoWF6crP20Gaa0MWyS6QKZLyfJr_F0oQkKHFEJ20_yVsYk3G-Mvc0xS11mZVx8IwYuwBwXIOkH8EBdVfnmrGAZ8IPac6rFyWmz8nXfm1HeuWdYmslKwVRa913RqoSWfcF_y7sb0u05t6yo4RwmDz0FJ1h3Nj94KLI9ADdLEVU_Mfo1KMGqMKb6TD9yO6hxdWSirzMwmrXOzlfXgFrgpq2-ojSDnb8E-EzoXeovE7o1wCoGkle"
+                                        src="images/socials/whatsapp.png"
                                     />
                                 </div>
                                 <span
@@ -729,7 +752,8 @@
                             </a>
                             <a
                                 class="bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
-                                href="#"
+                                href="https://www.instagram.com/corkvegansmeetup/"
+                                target="_blank"
                             >
                                 <div
                                     class="w-16 h-16 rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] flex items-center justify-center text-white mb-sm group-hover:rotate-12 transition-transform"
@@ -737,7 +761,7 @@
                                     <img
                                         alt="Instagram"
                                         class="w-[32px] h-[32px] object-contain"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEKh4x5gYj3ylxCJDlscen-uOa9rSR7TH5ZFaOCh9zkq72OmX-yGsFSZytKeiop5yUGUyt_du9xbd_joh1aTlC0OwnHKSCJskHZo6K4LnPFp9KXcZtv0Kkivoui_9h_lC9G4mNaDu-PfeaZiVIWJ-BHhYqEH9r6f_AMzUjmG-Bwq8icTgoBWV3JlhAnvWmTLhMuFlU6wkEb1gXlM2OlEIXX5rLElBzWBYS7He3md60nu52xeJS5WKm1IWsOJALiHx6gvsPs1wE6Vqt"
+                                        src="images/socials/insta.png"
                                     />
                                 </div>
                                 <span
@@ -751,7 +775,8 @@
                             </a>
                             <a
                                 class="bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
-                                href="#"
+                                href="https://www.eventbrite.ie/o/cork-vegans-91797524863"
+                                target="_blank"
                             >
                                 <div
                                     class="w-16 h-16 rounded-full flex items-center justify-center text-white mb-sm group-hover:rotate-12 transition-transform"
@@ -760,7 +785,7 @@
                                     <img
                                         alt="Eventbrite"
                                         class="w-[32px] h-[32px] object-contain"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAK2vtUQFOvgGpyU9QXxtIjDTFZJ9y8qV704Ojz6nGQDW-WB50UpbD2O4jQFPcBYgNZo7dU_zG68hzPZA6Sz6dft-YuV8QXVVH0NQqkF1GOXi06_BQDlxyQIkkMSmFtVdYKuQXLW7j6JKpUIvv7kQ0o2qsES5m9FpRAhv-iKv9OfmLkVQaKY_zVz1fW9SxYQRlRYArY3OVnejx-ERvxLwGkSbp-TMtcLR4EGlpf4ZpQF6JqTwopRBYY5z4Yxwn9nffl8XEczoOSVMl6"
+                                        src="images/socials/eventbrite.png"
                                     />
                                 </div>
                                 <span
@@ -786,21 +811,24 @@
                 class="flex flex-col md:flex-row items-center justify-between gap-md px-xl py-lg w-[calc(100%-2*theme(spacing.margin-mobile))] max-w-7xl mx-auto bg-primary text-on-primary shadow-lg mb-md rounded-lg"
             >
                 <div class="flex items-center gap-sm">
-                    <img
-                        alt="Cork vegans logo"
-                        class="w-auto object-contain h-[48px] brightness-0 invert"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKex_8dLz3rzI4alE42gZC5fGcaDFjcq-kg-pthfUo5l9RqLU50Ls1kEkgmpphwCEXQqKuSQb9Z3o_QnZm4X4iVAlr898FveD9AxfQWRJZZWSklKdVas-4zWMVw9DVGCP9Yfk8wow2wo0etjSV5KkiUBbfC3I9LbXR8YzvkdReyR7okOwbqD-jBqt3LXpZQJITQJCHrQ9iBqkGTaUB_ZjjCXDLINxdA2fDB1OXP0q1cj34_UeSITVSJ2Uq67ze5tNF_F4yF6NqSqph"
-                    />
+                    <a href="/"
+                        ><img
+                            alt="Cork vegans logo"
+                            class="w-auto object-contain h-[48px] brightness-0 invert"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKex_8dLz3rzI4alE42gZC5fGcaDFjcq-kg-pthfUo5l9RqLU50Ls1kEkgmpphwCEXQqKuSQb9Z3o_QnZm4X4iVAlr898FveD9AxfQWRJZZWSklKdVas-4zWMVw9DVGCP9Yfk8wow2wo0etjSV5KkiUBbfC3I9LbXR8YzvkdReyR7okOwbqD-jBqt3LXpZQJITQJCHrQ9iBqkGTaUB_ZjjCXDLINxdA2fDB1OXP0q1cj34_UeSITVSJ2Uq67ze5tNF_F4yF6NqSqph"
+                        />
+                    </a>
                 </div>
+
                 <nav class="flex flex-wrap justify-center gap-lg">
                     <a
                         class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors !text-on-primary/80 hover:!text-white"
-                        href="#"
+                        href="#events"
                         >Events</a
                     >
                     <a
                         class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors !text-on-primary/80 hover:!text-white"
-                        href="#"
+                        href="#communityLinks"
                         >Community links</a
                     >
                 </nav>
