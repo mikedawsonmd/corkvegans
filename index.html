@@ -13,6 +13,13 @@
             href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
             rel="stylesheet"
         />
+        <script>
+            document.addEventListener("dragstart", function (e) {
+                if (e.target.tagName === "IMG") {
+                    e.preventDefault();
+                }
+            });
+        </script>
         <script id="tailwind-config">
             tailwind.config = {
                 darkMode: "class",
@@ -69,8 +76,8 @@
                         },
                         borderRadius: {
                             DEFAULT: "1rem",
-                            lg: "2rem",
-                            xl: "3rem",
+                            lg: "1.5rem",
+                            xl: "2rem",
                             full: "9999px",
                         },
                         spacing: {
@@ -197,7 +204,7 @@
                 <div
                     class="flex items-center gap-sm transition-transform duration-200 active:scale-95"
                 >
-                    <a href="/corkvegans">
+                    <a href="/">
                         <img
                             alt="Cork vegans logo"
                             class="w-auto object-contain h-[48px]"
@@ -784,6 +791,9 @@
                                 >
                                     <img
                                         alt="Eventbrite"
+                                        draggable="{false}"
+                                        select-none
+                                        pointer-events-none
                                         class="w-[32px] h-[32px] object-contain"
                                         src="images/socials/eventbrite.png"
                                     />
@@ -811,7 +821,7 @@
                 class="flex flex-col md:flex-row items-center justify-between gap-md px-xl py-lg w-[calc(100%-2*theme(spacing.margin-mobile))] max-w-7xl mx-auto bg-primary text-on-primary shadow-lg mb-md rounded-lg"
             >
                 <div class="flex items-center gap-sm">
-                    <a href="/corkvegans"
+                    <a href="/"
                         ><img
                             alt="Cork vegans logo"
                             class="w-auto object-contain h-[48px] brightness-0 invert"
