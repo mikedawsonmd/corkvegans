@@ -144,6 +144,24 @@
             };
         </script>
         <style>
+            [id] {
+                scroll-margin-top: 96px;
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                html {
+                    scroll-behavior: auto;
+                }
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    scroll-behavior: auto !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
             .material-symbols-outlined {
                 font-variation-settings:
                     "FILL" 0,
@@ -196,27 +214,32 @@
     >
         <!-- TopAppBar -->
         <header
-            class="sticky top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm"
+            id="siteHeader"
+            class="sticky top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm transition-all duration-300"
         >
             <div
-                class="flex justify-between items-center px-margin-mobile py-lg w-full max-w-7xl mx-auto rounded-b-2xl"
+                id="headerInner"
+                class="flex justify-between items-center px-margin-mobile py-lg w-full max-w-7xl mx-auto rounded-b-2xl transition-all duration-300"
             >
-                <div
+                <a
+                    href="/"
+                    aria-label="Cork Vegans home"
                     class="flex items-center gap-sm transition-transform duration-200 active:scale-95"
                 >
-                    <a href="/">
-                        <img
-                            alt="Cork vegans logo"
-                            class="w-auto object-contain h-[48px]"
-                            src="images/logo.png"
-                        />
-                    </a>
-                </div>
+                    <img
+                        id="headerLogo"
+                        alt="Cork Vegans logo"
+                        class="w-auto object-contain h-[48px] transition-all duration-300"
+                        src="images/logo.png"
+                    />
+                </a>
+
                 <a
-                    class="bg-primary text-on-primary font-label-bold text-label-bold px-lg py-sm rounded-full hover:bg-surface-tint transition-all active:scale-95 shadow-sm"
+                    id="headerButton"
+                    class="bg-primary text-on-primary font-label-bold text-label-bold px-lg py-sm rounded-full hover:bg-surface-tint transition-all duration-300 active:scale-95 shadow-sm"
                     href="#communityLinks"
                 >
-                    Community links
+                    Get connected
                 </a>
             </div>
         </header>
@@ -259,7 +282,7 @@
                             class="bg-white/10 backdrop-blur-lg border border-white/20 text-white font-label-bold text-label-bold px-xl py-lg rounded-full hover:bg-white/20 transition-all active:scale-95"
                             href="#communityLinks"
                         >
-                            Community links
+                            Get connected
                         </a>
                     </div>
                 </div>
@@ -271,7 +294,7 @@
                 </div>
             </section>
             <!-- About Section -->
-            <section class="pt-xl pb-md bg-surface">
+            <section class="pt-xl pb-xl bg-surface">
                 <div class="max-w-7xl mx-auto px-margin-mobile">
                     <div class="flex flex-col lg:flex-row items-center gap-xl">
                         <div class="lg:w-1/2 relative">
@@ -428,7 +451,7 @@
                                 <img
                                     alt="Event cover image"
                                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    src="https://lh3.googleusercontent.com/aida/ADBb0uhz5382g7mAQvh3pLydJ9Zt_ZCkyh8jVMBlp20gdnfqH_zT_2TLeodJATOHV8Ae99q1XpUtg_ixhpNl3zLIF21aCv6Stbe0-VG1y4ZulUZ1LNtDl72qjvEbtjLw6axqbEglB05yPW-TVUuHZCnxFSzpyWJS5h0lqB9krLxRrgPDwypglNnpTAQXqlQ-gAzvyAS25NVzKJ6HCaoWzQ33qgtOasBLI4cB0hmpL--5ibDU-2NYEDUjSoiQJ6tp"
+                                    src="images/hero.jpg"
                                 />
                                 <div
                                     class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-md py-sm rounded-lg text-center shadow-md"
@@ -493,7 +516,7 @@
                                     <button
                                         class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold hover:bg-surface-tint transition-all active:scale-95"
                                     >
-                                        Join on meetup
+                                        View on Meetup
                                     </button>
                                 </div>
                             </div>
@@ -508,7 +531,7 @@
                                 <img
                                     alt="Event cover image"
                                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    src="https://lh3.googleusercontent.com/aida/ADBb0ugGDyEPju61D8MeXb-v6SZolzPdl6N48RyfxKaQkem9rDYo3I4VfB49tUI_yx-OOK7BOhAxaf-ZOKJurgPYrcv4TNQkSq4ubr6LTY84sWQ1RFS8iJ9wBh4CVho3O4ZF3P4r8OMH3mmWMQKKumLUB8euSYjDjzZbQ2FbkNZAHqbgc3tcFBwOgziuAfkSwtTnIxll5WMWapEqZd2I315-Ooz0b-mq8yN8IGfdWxRPT6Y3Y10KAXPBOv7vr1I"
+                                    src="images/hero.jpg"
                                 />
                                 <div
                                     class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-md py-sm rounded-lg text-center shadow-md"
@@ -574,7 +597,7 @@
                                     <button
                                         class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold hover:bg-surface-tint transition-all active:scale-95"
                                     >
-                                        Join on meetup
+                                        View on Meetup
                                     </button>
                                 </div>
                             </div>
@@ -589,7 +612,7 @@
                                 <img
                                     alt="Event cover image"
                                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    src="https://lh3.googleusercontent.com/aida/ADBb0ujUgrG3dGUmYCh0mLdfFpu_12Y0syVm4-zuqyGI5k-E6FwN7esoYEGbMpPjVW-VNQ6U9ihfx3LnkYPt6_U_1V3iqZyAPK6CobVE1P6TcIe1WQwrtjKWJcOtTS6QbVy2ovQm7B909egI-3lWPZbbimrbfdhTnA6Nbc4diDGvDqbQhlSK8MKJY71QD7hPaeVQpPP0K7ZoFg4idu7S3YmgR9PIm-AnCXkdjLfsrpE-IDA8n1ZiAT7oj8-BG28"
+                                    src="images/hero.jpg"
                                 />
                                 <div
                                     class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-md py-sm rounded-lg text-center shadow-md"
@@ -656,7 +679,7 @@
                                     <button
                                         class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold hover:bg-surface-tint transition-all active:scale-95"
                                     >
-                                        Join on meetup
+                                        View on Meetup
                                     </button>
                                 </div>
                             </div>
@@ -675,14 +698,13 @@
                         <h2
                             class="font-headline-lg text-headline-lg font-extrabold text-on-surface"
                         >
-                            Let's get social
+                            Get connected
                         </h2>
                         <p
                             class="font-body-lg text-body-lg max-w-xl opacity-90 text-on-surface-variant"
                         >
-                            Stay in the loop with daily updates, food pics, and
-                            community polls. Choose your favorite platform and
-                            jump in!
+                            Stay in the loop with events, food pics, and other
+                            updates. Choose your favorite platforms and jump in!
                         </p>
                         <div
                             class="grid grid-cols-1 md:grid-cols-3 gap-md w-full mt-md max-w-5xl lg:grid-cols-5"
@@ -754,7 +776,7 @@
                                 >
                                 <span
                                     class="text-label-sm text-on-surface-variant"
-                                    >Cork Vegans Community</span
+                                    >Join our Community</span
                                 >
                             </a>
                             <a
@@ -780,7 +802,7 @@
                                     >@corkvegans</span
                                 >
                             </a>
-                            <a
+                            <!-- <a
                                 class="bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
                                 href="https://www.eventbrite.ie/o/cork-vegans-91797524863"
                                 target="_blank"
@@ -805,6 +827,33 @@
                                 <span
                                     class="text-label-sm text-on-surface-variant"
                                     >Cork Vegans</span
+                                >
+                            </a> -->
+                            <a
+                                class="bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
+                                href="https://maps.app.goo.gl/2pRjVTprqDZsYrKp8"
+                                target="_blank"
+                            >
+                                <div
+                                    class="w-16 h-16 rounded-full flex items-center justify-center text-white mb-sm group-hover:rotate-12 transition-transform"
+                                    style="background-color: #417660"
+                                >
+                                    <img
+                                        alt="Eventbrite"
+                                        draggable="{false}"
+                                        select-none
+                                        pointer-events-none
+                                        class="w-[32px] h-[32px] object-contain"
+                                        src="images/socials/foodmap.png"
+                                    />
+                                </div>
+                                <span
+                                    class="font-label-bold text-headline-md text-on-surface"
+                                    >Dining</span
+                                >
+                                <span
+                                    class="text-label-sm text-on-surface-variant"
+                                    >Vegan food in Cork</span
                                 >
                             </a>
                         </div>
@@ -839,7 +888,7 @@
                     <a
                         class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors !text-on-primary/80 hover:!text-white"
                         href="#communityLinks"
-                        >Community links</a
+                        >Get connected</a
                     >
                 </nav>
                 <div class="w-full h-px bg-outline-variant/30 hidden"></div>
@@ -854,18 +903,53 @@
         </footer>
         <!-- Interactive Micro-interactions -->
         <script>
-            // Smooth scroll for anchors
+            const header = document.getElementById("siteHeader");
+            const headerInner = document.getElementById("headerInner");
+            const logo = document.getElementById("headerLogo");
+            const button = document.getElementById("headerButton");
+
+            function setHeaderState() {
+                const isScrolled = window.scrollY > 40;
+
+                header.classList.toggle("shadow-md", isScrolled);
+                header.classList.toggle("bg-surface/95", isScrolled);
+                header.classList.toggle("bg-surface/80", !isScrolled);
+
+                headerInner.classList.toggle("py-sm", isScrolled);
+                headerInner.classList.toggle("py-lg", !isScrolled);
+
+                logo.classList.toggle("h-[36px]", isScrolled);
+                logo.classList.toggle("h-[48px]", !isScrolled);
+
+                button.classList.toggle("px-md", isScrolled);
+                button.classList.toggle("py-xs", isScrolled);
+                button.classList.toggle("px-lg", !isScrolled);
+                button.classList.toggle("py-sm", !isScrolled);
+            }
+
+            window.addEventListener("scroll", setHeaderState, {
+                passive: true,
+            });
+            window.addEventListener("load", setHeaderState);
+
             document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
                 anchor.addEventListener("click", function (e) {
-                    e.preventDefault();
                     const target = document.querySelector(
                         this.getAttribute("href"),
                     );
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: "smooth",
-                        });
-                    }
+
+                    if (!target) return;
+
+                    e.preventDefault();
+
+                    const prefersReducedMotion = window.matchMedia(
+                        "(prefers-reduced-motion: reduce)",
+                    ).matches;
+
+                    target.scrollIntoView({
+                        behavior: prefersReducedMotion ? "auto" : "smooth",
+                        block: "start",
+                    });
                 });
             });
         </script>
