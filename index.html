@@ -3,6 +3,24 @@
     <head>
         <meta charset="utf-8" />
         <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <!-- Link preview image -->
+        <meta property="og:title" content="Cork Vegans" />
+        <meta
+            property="og:description"
+            content="Join Cork's vibrant vegan community for meetups, dining events, potlucks, and vegan living."
+        />
+        <meta property="og:image" content="images/bio.jpg" />
+        <meta property="og:url" content="https://corkvegans.ie/" />
+        <meta property="og:type" content="website" />
+
+        <!-- Twitter / X preview -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Cork Vegans" />
+        <meta
+            name="twitter:description"
+            content="Join Cork's vibrant vegan community for meetups, dining events, potlucks, and vegan living."
+        />
+        <meta name="twitter:image" content="images/bio.jpg" />
         <title>Cork Vegans</title>
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <link
@@ -211,6 +229,7 @@
     </head>
     <body
         class="bg-background text-on-background font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container"
+        id="top"
     >
         <!-- TopAppBar -->
         <header
@@ -222,7 +241,7 @@
                 class="flex justify-between items-center px-margin-mobile py-lg w-full max-w-7xl mx-auto rounded-b-2xl transition-all duration-300"
             >
                 <a
-                    href="/"
+                    href="#top"
                     aria-label="Cork Vegans home"
                     class="flex items-center gap-sm transition-transform duration-200 active:scale-95"
                 >
@@ -870,10 +889,13 @@
                 class="flex flex-col md:flex-row items-center justify-between gap-md px-xl py-lg w-[calc(100%-2*theme(spacing.margin-mobile))] max-w-7xl mx-auto bg-primary text-on-primary shadow-lg mb-md rounded-lg"
             >
                 <div class="flex items-center gap-sm">
-                    <a href="/"
+                    <a
+                        href="#top"
+                        class="flex items-center gap-sm transition-transform duration-200 active:scale-95"
+                        aria-label="Cork Vegans home"
                         ><img
                             alt="Cork vegans logo"
-                            class="w-auto object-contain h-[48px] brightness-0 invert"
+                            class="w-auto object-contain h-[48px] transition-all duration-300 brightness-0 invert"
                             src="images/logo.png"
                         />
                     </a>
