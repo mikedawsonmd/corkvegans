@@ -32,7 +32,7 @@
             + ' aria-label="' + esc(ev.title) + '">'
 
             // Left: logo panel with date badge
-            + '<div class="md:w-1/3 h-48 md:h-auto relative overflow-hidden flex items-center justify-center" style="background:#f0fdf4">'
+            + '<div class="md:w-1/3 h-48 md:h-auto relative overflow-hidden flex items-center justify-center" style="background:#ffffff">'
             +   '<img alt="Cork Vegans" class="w-32 h-auto object-contain transition-transform duration-500 group-hover:scale-110 opacity-80" src="images/logo.png" />'
             +   '<div class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-md py-sm rounded-lg text-center shadow-md">'
             +     '<span class="block font-label-bold text-label-sm text-secondary uppercase">' + esc(month) + '</span>'
