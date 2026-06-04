@@ -40,10 +40,13 @@
 
             e.preventDefault();
 
+            var headerHeight = header ? header.getBoundingClientRect().height : 0;
+            var targetTop = target.getBoundingClientRect().top + window.scrollY - headerHeight;
             var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-            target.scrollIntoView({
+
+            window.scrollTo({
+                top: targetTop,
                 behavior: prefersReducedMotion ? "auto" : "smooth",
-                block: "start",
             });
         });
     });
