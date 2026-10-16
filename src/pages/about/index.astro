@@ -1,0 +1,34 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import AboutIntro from "../../components/AboutIntro.astro";
+import ConnectSections from "../../components/ConnectSections.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import SupportTeaser from "../../components/SupportTeaser.astro";
+import { organizationJsonLd } from "../../lib/seo";
+
+const description =
+    "Cork Vegans is a community for vegans and the veg-curious in Cork — coffee meetups, dining events, potlucks, outdoor adventures and more.";
+---
+
+<BaseLayout title="About" description={description} jsonLd={[organizationJsonLd()]}>
+    <PageHeader eyebrow="About us" title="About Cork Vegans" />
+    <AboutIntro />
+    <section class="pt-xl pb-xl bg-surface-container-lowest" aria-labelledby="join-heading">
+        <div class="max-w-5xl mx-auto px-margin-mobile flex flex-col items-center text-center gap-md">
+            <h2 id="join-heading" class="font-headline-lg text-headline-lg text-on-surface">Come along</h2>
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                Whether you're a lifelong vegan or just curious about tofu and plant-based living, there's a seat for you
+                at our table. The easiest way to start is to join one of our events.
+            </p>
+            <a
+                href="/events/"
+                class="mt-sm inline-flex items-center gap-sm bg-primary text-on-primary font-label-bold text-label-bold px-xl py-md rounded-full pill-shadow hover:bg-surface-tint transition-all active:scale-95"
+            >
+                See upcoming events
+                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_forward</span>
+            </a>
+        </div>
+    </section>
+    <SupportTeaser />
+    <ConnectSections />
+</BaseLayout>

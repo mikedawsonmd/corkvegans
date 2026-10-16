@@ -1,0 +1,103 @@
+---
+import { nav } from "../config/site";
+
+const path = Astro.url.pathname;
+const isActive = (href: string) => path === href || path.startsWith(href);
+const linkBase =
+    "relative font-label-bold text-label-bold rounded-full px-sm py-sm transition-colors hover:text-primary";
+---
+
+<!-- TopAppBar -->
+<header
+    id="siteHeader"
+    class="sticky top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm transition-all duration-300"
+>
+    <div
+        id="headerInner"
+        class="flex justify-between items-center gap-md px-margin-mobile py-lg w-full max-w-7xl mx-auto rounded-b-2xl transition-all duration-300"
+    >
+        <a
+            href="/"
+            aria-label="Cork Vegans home"
+            class="flex items-center gap-sm shrink-0 transition-transform duration-200 active:scale-95"
+        >
+            <img
+                id="headerLogo"
+                alt="Cork Vegans logo"
+                class="w-auto object-contain h-[48px] transition-all duration-300"
+                src="/images/logo.png"
+                width="466"
+                height="332"
+            />
+        </a>
+
+        <nav aria-label="Main" class="hidden md:block">
+            <ul class="flex items-center gap-md lg:gap-lg">
+                {
+                    nav.map((item) => (
+                        <li>
+                            <a
+                                href={item.href}
+                                aria-current={isActive(item.href) ? "page" : undefined}
+                                class:list={[
+                                    linkBase,
+                                    isActive(item.href)
+                                        ? "text-primary after:absolute after:left-sm after:right-sm after:-bottom-[2px] after:h-[3px] after:rounded-full after:bg-primary"
+                                        : "text-on-surface-variant",
+                                ]}
+                            >
+                                {item.label}
+                            </a>
+                        </li>
+                    ))
+                }
+            </ul>
+        </nav>
+
+        <div class="flex items-center gap-sm">
+            <a
+                id="headerButton"
+                class="bg-primary text-on-primary font-label-bold text-label-bold px-lg py-sm rounded-full hover:bg-surface-tint transition-all duration-300 active:scale-95 shadow-sm whitespace-nowrap"
+                href="/#communityLinks"
+            >
+                Get connected
+            </a>
+            <button
+                id="menuButton"
+                type="button"
+                class="md:hidden inline-flex items-center justify-center w-[44px] h-[44px] rounded-full text-on-surface hover:bg-surface-container-high transition-colors"
+                aria-expanded="false"
+                aria-controls="mobileMenu"
+            >
+                <span class="material-symbols-outlined" aria-hidden="true" data-menu-icon>menu</span>
+                <span class="sr-only">Menu</span>
+            </button>
+        </div>
+    </div>
+
+    <nav
+        id="mobileMenu"
+        aria-label="Main"
+        class="md:hidden border-t border-surface-variant bg-surface"
+        hidden
+    >
+        <ul class="flex flex-col max-w-7xl mx-auto px-margin-mobile py-sm">
+            {
+                nav.map((item) => (
+                    <li>
+                        <a
+                            href={item.href}
+                            aria-current={isActive(item.href) ? "page" : undefined}
+                            class:list={[
+                                "flex items-center min-h-[48px] px-md rounded-lg font-label-bold text-body-lg transition-colors hover:bg-surface-container-high",
+                                isActive(item.href) ? "text-primary bg-surface-container-low" : "text-on-surface",
+                            ]}
+                        >
+                            {item.label}
+                        </a>
+                    </li>
+                ))
+            }
+        </ul>
+    </nav>
+</header>

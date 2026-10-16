@@ -1,0 +1,42 @@
+---
+/**
+ * The site's section heading pattern: small uppercase eyebrow, large title,
+ * short coloured bar. The bar keeps the original colour; the eyebrow text uses
+ * a slightly darker shade so it meets WCAG AA contrast.
+ */
+interface Props {
+    eyebrow?: string;
+    title: string;
+    level?: "h1" | "h2";
+    /** Bar colour (decorative). */
+    accent?: string;
+    /** Eyebrow text colour (must meet 4.5:1 on the background). */
+    eyebrowColor?: string;
+    intro?: string;
+    id?: string;
+}
+
+const {
+    eyebrow,
+    title,
+    level = "h2",
+    accent = "#f64060",
+    eyebrowColor = "#d42a4a",
+    intro,
+    id,
+} = Astro.props;
+const Heading = level;
+---
+
+<div class="flex flex-col items-center text-center gap-sm mb-xl">
+    {
+        eyebrow && (
+            <span class="font-label-bold text-label-sm uppercase tracking-[0.2em]" style={`color: ${eyebrowColor}`}>
+                {eyebrow}
+            </span>
+        )
+    }
+    <Heading id={id} class="font-headline-lg text-headline-lg text-on-surface">{title}</Heading>
+    <div class="h-1.5 w-20 rounded-full mt-xs" style={`background-color: ${accent}`} aria-hidden="true"></div>
+    {intro && <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mt-sm">{intro}</p>}
+</div>

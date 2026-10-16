@@ -1,0 +1,20 @@
+---
+/** Top-of-page heading block for inner pages, using the site's section heading pattern. */
+import SectionHeading from "./SectionHeading.astro";
+
+interface Props {
+    eyebrow?: string;
+    title: string;
+    intro?: string;
+    accent?: string;
+    eyebrowColor?: string;
+}
+const props = Astro.props;
+---
+
+<section class="pt-xl pb-sm bg-surface">
+    <div class="max-w-7xl mx-auto px-margin-mobile pt-lg">
+        <SectionHeading {...props} level="h1" />
+        <slot />
+    </div>
+</section>

@@ -1,0 +1,97 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import AboutIntro from "../components/AboutIntro.astro";
+import ConnectSections from "../components/ConnectSections.astro";
+import EventList from "../components/EventList.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import StoryCard from "../components/StoryCard.astro";
+import SupportTeaser from "../components/SupportTeaser.astro";
+import { getEventsAsOf, getUpcomingEvents } from "../lib/events/data";
+import { getStories } from "../lib/content";
+import { organizationJsonLd } from "../lib/seo";
+import { site } from "../config/site";
+
+const events = getUpcomingEvents();
+const latestStories = getStories().slice(0, 3);
+const button =
+    "inline-flex items-center gap-sm bg-primary text-on-primary font-label-bold text-label-bold px-xl py-md rounded-full pill-shadow hover:bg-surface-tint transition-all active:scale-95";
+---
+
+<BaseLayout
+    image={{ src: "/images/bio.jpg", width: 1500, height: 1261, alt: "Smiling Cork Vegans members gathered around a sheep in a field" }}
+    jsonLd={[{ "@context": "https://schema.org", "@type": "WebSite", name: site.name, url: `${site.url}/` }, organizationJsonLd()]}
+>
+    <!-- Hero Section -->
+    <section class="relative min-h-[751px] flex items-center overflow-hidden" data-surface="dark">
+        <div class="absolute inset-0 z-0">
+            <img alt="" class="w-full h-full object-cover" src="/images/hero.jpg" width="2000" height="1363" fetchpriority="high" />
+            <div class="absolute inset-0 bg-black/50"></div>
+        </div>
+        <div class="relative z-10 w-full max-w-7xl mx-auto px-margin-mobile flex flex-col items-start gap-lg">
+            <h1 class="font-display-lg text-display-lg text-white max-w-2xl leading-tight">Welcome to Cork Vegans</h1>
+            <p class="font-body-lg text-body-lg text-surface-variant max-w-lg">
+                Join Cork's vibrant vegan community. Whether you're a lifelong vegan or just curious about tofu and
+                plant-based living, there's a seat for you at our table.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-md mt-md">
+                <a
+                    class="bg-primary text-on-primary font-label-bold text-label-bold px-xl py-lg rounded-full pill-shadow flex items-center justify-center gap-sm hover:bg-surface-tint transition-all active:scale-95"
+                    href="#events"
+                >
+                    Upcoming events
+                </a>
+                <a
+                    class="bg-white/10 backdrop-blur-lg border border-white/20 text-white font-label-bold text-label-bold px-xl py-lg rounded-full hover:bg-white/20 transition-all active:scale-95"
+                    href="#communityLinks"
+                >
+                    Get connected
+                </a>
+            </div>
+        </div>
+        <!-- Floating Decoration -->
+        <div class="absolute bottom-0 right-0 p-xl hidden md:block" aria-hidden="true">
+            <div class="w-64 h-64 asymmetric-shape bg-primary opacity-20 animate-float"></div>
+        </div>
+    </section>
+
+    <AboutIntro showMoreLink />
+
+    <!-- Events Section -->
+    <section class="pt-xl pb-xl bg-surface-container-lowest" id="events" aria-labelledby="events-heading">
+        <div class="max-w-7xl mx-auto px-margin-mobile">
+            <SectionHeading id="events-heading" eyebrow="What's on" title="Upcoming events" />
+            <EventList events={events} limit={3} asOf={getEventsAsOf()} label="Upcoming Cork Vegans events" />
+            <div class="flex justify-center mt-xl">
+                <a href="/events/" class={button}>
+                    View all events
+                    <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_forward</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {
+        latestStories.length > 0 && (
+            <section class="pt-xl pb-xl bg-surface" aria-labelledby="stories-heading">
+                <div class="max-w-7xl mx-auto px-margin-mobile">
+                    <SectionHeading id="stories-heading" eyebrow="Stories & updates" title="Latest stories" accent="#417660" eyebrowColor="#275d49" />
+                    <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+                        {latestStories.map((story) => (
+                            <StoryCard story={story} />
+                        ))}
+                    </ul>
+                    <div class="flex justify-center mt-xl">
+                        <a href="/stories/" class={button}>
+                            View all stories
+                            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        )
+    }
+
+    <SupportTeaser />
+
+    <ConnectSections />
+</BaseLayout>

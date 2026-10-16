@@ -1,0 +1,20 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Page not found" description="Sorry, we couldn't find that page." noindex>
+    <section class="pt-xl pb-xl bg-surface">
+        <div class="max-w-3xl mx-auto px-margin-mobile py-xl flex flex-col items-center text-center gap-lg">
+            <div class="w-20 h-20 rounded-full bg-surface-container-low flex items-center justify-center text-4xl" aria-hidden="true">🌱</div>
+            <h1 class="font-headline-lg text-headline-lg text-on-surface">Page not found</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">
+                Sorry, we couldn't find that page. It may have moved, or the link might be mistyped.
+            </p>
+            <ul class="flex flex-wrap justify-center gap-md">
+                <li><a href="/" class="inline-flex min-h-[44px] items-center bg-primary text-on-primary px-xl rounded-full font-label-bold text-label-bold hover:bg-surface-tint">Go to the homepage</a></li>
+                <li><a href="/events/" class="inline-flex min-h-[44px] items-center px-xl rounded-full border border-outline-variant font-label-bold text-label-bold hover:bg-surface-container-high">Events</a></li>
+                <li><a href="/stories/" class="inline-flex min-h-[44px] items-center px-xl rounded-full border border-outline-variant font-label-bold text-label-bold hover:bg-surface-container-high">Stories</a></li>
+            </ul>
+        </div>
+    </section>
+</BaseLayout>

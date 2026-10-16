@@ -1,0 +1,242 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ════════════════════════════════════════════════════════════════════════
+   Original site styles (formerly styles.css) — unchanged
+   ════════════════════════════════════════════════════════════════════════ */
+/* ── Scroll offset for sticky header ─────────────────────────────────────── */
+[id] {
+    scroll-margin-top: 96px;
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ── Material icons default style ────────────────────────────────────────── */
+.material-symbols-outlined {
+    font-variation-settings:
+        "FILL" 0,
+        "wght" 400,
+        "GRAD" 0,
+        "opsz" 24;
+}
+
+/* ── Utility classes ─────────────────────────────────────────────────────── */
+.pill-shadow {
+    box-shadow: 0 10px 30px -10px rgba(65, 118, 96, 0.3);
+}
+
+.asymmetric-shape {
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+}
+
+/* ── Floating decoration animation ──────────────────────────────────────── */
+@keyframes float {
+    0%   { transform: translateY(0px)   rotate(0deg); }
+    50%  { transform: translateY(-10px) rotate(2deg); }
+    100% { transform: translateY(0px)   rotate(0deg); }
+}
+
+.animate-float {
+    animation: float 4s ease-in-out infinite;
+}
+
+/* ── Body min-height ─────────────────────────────────────────────────────── */
+body {
+    min-height: max(884px, 100dvh);
+}
+
+/* ── Meetup event card skeleton loader ───────────────────────────────────── */
+@keyframes cv-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.cv-skeleton {
+    background: linear-gradient(90deg, #ece7e8 25%, #e0dada 50%, #ece7e8 75%);
+    background-size: 200% 100%;
+    animation: cv-shimmer 1.4s infinite;
+    border-radius: 1rem;
+    min-height: 160px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   Additions for the multipage site
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── The hidden attribute always wins over display utilities (e.g. "flex") ── */
+[hidden]:not([hidden="until-found"]) {
+    display: none !important;
+}
+
+/* ── Visible keyboard focus (WCAG 2.4.7 / 2.4.11) ───────────────────────── */
+:focus-visible {
+    outline: 3px solid #1d1b1c;
+    outline-offset: 3px;
+}
+
+[data-surface="dark"] :focus-visible {
+    outline-color: #ffffff;
+}
+
+/* ── Skip link ───────────────────────────────────────────────────────────── */
+.cv-skip-link {
+    position: absolute;
+    left: 16px;
+    top: -100px;
+    z-index: 100;
+}
+
+.cv-skip-link:focus {
+    top: 16px;
+}
+
+/* ── Line clamp helper for card excerpts ─────────────────────────────────── */
+.cv-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ── Article typography ──────────────────────────────────────────────────── */
+.cv-prose {
+    color: #1d1b1c;
+    font-size: 18px;
+    line-height: 30px;
+    max-width: 68ch;
+    overflow-wrap: break-word;
+}
+
+.cv-prose > * + * {
+    margin-top: 1.25em;
+}
+
+.cv-prose h2 {
+    font-size: 28px;
+    line-height: 36px;
+    font-weight: 600;
+    margin-top: 1.8em;
+}
+
+.cv-prose h3 {
+    font-size: 22px;
+    line-height: 30px;
+    font-weight: 600;
+    margin-top: 1.6em;
+}
+
+.cv-prose h4 {
+    font-size: 18px;
+    line-height: 28px;
+    font-weight: 700;
+    margin-top: 1.4em;
+}
+
+.cv-prose a {
+    color: #275d49;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.cv-prose a:hover {
+    color: #336853;
+}
+
+.cv-prose ul,
+.cv-prose ol {
+    padding-left: 1.5em;
+}
+
+.cv-prose ul {
+    list-style: disc;
+}
+
+.cv-prose ol {
+    list-style: decimal;
+}
+
+.cv-prose li + li {
+    margin-top: 0.4em;
+}
+
+.cv-prose li::marker {
+    color: #275d49;
+}
+
+.cv-prose blockquote {
+    border-left: 4px solid #417660;
+    background: #f8f2f3;
+    border-radius: 0 1rem 1rem 0;
+    padding: 16px 24px;
+    font-style: italic;
+    color: #404944;
+}
+
+.cv-prose img {
+    border-radius: 1rem;
+    width: 100%;
+    height: auto;
+}
+
+.cv-prose figure figcaption {
+    color: #404944;
+    font-size: 14px;
+    line-height: 20px;
+    margin-top: 8px;
+    text-align: center;
+}
+
+.cv-prose hr {
+    border: 0;
+    border-top: 1px solid #c0c9c2;
+    margin: 2.5em 0;
+}
+
+.cv-prose code {
+    background: #f2eced;
+    border-radius: 6px;
+    padding: 0.1em 0.35em;
+    font-size: 0.9em;
+}
+
+.cv-prose pre {
+    background: #f2eced;
+    border-radius: 1rem;
+    padding: 16px;
+    overflow-x: auto;
+}
+
+.cv-prose pre code {
+    background: none;
+    padding: 0;
+}
+
+.cv-prose table {
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 16px;
+}
+
+.cv-prose th,
+.cv-prose td {
+    border: 1px solid #c0c9c2;
+    padding: 8px 12px;
+    text-align: left;
+}

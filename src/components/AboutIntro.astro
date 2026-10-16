@@ -1,0 +1,77 @@
+---
+/** "Community first, plants always." — the original homepage about section. */
+interface Props {
+    level?: "h1" | "h2";
+    showMoreLink?: boolean;
+}
+const { level = "h2", showMoreLink = false } = Astro.props;
+const Heading = level;
+
+const activities = [
+    { icon: "restaurant", title: "Dining and potlucks", text: "Exploring Cork's best vegan-friendly spots and get together." },
+    { icon: "hiking", title: "Adventures", text: "Day trips and outdoor walks for the active souls." },
+    { icon: "volunteer_activism", title: "Volunteering", text: "Support local sanctuaries and help build the community." },
+    { icon: "campaign", title: "Activism", text: "Support animal rights campaigns and outreach." },
+];
+---
+
+<section class="pt-xl pb-xl bg-surface" aria-labelledby="about-heading">
+    <div class="max-w-7xl mx-auto px-margin-mobile">
+        <div class="flex flex-col lg:flex-row items-center gap-xl">
+            <div class="lg:w-1/2 relative">
+                <div
+                    class="absolute -top-10 -left-10 w-40 h-40 asymmetric-shape bg-tertiary-container opacity-20 -z-10 animate-float"
+                    aria-hidden="true"
+                >
+                </div>
+                <img
+                    alt="Smiling Cork Vegans members gathered around a sheep in a field"
+                    class="rounded-lg shadow-2xl relative z-10 w-full aspect-[1.4] object-cover"
+                    src="/images/bio.jpg"
+                    width="1500"
+                    height="1261"
+                    loading="lazy"
+                    decoding="async"
+                />
+            </div>
+            <div class="lg:w-1/2 flex flex-col gap-md">
+                <Heading id="about-heading" class="font-headline-lg text-headline-lg text-on-surface">
+                    Community first, <br /><span class="text-secondary">plants always.</span>
+                </Heading>
+                <p class="font-body-lg text-body-lg text-on-surface-variant">
+                    Cork Vegans isn't just about what's on your plate - it's about who's in your circle. We host regular
+                    coffee meetups, dining events, potlucks, and outdoor adventures to bring the community together so
+                    we can build real and lasting connections.
+                </p>
+                <ul class="grid grid-cols-1 min-[400px]:grid-cols-2 gap-md mt-sm">
+                    {
+                        activities.map((a) => (
+                            <li class="p-md rounded-lg bg-surface-container-low border border-surface-variant flex flex-col gap-xs">
+                                <span
+                                    class="material-symbols-outlined text-primary"
+                                    style="font-variation-settings: 'FILL' 1;"
+                                    aria-hidden="true"
+                                >
+                                    {a.icon}
+                                </span>
+                                <p class="font-label-bold text-label-bold">{a.title}</p>
+                                <p class="text-label-sm text-on-surface-variant">{a.text}</p>
+                            </li>
+                        ))
+                    }
+                </ul>
+                {
+                    showMoreLink && (
+                        <a
+                            href="/about/"
+                            class="self-start inline-flex items-center gap-xs font-label-bold text-label-bold text-primary hover:text-surface-tint underline-offset-4 hover:underline mt-sm"
+                        >
+                            More about Cork Vegans
+                            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_forward</span>
+                        </a>
+                    )
+                }
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,49 @@
+---
+/** Concise homepage pointer to the Support us page. */
+import SectionHeading from "./SectionHeading.astro";
+
+const cards = [
+    {
+        href: "/support/#donate",
+        icon: "favorite",
+        title: "Donate",
+        text: "Chip in once or monthly to help keep Cork Vegans events and activities going.",
+        cta: "Ways to give",
+    },
+    {
+        href: "/support/#volunteer",
+        icon: "volunteer_activism",
+        title: "Volunteer",
+        text: "Lend a hand with events, photos, writing, social media or outreach.",
+        cta: "Get involved",
+    },
+];
+---
+
+<section class="pt-xl pb-xl bg-surface-container-lowest" aria-labelledby="support-heading">
+    <div class="max-w-7xl mx-auto px-margin-mobile">
+        <SectionHeading id="support-heading" eyebrow="Get involved" title="Support Cork Vegans" accent="#417660" eyebrowColor="#275d49" />
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-lg max-w-5xl mx-auto">
+            {
+                cards.map((c) => (
+                    <li>
+                        <a
+                            href={c.href}
+                            class="group h-full flex flex-col gap-sm p-lg rounded-lg bg-surface-container-low border border-surface-variant hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                        >
+                            <span class="material-symbols-outlined text-primary text-[32px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">
+                                {c.icon}
+                            </span>
+                            <span class="font-headline-md text-headline-md text-on-surface">{c.title}</span>
+                            <span class="font-body-md text-body-md text-on-surface-variant">{c.text}</span>
+                            <span class="mt-auto pt-sm inline-flex items-center gap-xs font-label-bold text-label-bold text-primary group-hover:underline underline-offset-4">
+                                {c.cta}
+                                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_forward</span>
+                            </span>
+                        </a>
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
+</section>

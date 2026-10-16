@@ -1,0 +1,54 @@
+---
+import { nav } from "../config/site";
+
+const year = new Date().getFullYear();
+const footerLinks = [...nav, { href: "/#communityLinks", label: "Get connected" }];
+const linkClass =
+    "font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors !text-on-primary/80 hover:!text-white underline-offset-4 hover:underline";
+---
+
+<!-- Footer -->
+<footer
+    class="w-full shadow-lg !shadow-none !rounded-none pb-md rounded-t-[32px] pt-xl"
+    style="background-color: rgb(255, 220, 188)"
+>
+    <div
+        data-surface="dark"
+        class="flex flex-col md:flex-row items-center justify-between gap-md px-xl py-lg w-[calc(100%-2*theme(spacing.margin-mobile))] max-w-7xl mx-auto bg-primary text-on-primary shadow-lg mb-md rounded-lg"
+    >
+        <div class="flex items-center gap-sm">
+            <a
+                href="/"
+                class="flex items-center gap-sm transition-transform duration-200 active:scale-95"
+                aria-label="Cork Vegans home"
+                ><img
+                    alt="Cork Vegans logo"
+                    class="w-auto object-contain h-[48px] transition-all duration-300 brightness-0 invert"
+                    src="/images/logo.png"
+                    width="466"
+                    height="332"
+                    loading="lazy"
+                />
+            </a>
+        </div>
+
+        <nav aria-label="Footer">
+            <ul class="flex flex-wrap justify-center gap-x-lg gap-y-sm">
+                {
+                    footerLinks.map((item) => (
+                        <li>
+                            <a class={linkClass} href={item.href}>
+                                {item.label}
+                            </a>
+                        </li>
+                    ))
+                }
+            </ul>
+        </nav>
+        <div class="flex flex-col items-center gap-sm">
+            <p class="font-body-md text-body-md text-on-surface-variant !text-on-primary/80">
+                © {year} Cork Vegans
+            </p>
+        </div>
+    </div>
+</footer>

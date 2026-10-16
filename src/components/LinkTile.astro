@@ -1,0 +1,33 @@
+---
+/** Rounded social/resource tile used in "Get connected" and "Resources". */
+interface Props {
+    href: string;
+    icon: string;
+    label: string;
+    sublabel: string;
+    /** Inline style or class for the icon circle background. */
+    circleClass?: string;
+    circleStyle?: string;
+}
+const { href, icon, label, sublabel, circleClass = "", circleStyle } = Astro.props;
+---
+
+<a
+    class="bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+>
+    <div
+        class:list={[
+            "w-16 h-16 rounded-full flex items-center justify-center text-white mb-sm group-hover:rotate-12 transition-transform",
+            circleClass,
+        ]}
+        style={circleStyle}
+    >
+        <img alt="" class="w-[32px] h-[32px] object-contain" src={icon} width="32" height="32" loading="lazy" />
+    </div>
+    <span class="font-label-bold text-headline-md text-on-surface">{label}</span>
+    <span class="text-label-sm text-on-surface-variant">{sublabel}</span>
+    <span class="sr-only">(opens in a new tab)</span>
+</a>
