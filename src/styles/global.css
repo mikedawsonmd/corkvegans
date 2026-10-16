@@ -78,6 +78,13 @@ body {
    Additions for the multipage site
    ════════════════════════════════════════════════════════════════════════ */
 
+/* ── Keep layout steady between short and long pages ─────────────────────
+   Always reserve space for the scrollbar, so the header and content don't
+   shift sideways on pages too short to scroll.                              */
+html {
+    scrollbar-gutter: stable;
+}
+
 /* ── The hidden attribute always wins over display utilities (e.g. "flex") ── */
 [hidden]:not([hidden="until-found"]) {
     display: none !important;
@@ -91,6 +98,54 @@ body {
 
 [data-surface="dark"] :focus-visible {
     outline-color: #ffffff;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────────
+   One button style for the whole site: pick a variant and a size.
+     Variants: cv-btn-primary · cv-btn-secondary · cv-btn-on-image · cv-btn-placeholder
+     Sizes:    cv-btn-lg (hero only) · cv-btn-md (default) · cv-btn-sm (header, cards, chips)
+   e.g. <a class="cv-btn cv-btn-md cv-btn-primary">…</a>                      */
+@layer components {
+    .cv-btn {
+        @apply inline-flex items-center justify-center gap-sm rounded-full text-center font-label-bold text-label-bold transition-all duration-200 active:scale-95;
+    }
+
+    .cv-btn:disabled {
+        @apply cursor-not-allowed active:scale-100;
+    }
+
+    .cv-btn-lg {
+        @apply min-h-[60px] px-xl py-md;
+    }
+
+    .cv-btn-md {
+        @apply min-h-[48px] px-xl py-sm;
+    }
+
+    .cv-btn-sm {
+        @apply min-h-[44px] px-lg py-xs;
+    }
+
+    .cv-btn-primary {
+        @apply bg-primary text-on-primary hover:bg-surface-tint;
+        box-shadow: 0 10px 30px -10px rgba(65, 118, 96, 0.3);
+    }
+
+    .cv-btn-secondary {
+        @apply border border-outline-variant bg-surface text-on-surface hover:border-outline hover:bg-surface-container-high;
+    }
+
+    .cv-btn-on-image {
+        @apply border border-white/20 bg-white/10 text-white backdrop-blur-lg hover:bg-white/20;
+    }
+
+    .cv-btn-placeholder {
+        @apply cursor-default bg-surface-container-high text-on-surface-variant active:scale-100;
+    }
+
+    .cv-btn .material-symbols-outlined {
+        font-size: 20px;
+    }
 }
 
 /* ── Skip link ───────────────────────────────────────────────────────────── */

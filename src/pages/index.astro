@@ -13,8 +13,7 @@ import { site } from "../config/site";
 
 const events = getUpcomingEvents();
 const latestStories = getStories().slice(0, 3);
-const button =
-    "inline-flex items-center gap-sm bg-primary text-on-primary font-label-bold text-label-bold px-xl py-md rounded-full pill-shadow hover:bg-surface-tint transition-all active:scale-95";
+const button = "cv-btn cv-btn-md cv-btn-primary";
 ---
 
 <BaseLayout
@@ -34,16 +33,10 @@ const button =
                 plant-based living, there's a seat for you at our table.
             </p>
             <div class="flex flex-col sm:flex-row gap-md mt-md">
-                <a
-                    class="bg-primary text-on-primary font-label-bold text-label-bold px-xl py-lg rounded-full pill-shadow flex items-center justify-center gap-sm hover:bg-surface-tint transition-all active:scale-95"
-                    href="#events"
-                >
+                <a class="cv-btn cv-btn-lg cv-btn-primary" href="#events">
                     Upcoming events
                 </a>
-                <a
-                    class="bg-white/10 backdrop-blur-lg border border-white/20 text-white font-label-bold text-label-bold px-xl py-lg rounded-full hover:bg-white/20 transition-all active:scale-95"
-                    href="#communityLinks"
-                >
+                <a class="cv-btn cv-btn-lg cv-btn-on-image" href="#communityLinks">
                     Get connected
                 </a>
             </div>
@@ -64,7 +57,7 @@ const button =
             <div class="flex justify-center mt-xl">
                 <a href="/events/" class={button}>
                     View all events
-                    <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_forward</span>
+                    <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
                 </a>
             </div>
         </div>
@@ -83,7 +76,7 @@ const button =
                     <div class="flex justify-center mt-xl">
                         <a href="/stories/" class={button}>
                             View all stories
-                            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_forward</span>
+                            <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
                         </a>
                     </div>
                 </div>

@@ -43,8 +43,11 @@ export const nav = [
     { href: "/events/", label: "Events" },
     { href: "/stories/", label: "Stories" },
     { href: "/about/", label: "About" },
-    { href: "/support/", label: "Support us" },
+    { href: "/#communityLinks", label: "Get connected" },
 ];
+
+/** The primary button in the top-right of the header. */
+export const headerCta = { href: "/support/", label: "Support us" };
 
 /**
  * Donations — REQUIRES OWNER SETUP.

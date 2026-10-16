@@ -1,10 +1,11 @@
 ---
-import { nav } from "../config/site";
+import { headerCta, nav } from "../config/site";
 
 const path = Astro.url.pathname;
-const isActive = (href: string) => path === href || path.startsWith(href);
+// In-page links like "/#communityLinks" are never the "current page".
+const isActive = (href: string) => !href.includes("#") && (path === href || path.startsWith(href));
 const linkBase =
-    "relative font-label-bold text-label-bold rounded-full px-sm py-sm transition-colors hover:text-primary";
+    "relative whitespace-nowrap font-label-bold text-label-bold rounded-full px-sm py-sm transition-colors hover:text-primary";
 ---
 
 <!-- TopAppBar -->
@@ -57,10 +58,11 @@ const linkBase =
         <div class="flex items-center gap-sm">
             <a
                 id="headerButton"
-                class="bg-primary text-on-primary font-label-bold text-label-bold px-lg py-sm rounded-full hover:bg-surface-tint transition-all duration-300 active:scale-95 shadow-sm whitespace-nowrap"
-                href="/#communityLinks"
+                class="cv-btn cv-btn-primary px-lg py-sm whitespace-nowrap duration-300"
+                href={headerCta.href}
+                aria-current={isActive(headerCta.href) ? "page" : undefined}
             >
-                Get connected
+                {headerCta.label}
             </a>
             <button
                 id="menuButton"

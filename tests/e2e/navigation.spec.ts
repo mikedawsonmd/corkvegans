@@ -49,11 +49,42 @@ test.describe("navigation", () => {
         test.skip(isMobile, "desktop navigation");
         await page.goto("/");
         const nav = page.getByRole("navigation", { name: "Main" });
-        for (const [label, path] of [["Events", "/events/"], ["Stories", "/stories/"], ["About", "/about/"], ["Support us", "/support/"]]) {
+        for (const [label, path] of [["Events", "/events/"], ["Stories", "/stories/"], ["About", "/about/"]]) {
             await nav.getByRole("link", { name: label }).click();
             await expect(page).toHaveURL(path);
             await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: label })).toHaveAttribute("aria-current", "page");
         }
+        await nav.getByRole("link", { name: "Get connected" }).click();
+        await expect(page).toHaveURL("/#communityLinks");
+        await expect(page.locator("#communityLinks")).toBeInViewport();
+    });
+
+    test("'Support us' is the primary header action on every page", async ({ page }) => {
+        for (const path of ["/", "/events/", "/stories/", "/about/"]) {
+            await page.goto(path);
+            const cta = page.locator("#headerButton");
+            await expect(cta).toHaveText("Support us");
+            await expect(cta).toHaveClass(/cv-btn-primary/);
+            await expect(cta).toBeVisible();
+        }
+        await page.locator("#headerButton").click();
+        await expect(page).toHaveURL("/support/");
+        await expect(page.locator("#headerButton")).toHaveAttribute("aria-current", "page");
+    });
+
+    test("header and logo sit in the same place on short and long pages", async ({ page, isMobile }) => {
+        test.skip(isMobile, "desktop layout");
+        await page.setViewportSize({ width: 1920, height: 1400 });
+        const positions = new Set<string>();
+        for (const path of ["/", "/stories/page/2/", "/no-such-page/", "/about/"]) {
+            await page.goto(path);
+            positions.add(await page.evaluate(() => {
+                const logo = document.getElementById("headerLogo")!.getBoundingClientRect();
+                const cta = document.getElementById("headerButton")!.getBoundingClientRect();
+                return `${Math.round(logo.x)} ${Math.round(logo.height)} ${Math.round(cta.right)}`;
+            }));
+        }
+        expect([...positions]).toHaveLength(1);
     });
 
     test("mobile menu opens, closes with Escape and returns focus", async ({ page, isMobile }) => {

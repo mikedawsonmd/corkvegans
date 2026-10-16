@@ -16,8 +16,7 @@ const direct = [
     { label: "LinkedIn", href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}` },
     { label: "Email", href: `mailto:?subject=${enc(title)}&body=${enc(url)}` },
 ];
-const pill =
-    "inline-flex items-center gap-xs min-h-[44px] px-md rounded-full border border-outline-variant bg-surface font-label-bold text-label-bold text-on-surface hover:bg-surface-container-high transition-colors";
+const pill = "cv-btn cv-btn-sm cv-btn-secondary";
 ---
 
 <section data-share data-url={url} data-title={title} aria-labelledby="share-heading" class="flex flex-col gap-md">
@@ -25,12 +24,12 @@ const pill =
     <ul class="flex flex-wrap gap-sm">
         <li data-native-share hidden>
             <button type="button" class={pill}>
-                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">share</span>Share…
+                <span class="material-symbols-outlined" aria-hidden="true">share</span>Share…
             </button>
         </li>
         <li data-copy-link hidden>
             <button type="button" class={pill}>
-                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">link</span>Copy link
+                <span class="material-symbols-outlined" aria-hidden="true">link</span>Copy link
             </button>
         </li>
         {
