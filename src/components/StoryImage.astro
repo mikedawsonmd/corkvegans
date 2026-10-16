@@ -1,0 +1,40 @@
+---
+/**
+ * Featured image for a story, optimised at build time.
+ * Falls back to a branded placeholder when there is no image (or the file is missing).
+ */
+import { Image } from "astro:assets";
+import { getStoryImage } from "../lib/content";
+
+interface Props {
+    src: string | null;
+    alt: string;
+    widths: number[];
+    sizes: string;
+    class?: string;
+    eager?: boolean;
+}
+
+const { src, alt, widths, sizes, class: className = "", eager = false } = Astro.props;
+const image = getStoryImage(src);
+---
+
+{
+    image ? (
+        <Image
+            src={image}
+            alt={alt}
+            widths={widths.filter((w) => w <= image.width)}
+            quality={75}
+            sizes={sizes}
+            format="webp"
+            class:list={["w-full object-cover", className]}
+            loading={eager ? "eager" : "lazy"}
+            fetchpriority={eager ? "high" : undefined}
+        />
+    ) : (
+        <div class:list={["w-full flex items-center justify-center bg-primary-container", className]} aria-hidden="true">
+            <img src="/images/logo.png" alt="" width="466" height="332" class="w-1/3 max-w-[160px] h-auto brightness-0 invert opacity-90" loading="lazy" />
+        </div>
+    )
+}

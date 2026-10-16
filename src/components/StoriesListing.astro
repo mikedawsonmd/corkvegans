@@ -1,0 +1,72 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHeader from "./PageHeader.astro";
+import StoryCard from "./StoryCard.astro";
+import type { Story } from "../lib/stories";
+
+interface Props {
+    stories: Story[];
+    currentPage: number;
+    lastPage: number;
+}
+
+const { stories, currentPage, lastPage } = Astro.props;
+const pageUrl = (n: number) => (n <= 1 ? "/stories/" : `/stories/page/${n}/`);
+const description = "Stories, news, reviews and updates from the Cork Vegans community.";
+const pill =
+    "inline-flex items-center gap-xs min-h-[44px] px-lg rounded-full border border-outline-variant bg-surface font-label-bold text-label-bold text-on-surface hover:bg-surface-container-high transition-colors";
+---
+
+<BaseLayout title={currentPage > 1 ? `Stories & Updates — page ${currentPage}` : "Stories & Updates"} description={description}>
+    <PageHeader
+        eyebrow="Stories"
+        title="Stories & Updates"
+        intro="News, reviews, event recaps and stories from around Cork's vegan community."
+        accent="#417660"
+        eyebrowColor="#275d49"
+    />
+    <section class="pb-xl bg-surface" aria-label="Stories">
+        <div class="max-w-7xl mx-auto px-margin-mobile">
+            {
+                stories.length > 0 ? (
+                    <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+                        {stories.map((story) => (
+                            <StoryCard story={story} headingLevel="h2" />
+                        ))}
+                    </ul>
+                ) : (
+                    <div class="flex flex-col items-center justify-center gap-lg py-xl px-lg text-center bg-surface-container-low border border-surface-variant rounded-lg max-w-3xl mx-auto">
+                        <div class="w-20 h-20 rounded-full bg-surface flex items-center justify-center text-4xl" aria-hidden="true">📝</div>
+                        <h2 class="font-headline-md text-headline-md text-on-surface">No stories yet</h2>
+                        <p class="font-body-md text-body-md text-on-surface-variant max-w-md">
+                            Our first stories are on the way. In the meantime, come along to one of our events.
+                        </p>
+                        <a href="/events/" class="bg-primary text-on-primary px-xl py-sm rounded-full font-label-bold text-label-bold hover:bg-surface-tint transition-all">
+                            See upcoming events
+                        </a>
+                    </div>
+                )
+            }
+
+            {
+                lastPage > 1 && (
+                    <nav aria-label="Stories pages" class="mt-xl flex flex-wrap items-center justify-center gap-md">
+                        {currentPage > 1 && (
+                            <a href={pageUrl(currentPage - 1)} class={pill} rel="prev">
+                                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_back</span>Newer stories
+                            </a>
+                        )}
+                        <span class="text-body-md text-on-surface-variant">
+                            Page {currentPage} of {lastPage}
+                        </span>
+                        {currentPage < lastPage && (
+                            <a href={pageUrl(currentPage + 1)} class={pill} rel="next">
+                                Older stories<span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_forward</span>
+                            </a>
+                        )}
+                    </nav>
+                )
+            }
+        </div>
+    </section>
+</BaseLayout>

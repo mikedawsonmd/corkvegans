@@ -1,0 +1,123 @@
+# Pages CMS configuration — https://pagescms.org/docs/configuration/
+#
+# Editors open https://app.pagescms.org, choose this repository, and edit
+# stories in a visual editor. Every save is a commit to this repository,
+# which triggers the "Deploy site" GitHub Action.
+#
+# Only stories and story images are exposed here on purpose: editors cannot
+# change site settings, donation links or code through the CMS.
+
+media:
+  - name: stories
+    label: Story images
+    input: src/assets/stories
+    output: /src/assets/stories
+    extensions: [jpg, jpeg, png, webp]
+    rename: safe
+
+content:
+  - name: stories
+    label: Stories
+    type: collection
+    path: src/content/stories
+    format: yaml-frontmatter
+    subfolders: false
+    exclude: [README.md, .gitkeep]
+    filename:
+      # The web address is made from the title when the story is first created
+      # and never changes afterwards, so shared links keep working.
+      template: "{primary}.md"
+      field: create
+    view:
+      primary: title
+      fields: [title, category, publishedAt, draft]
+      sort: [publishedAt, title]
+      search: [title, description, author]
+      default:
+        sort: publishedAt
+        order: desc
+    commit:
+      templates:
+        create: "Create story {filename} (via Pages CMS by {userName})"
+        update: "Update story {filename} (via Pages CMS by {userName})"
+        delete: "Delete story {filename} (via Pages CMS by {userName})"
+        rename: "Rename story {oldFilename} to {newFilename} (via Pages CMS by {userName})"
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+        options:
+          maxlength: 120
+
+      - name: description
+        label: Short summary
+        type: text
+        required: true
+        description: "One or two sentences. Shown on story cards and in link previews on WhatsApp, Facebook, LinkedIn, etc."
+        options:
+          maxlength: 300
+
+      - name: category
+        label: Category
+        type: select
+        required: true
+        default: Stories
+        options:
+          values: [Community, News, Reviews, Events, Guides, Stories]
+
+      - name: author
+        label: Author
+        type: string
+        default: Cork Vegans
+        description: "Your name, or leave as Cork Vegans."
+        options:
+          maxlength: 80
+
+      - name: publishedAt
+        label: Publish date
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+
+      - name: updatedAt
+        label: Last updated (optional)
+        type: date
+        default: ""
+        description: "Only set this if you make a significant change after publishing."
+        options:
+          format: yyyy-MM-dd
+
+      - name: featuredImage
+        label: Featured image
+        type: image
+        description: "Landscape photo, ideally 1200 × 630 pixels or larger. Keep the important part in the centre — the edges may be cropped in link previews. JPG, PNG or WebP."
+        options:
+          media: stories
+          extensions: [jpg, jpeg, png, webp]
+
+      - name: featuredImageAlt
+        label: Image description (alt text)
+        type: string
+        description: "Describe the photo for people who can't see it, e.g. \"Three people sharing a vegan pizza at a long table\". Required if you add a featured image."
+        options:
+          maxlength: 200
+
+      - name: draft
+        label: "Draft — hidden from the website (untick to publish)"
+        type: boolean
+        default: true
+        description: "While ticked, the story does not appear on corkvegans.ie. Note: drafts are still visible to anyone who looks at the public GitHub repository."
+
+      - name: body
+        label: Story
+        type: rich-text
+        options:
+          format: markdown
+          media: stories
+          switcher: false
+
+settings:
+  commit:
+    identity: user
