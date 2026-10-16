@@ -1,0 +1,269 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Meetup//Meetup Calendar 1.0//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+NAME:Cork Vegans
+X-WR-CALNAME:Cork Vegans
+BEGIN:VTIMEZONE
+TZID:Europe/Dublin
+TZURL:http://tzurl.org/zoneinfo-outlook/Europe/Dublin
+X-LIC-LOCATION:Europe/Dublin
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0000
+TZOFFSETTO:+0100
+TZNAME:IST
+DTSTART:19700329T010000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0000
+TZNAME:GMT
+DTSTART:19701025T020000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:event_316851291@meetup.com
+SEQUENCE:1
+DTSTAMP:20261016T164611Z
+DTSTART;TZID=Europe/Dublin:20261107T110000
+DTEND;TZID=Europe/Dublin:20261107T120000
+SUMMARY:Monthly Social - My Goodness
+DESCRIPTION:Cork Vegans\n**Connect with us:**\n**[Website](https://www.cor
+ kvegans.ie/) \\| [WhatsApp](https://chat.whatsapp.com/GLVQxJC9qCFK4xGSUafw
+ o3) \\| [Linktree](https://linktr.ee/corkvegans)**\n\nMeeting new people c
+ an feel like a big step\, so this event is focused on making making it as 
+ easy and accessible as possible for new and reconnecting members! Join us 
+ for our monthly social event - this month\, this will be the at [My Goodne
+ ss Cafe (Co-op)](https://share.google/f6DvZxjG0z5lNeDAn)\n\n**The plan:**\
+ n\nWe'll meet at 11:00 am to grab someone food. We will aim to finish up a
+ t noon but may also grab a drink after or take a short walk.\n\n**What to 
+ bring:**\n\n* Just yourself and some spending money!
+URL;VALUE=URI:https://www.meetup.com/corkvegans/events/316851291/
+STATUS:CONFIRMED
+CREATED:20261005T102402Z
+LAST-MODIFIED:20261005T102402Z
+CLASS:PUBLIC
+END:VEVENT
+BEGIN:VEVENT
+UID:event_hqdnbvyjcpbrb@meetup.com
+SEQUENCE:1
+DTSTAMP:20261016T164611Z
+DTSTART;TZID=Europe/Dublin:20261113T170000
+DTEND;TZID=Europe/Dublin:20261113T200000
+SUMMARY:Indoor Climbing at Awesome Walls
+DESCRIPTION:Cork Vegans\nJoin us for some indoor climbing in Awesome Walls
+ ! Shoes available for rent at the climbing centre. 🧗\n\n**Connect with 
+ us:**\n**[Website](https://www.corkvegans.ie) \\| [WhatsApp](https://chat.
+ whatsapp.com/GLVQxJC9qCFK4xGSUafwo3) \\| [Linktree](https://linktr.ee/cork
+ vegans)**\n\n**Please note:** You will need to complete the **[Bouldering 
+ Induction](https://awesomewalls.ie/cork-inductions/)**. Online booking onl
+ y available 48 hours in advance\, after that you’ll need to call **02148
+ 67060** to book a slot.\n\nThose who have complete the rope induction can 
+ also top rope! 🧗\n\n**The plan:**\n\nWe will meet at **[Awesome Walls](
+ https://goo.gl/maps/xpm3XuzHSU43tSm97)** at 06:00 pm. We'll be climbing th
+ ere for \\~ 2 hrs so we will aim to finish up at 08:00 pm.\n\n**What to br
+ ing:**\n\n* Water\n* Plant-based food or snacks
+URL;VALUE=URI:https://www.meetup.com/corkvegans/events/hqdnbvyjcpbrb/
+STATUS:CONFIRMED
+CREATED:20261005T150111Z
+LAST-MODIFIED:20261005T150111Z
+CLASS:PUBLIC
+END:VEVENT
+BEGIN:VEVENT
+UID:event_cmcnbvyjcqbhb@meetup.com
+SEQUENCE:1
+DTSTAMP:20261016T164611Z
+DTSTART;TZID=Europe/Dublin:20261205T110000
+DTEND;TZID=Europe/Dublin:20261205T120000
+SUMMARY:Monthly Social - My Goodness
+DESCRIPTION:Cork Vegans\n**Connect with us:**\n**[Website](https://www.cor
+ kvegans.ie/) \\| [WhatsApp](https://chat.whatsapp.com/GLVQxJC9qCFK4xGSUafw
+ o3) \\| [Linktree](https://linktr.ee/corkvegans)**\n\nMeeting new people c
+ an feel like a big step\, so this event is focused on making making it as 
+ easy and accessible as possible for new and reconnecting members! Join us 
+ for our monthly social event - this month\, this will be the at [My Goodne
+ ss Cafe (Co-op)](https://share.google/f6DvZxjG0z5lNeDAn)\n\n**The plan:**\
+ n\nWe'll meet at 11:00 am to grab someone food. We will aim to finish up a
+ t noon but may also grab a drink after or take a short walk.\n\n**What to 
+ bring:**\n\n* Just yourself and some spending money!
+URL;VALUE=URI:https://www.meetup.com/corkvegans/events/cmcnbvyjcqbhb/
+STATUS:CONFIRMED
+CREATED:20261005T103540Z
+LAST-MODIFIED:20261005T103540Z
+CLASS:PUBLIC
+END:VEVENT
+BEGIN:VEVENT
+UID:event_hqdnbvyjcqbpb@meetup.com
+SEQUENCE:1
+DTSTAMP:20261016T164611Z
+DTSTART;TZID=Europe/Dublin:20261211T170000
+DTEND;TZID=Europe/Dublin:20261211T200000
+SUMMARY:Indoor Climbing at Awesome Walls
+DESCRIPTION:Cork Vegans\nJoin us for some indoor climbing in Awesome Walls
+ ! Shoes available for rent at the climbing centre. 🧗\n\n**Connect with 
+ us:**\n**[Website](https://www.corkvegans.ie) \\| [WhatsApp](https://chat.
+ whatsapp.com/GLVQxJC9qCFK4xGSUafwo3) \\| [Linktree](https://linktr.ee/cork
+ vegans)**\n\n**Please note:** You will need to complete the **[Bouldering 
+ Induction](https://awesomewalls.ie/cork-inductions/)**. Online booking onl
+ y available 48 hours in advance\, after that you’ll need to call **02148
+ 67060** to book a slot.\n\nThose who have complete the rope induction can 
+ also top rope! 🧗\n\n**The plan:**\n\nWe will meet at **[Awesome Walls](
+ https://goo.gl/maps/xpm3XuzHSU43tSm97)** at 06:00 pm. We'll be climbing th
+ ere for \\~ 2 hrs so we will aim to finish up at 08:00 pm.\n\n**What to br
+ ing:**\n\n* Water\n* Plant-based food or snacks
+URL;VALUE=URI:https://www.meetup.com/corkvegans/events/hqdnbvyjcqbpb/
+STATUS:CONFIRMED
+CREATED:20261005T150111Z
+LAST-MODIFIED:20261005T150111Z
+CLASS:PUBLIC
+END:VEVENT
+BEGIN:VEVENT
+UID:event_cmcnbvykccbdb@meetup.com
+SEQUENCE:1
+DTSTAMP:20261016T164611Z
+DTSTART;TZID=Europe/Dublin:20270102T110000
+DTEND;TZID=Europe/Dublin:20270102T120000
+SUMMARY:Monthly Social - My Goodness
+DESCRIPTION:Cork Vegans\n**Connect with us:**\n**[Website](https://www.cor
+ kvegans.ie/) \\| [WhatsApp](https://chat.whatsapp.com/GLVQxJC9qCFK4xGSUafw
+ o3) \\| [Linktree](https://linktr.ee/corkvegans)**\n\nMeeting new people c
+ an feel like a big step\, so this event is focused on making making it as 
+ easy and accessible as possible for new and reconnecting members! Join us 
+ for our monthly social event - this month\, this will be the at [My Goodne
+ ss Cafe (Co-op)](https://share.google/f6DvZxjG0z5lNeDAn)\n\n**The plan:**\
+ n\nWe'll meet at 11:00 am to grab someone food. We will aim to finish up a
+ t noon but may also grab a drink after or take a short walk.\n\n**What to 
+ bring:**\n\n* Just yourself and some spending money!
+URL;VALUE=URI:https://www.meetup.com/corkvegans/events/cmcnbvykccbdb/
+STATUS:CONFIRMED
+CREATED:20261005T103540Z
+LAST-MODIFIED:20261005T103540Z
+CLASS:PUBLIC
+END:VEVENT
+BEGIN:VEVENT
+UID:event_hqdnbvykccblb@meetup.com
+SEQUENCE:1
+DTSTAMP:20261016T164611Z
+DTSTART;TZID=Europe/Dublin:20270108T170000
+DTEND;TZID=Europe/Dublin:20270108T200000
+SUMMARY:Indoor Climbing at Awesome Walls
+DESCRIPTION:Cork Vegans\nJoin us for some indoor climbing in Awesome Walls
+ ! Shoes available for rent at the climbing centre. 🧗\n\n**Connect with 
+ us:**\n**[Website](https://www.corkvegans.ie) \\| [WhatsApp](https://chat.
+ whatsapp.com/GLVQxJC9qCFK4xGSUafwo3) \\| [Linktree](https://linktr.ee/cork
+ vegans)**\n\n**Please note:** You will need to complete the **[Bouldering 
+ Induction](https://awesomewalls.ie/cork-inductions/)**. Online booking onl
+ y available 48 hours in advance\, after that you’ll need to call **02148
+ 67060** to book a slot.\n\nThose who have complete the rope induction can 
+ also top rope! 🧗\n\n**The plan:**\n\nWe will meet at **[Awesome Walls](
+ https://goo.gl/maps/xpm3XuzHSU43tSm97)** at 06:00 pm. We'll be climbing th
+ ere for \\~ 2 hrs so we will aim to finish up at 08:00 pm.\n\n**What to br
+ ing:**\n\n* Water\n* Plant-based food or snacks
+URL;VALUE=URI:https://www.meetup.com/corkvegans/events/hqdnbvykccblb/
+STATUS:CONFIRMED
+CREATED:20261005T150111Z
+LAST-MODIFIED:20261005T150111Z
+CLASS:PUBLIC
+END:VEVENT
+BEGIN:VEVENT
+UID:event_cmcnbvykcdbjb@meetup.com
+SEQUENCE:1
+DTSTAMP:20261016T164611Z
+DTSTART;TZID=Europe/Dublin:20270206T110000
+DTEND;TZID=Europe/Dublin:20270206T120000
+SUMMARY:Monthly Social - My Goodness
+DESCRIPTION:Cork Vegans\n**Connect with us:**\n**[Website](https://www.cor
+ kvegans.ie/) \\| [WhatsApp](https://chat.whatsapp.com/GLVQxJC9qCFK4xGSUafw
+ o3) \\| [Linktree](https://linktr.ee/corkvegans)**\n\nMeeting new people c
+ an feel like a big step\, so this event is focused on making making it as 
+ easy and accessible as possible for new and reconnecting members! Join us 
+ for our monthly social event - this month\, this will be the at [My Goodne
+ ss Cafe (Co-op)](https://share.google/f6DvZxjG0z5lNeDAn)\n\n**The plan:**\
+ n\nWe'll meet at 11:00 am to grab someone food. We will aim to finish up a
+ t noon but may also grab a drink after or take a short walk.\n\n**What to 
+ bring:**\n\n* Just yourself and some spending money!
+URL;VALUE=URI:https://www.meetup.com/corkvegans/events/cmcnbvykcdbjb/
+STATUS:CONFIRMED
+CREATED:20261005T103540Z
+LAST-MODIFIED:20261005T103540Z
+CLASS:PUBLIC
+END:VEVENT
+BEGIN:VEVENT
+UID:event_hqdnbvykcdbqb@meetup.com
+SEQUENCE:1
+DTSTAMP:20261016T164611Z
+DTSTART;TZID=Europe/Dublin:20270212T170000
+DTEND;TZID=Europe/Dublin:20270212T200000
+SUMMARY:Indoor Climbing at Awesome Walls
+DESCRIPTION:Cork Vegans\nJoin us for some indoor climbing in Awesome Walls
+ ! Shoes available for rent at the climbing centre. 🧗\n\n**Connect with 
+ us:**\n**[Website](https://www.corkvegans.ie) \\| [WhatsApp](https://chat.
+ whatsapp.com/GLVQxJC9qCFK4xGSUafwo3) \\| [Linktree](https://linktr.ee/cork
+ vegans)**\n\n**Please note:** You will need to complete the **[Bouldering 
+ Induction](https://awesomewalls.ie/cork-inductions/)**. Online booking onl
+ y available 48 hours in advance\, after that you’ll need to call **02148
+ 67060** to book a slot.\n\nThose who have complete the rope induction can 
+ also top rope! 🧗\n\n**The plan:**\n\nWe will meet at **[Awesome Walls](
+ https://goo.gl/maps/xpm3XuzHSU43tSm97)** at 06:00 pm. We'll be climbing th
+ ere for \\~ 2 hrs so we will aim to finish up at 08:00 pm.\n\n**What to br
+ ing:**\n\n* Water\n* Plant-based food or snacks
+URL;VALUE=URI:https://www.meetup.com/corkvegans/events/hqdnbvykcdbqb/
+STATUS:CONFIRMED
+CREATED:20261005T150111Z
+LAST-MODIFIED:20261005T150111Z
+CLASS:PUBLIC
+END:VEVENT
+BEGIN:VEVENT
+UID:event_cmcnbvykcfbjb@meetup.com
+SEQUENCE:1
+DTSTAMP:20261016T164611Z
+DTSTART;TZID=Europe/Dublin:20270306T110000
+DTEND;TZID=Europe/Dublin:20270306T120000
+SUMMARY:Monthly Social - My Goodness
+DESCRIPTION:Cork Vegans\n**Connect with us:**\n**[Website](https://www.cor
+ kvegans.ie/) \\| [WhatsApp](https://chat.whatsapp.com/GLVQxJC9qCFK4xGSUafw
+ o3) \\| [Linktree](https://linktr.ee/corkvegans)**\n\nMeeting new people c
+ an feel like a big step\, so this event is focused on making making it as 
+ easy and accessible as possible for new and reconnecting members! Join us 
+ for our monthly social event - this month\, this will be the at [My Goodne
+ ss Cafe (Co-op)](https://share.google/f6DvZxjG0z5lNeDAn)\n\n**The plan:**\
+ n\nWe'll meet at 11:00 am to grab someone food. We will aim to finish up a
+ t noon but may also grab a drink after or take a short walk.\n\n**What to 
+ bring:**\n\n* Just yourself and some spending money!
+URL;VALUE=URI:https://www.meetup.com/corkvegans/events/cmcnbvykcfbjb/
+STATUS:CONFIRMED
+CREATED:20261005T103540Z
+LAST-MODIFIED:20261005T103540Z
+CLASS:PUBLIC
+END:VEVENT
+BEGIN:VEVENT
+UID:event_hqdnbvykcfbqb@meetup.com
+SEQUENCE:1
+DTSTAMP:20261016T164611Z
+DTSTART;TZID=Europe/Dublin:20270312T170000
+DTEND;TZID=Europe/Dublin:20270312T200000
+SUMMARY:Indoor Climbing at Awesome Walls
+DESCRIPTION:Cork Vegans\nJoin us for some indoor climbing in Awesome Walls
+ ! Shoes available for rent at the climbing centre. 🧗\n\n**Connect with 
+ us:**\n**[Website](https://www.corkvegans.ie) \\| [WhatsApp](https://chat.
+ whatsapp.com/GLVQxJC9qCFK4xGSUafwo3) \\| [Linktree](https://linktr.ee/cork
+ vegans)**\n\n**Please note:** You will need to complete the **[Bouldering 
+ Induction](https://awesomewalls.ie/cork-inductions/)**. Online booking onl
+ y available 48 hours in advance\, after that you’ll need to call **02148
+ 67060** to book a slot.\n\nThose who have complete the rope induction can 
+ also top rope! 🧗\n\n**The plan:**\n\nWe will meet at **[Awesome Walls](
+ https://goo.gl/maps/xpm3XuzHSU43tSm97)** at 06:00 pm. We'll be climbing th
+ ere for \\~ 2 hrs so we will aim to finish up at 08:00 pm.\n\n**What to br
+ ing:**\n\n* Water\n* Plant-based food or snacks
+URL;VALUE=URI:https://www.meetup.com/corkvegans/events/hqdnbvykcfbqb/
+STATUS:CONFIRMED
+CREATED:20261005T150111Z
+LAST-MODIFIED:20261005T150111Z
+CLASS:PUBLIC
+END:VEVENT
+X-ORIGINAL-URL:https://www.meetup.com/corkvegans/events/ical/
+X-WR-CALNAME:Cork Vegans
+END:VCALENDAR
