@@ -80,6 +80,12 @@ describe("collecting stories", () => {
         expect(problems.map((p) => p.file)).toEqual(["bad.md"]);
     });
 
+    it("ignores README files in the stories folder", () => {
+        const { stories, problems } = collectStories({ "/c/README.md": "# Stories\n\nNotes for admins." });
+        expect(stories).toEqual([]);
+        expect(problems).toEqual([]);
+    });
+
     it("prevents two stories from sharing a web address", () => {
         const s = story("title: T\ndescription: D\npublishedAt: 2026-01-01\ndraft: false");
         const { stories, problems } = collectStories({ "/c/My-Story.md": s, "/c/my-story.md": s });

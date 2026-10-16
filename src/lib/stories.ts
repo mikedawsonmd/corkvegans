@@ -151,6 +151,7 @@ export function collectStories(files: Record<string, string>): { stories: Story[
 
     for (const [path, raw] of Object.entries(files).sort(([a], [b]) => a.localeCompare(b))) {
         const file = path.split("/").pop() ?? path;
+        if (/^readme\.md$/i.test(file)) continue; // folder notes for admins, not a story
         const result = parseStoryFile(file, raw);
         if (result.kind === "draft") drafts++;
         else if (result.kind === "invalid") problems.push(result.problem);
