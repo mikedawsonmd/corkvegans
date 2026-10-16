@@ -1,0 +1,72 @@
+# Builds the site and publishes it to GitHub Pages.
+#
+# Runs when:
+#   - anything is pushed to main (including every Pages CMS save),
+#   - every 6 hours, to refresh Meetup / Eventbrite events,
+#   - manually: Actions → "Deploy site" → "Run workflow".
+#
+# Requires Settings → Pages → Source = "GitHub Actions".
+
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 */6 * * *" # 00:17, 06:17, 12:17, 18:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Refresh events (never fails the build; keeps last good data)
+        run: npm run sync:events
+        env:
+          EVENTBRITE_TOKEN: ${{ secrets.EVENTBRITE_TOKEN }}
+          EVENTBRITE_ORGANIZATION_ID: ${{ vars.EVENTBRITE_ORGANIZATION_ID }}
+          EVENTS_PREVIOUS_URL: https://corkvegans.ie/events.json
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build and check site
+        run: npm run build
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
