@@ -126,7 +126,6 @@ describe("helpers", () => {
         expect(storyImageKey("src/assets/stories/sub/b.png")).toBe("/src/assets/stories/sub/b.png");
         expect(storyImageKey("/src/assets/stories/../../../secrets.txt")).toBeNull();
         expect(storyImageKey("/src/assets/stories/%2e%2e/x.jpg")).toBeNull();
-        expect(storyImageKey("/src/assets/sample-stories/c.jpg")).toBe("/src/assets/sample-stories/c.jpg");
         expect(storyImageKey("/src/assets/other/c.jpg")).toBeNull();
         expect(storyImageKey("https://example.com/a.jpg")).toBeNull();
         expect(storyImageKey(null)).toBeNull();

@@ -177,15 +177,15 @@ export function relatedStories(story: Story, all: Story[], limit = 3): Story[] {
 
 /**
  * Maps a featured-image value written by Pages CMS (e.g. "/src/assets/stories/photo.jpg")
- * to a key in the image map. Rejects anything outside the stories media folders.
+ * to a key in the image map. Rejects anything outside the stories media folder.
  */
 export function storyImageKey(value: string | null): string | null {
     if (!value) return null;
-    const match = /(?:^|\/)assets\/(stories|sample-stories)\/(.+)$/.exec(value.trim());
+    const match = /(?:^|\/)assets\/stories\/(.+)$/.exec(value.trim());
     if (!match) return null;
-    const rel = decodeURIComponent(match[2]);
+    const rel = decodeURIComponent(match[1]);
     if (rel.split("/").some((part) => part === ".." || part === "")) return null;
-    return `/src/assets/${match[1]}/${rel}`;
+    return `/src/assets/stories/${rel}`;
 }
 
 export function formatStoryDate(date: Date): string {

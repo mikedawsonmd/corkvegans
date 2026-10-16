@@ -27,12 +27,8 @@ Eventbrite, when configured) every few hours.
   CMS access, donations, the volunteer form, troubleshooting and costs.
 - **[Audit and architecture](docs/AUDIT.md)**: why the site is built this way.
 
-## Sample stories
-
-`src/content/sample-stories/` holds example stories so the Stories pages
-have content while you preview locally. **The live deploy leaves them out**
-(`CV_HIDE_SAMPLES=1`), and editors don't see them in Pages CMS. Delete that
-folder and `src/assets/sample-stories/` once real stories exist.
+Run `npm run dev:fixtures` to preview the Stories pages with example
+content (the test fixtures). It is never published.
 
 ## Development
 

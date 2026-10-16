@@ -19,9 +19,7 @@ import { collectStories, parseStoryFile, slugify } from "../src/lib/stories.ts";
 const root = fileURLToPath(new URL("..", import.meta.url));
 const outDir = join(root, process.argv[2] ?? "dist");
 const useFixtures = process.env.CV_FIXTURES === "1";
-const hideSamples = process.env.CV_HIDE_SAMPLES === "1";
-const storyDirs = useFixtures ? ["tests/fixtures/stories"] : ["src/content/stories", ...(hideSamples ? [] : ["src/content/sample-stories"])];
-const hiddenSampleDir = !useFixtures && hideSamples ? join(root, "src/content/sample-stories") : null;
+const storyDirs = useFixtures ? ["tests/fixtures/stories"] : ["src/content/stories"];
 
 const errors: string[] = [];
 const fail = (msg: string) => errors.push(msg);
@@ -151,14 +149,6 @@ for (const file of storyFiles) {
     const slug = slugify(file.replace(/\.md$/, ""));
     if (existsSync(join(outDir, "stories", slug))) fail(`Unpublished story was built: ${file}`);
     if (sitemap.includes(`/stories/${slug}/`)) fail(`Unpublished story is in the sitemap: ${file}`);
-}
-
-// Sample stories must never reach the live site.
-if (hiddenSampleDir) {
-    for (const file of listStories(hiddenSampleDir)) {
-        const slug = slugify(file.replace(/\.md$/, ""));
-        if (!(file in raw) && existsSync(join(outDir, "stories", slug))) fail(`Sample story was built although samples are hidden: ${file}`);
-    }
 }
 
 // ── 5. Support page reflects the real donation / form configuration ──────

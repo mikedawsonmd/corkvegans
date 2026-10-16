@@ -195,12 +195,6 @@ Commit to `main` and the site updates after the deploy.
 **Header behaviour:** the header gains a shadow when you scroll. It only
 shrinks on phones (under 768px wide); on larger screens it stays full height.
 
-**Sample stories:** `src/content/sample-stories/` holds example stories for
-local previews. The deploy workflow sets `CV_HIDE_SAMPLES=1`, so they are
-never published, and a post-build check fails the deploy if one slips
-through. Delete the folder (and `src/assets/sample-stories/`) once real
-stories exist.
-
 ## 4. Managing editors (Pages CMS)
 
 - **Add an editor:** in Pages CMS, open the project → **Settings /
