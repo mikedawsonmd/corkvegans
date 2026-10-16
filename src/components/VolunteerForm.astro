@@ -1,0 +1,151 @@
+---
+/**
+ * Volunteer enquiry form. Submissions go to a hosted form service
+ * (Formspree by default) configured in src/config/site.ts — no data is
+ * stored on corkvegans.ie. Until an endpoint is configured the form is shown
+ * as "not open yet" and cannot be submitted.
+ */
+import { links, volunteerForm } from "../config/site";
+
+const endpoint = volunteerForm.endpoint.trim();
+const configured = /^https:\/\/formspree\.io\/f\/[A-Za-z0-9]+$/.test(endpoint);
+
+const interests = [
+    "Event organisation",
+    "Event-day support",
+    "Photography and video",
+    "Writing and storytelling",
+    "Social media and communications",
+    "Community outreach",
+    "Other",
+];
+
+const input =
+    "mt-xs block w-full rounded-lg border-outline bg-surface-container-lowest px-md py-sm text-body-md text-on-surface focus:border-primary focus:ring-primary aria-[invalid=true]:border-error";
+const label = "font-label-bold text-label-bold text-on-surface";
+const errorText = "mt-xs text-label-bold text-error flex items-center gap-xs";
+---
+
+<div class="bg-surface border border-surface-variant rounded-lg p-lg md:p-xl shadow-sm">
+    {
+        !configured && (
+            <div class="mb-lg rounded-lg border border-tertiary-fixed-dim bg-tertiary-fixed px-lg py-md text-on-tertiary-fixed" role="note">
+                <p class="font-label-bold text-label-bold">Online volunteer sign-up isn't open yet.</p>
+                <p class="text-body-md mt-xs">
+                    In the meantime, send us a message on{" "}
+                    <a class="font-label-bold underline" href={links.facebook} target="_blank" rel="noopener noreferrer">Facebook</a> or{" "}
+                    <a class="font-label-bold underline" href={links.instagram} target="_blank" rel="noopener noreferrer">Instagram</a>, or say
+                    hello at one of our events.
+                </p>
+            </div>
+        )
+    }
+
+    <form
+        data-volunteer-form
+        action={configured ? endpoint : undefined}
+        method="POST"
+        novalidate
+        aria-labelledby="volunteer-form-title"
+        aria-describedby="volunteer-privacy"
+    >
+        <h3 id="volunteer-form-title" class="font-headline-md text-headline-md text-on-surface mb-md">Volunteer enquiry</h3>
+
+        <div data-error-summary role="alert" tabindex="-1" class="mb-lg rounded-lg border-2 border-error bg-error-container px-lg py-md text-on-error-container" hidden>
+            <p class="font-label-bold text-label-bold">Please check the following:</p>
+            <ul class="mt-xs list-disc pl-lg text-body-md" data-error-list></ul>
+        </div>
+
+        <fieldset disabled={!configured || undefined} class="flex flex-col gap-lg disabled:opacity-60">
+            <legend class="sr-only">Your details</legend>
+            <p class="text-label-sm text-on-surface-variant">Fields marked <span aria-hidden="true">*</span><span class="sr-only">with an asterisk</span> are required.</p>
+
+            <div>
+                <label for="vf-name" class={label}>Name <span aria-hidden="true">*</span></label>
+                <input id="vf-name" name="name" type="text" autocomplete="name" required maxlength="100" aria-describedby="vf-name-error" class={input} />
+                <p id="vf-name-error" class={errorText} hidden></p>
+            </div>
+
+            <div>
+                <label for="vf-email" class={label}>Email <span aria-hidden="true">*</span></label>
+                <input id="vf-email" name="email" type="email" autocomplete="email" required maxlength="254" aria-describedby="vf-email-hint vf-email-error" class={input} />
+                <p id="vf-email-hint" class="mt-xs text-label-sm text-on-surface-variant">We'll only use this to reply to you.</p>
+                <p id="vf-email-error" class={errorText} hidden></p>
+            </div>
+
+            <fieldset>
+                <legend class={label}>Areas you're interested in <span class="font-body-md text-on-surface-variant">(optional)</span></legend>
+                <div class="mt-sm grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                    {
+                        interests.map((interest, i) => (
+                            <label class="flex items-center gap-sm min-h-[44px] px-md rounded-lg border border-surface-variant bg-surface-container-lowest cursor-pointer hover:bg-surface-container-low">
+                                <input type="checkbox" name="interests" value={interest} id={`vf-interest-${i}`} class="h-5 w-5 rounded-[4px] border-outline text-primary focus:ring-primary" />
+                                <span class="text-body-md text-on-surface">{interest}</span>
+                            </label>
+                        ))
+                    }
+                </div>
+            </fieldset>
+
+            <div>
+                <label for="vf-message" class={label}>Message <span class="font-body-md text-on-surface-variant">(optional)</span></label>
+                <textarea id="vf-message" name="message" rows="5" maxlength="2000" aria-describedby="vf-message-hint" class={input}></textarea>
+                <p id="vf-message-hint" class="mt-xs text-label-sm text-on-surface-variant">Anything you'd like us to know — skills, availability, questions.</p>
+            </div>
+
+            <!-- Spam trap: hidden from people, filled in by bots. -->
+            <div class="hidden" aria-hidden="true">
+                <label for="vf-gotcha">Leave this field empty</label>
+                <input id="vf-gotcha" type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
+            </div>
+            <input type="hidden" name="_subject" value="Volunteer enquiry from corkvegans.ie" />
+
+            <div>
+                <div class="flex items-start gap-sm">
+                    <input id="vf-privacy" name="privacy" type="checkbox" value="acknowledged" required aria-describedby="vf-privacy-error" class="mt-[2px] h-5 w-5 shrink-0 rounded-[4px] border-outline text-primary focus:ring-primary" />
+                    <label for="vf-privacy" class="text-body-md text-on-surface">
+                        I understand Cork Vegans will use these details to reply to my volunteering enquiry, as explained
+                        in the privacy note below. <span aria-hidden="true">*</span>
+                    </label>
+                </div>
+                <p id="vf-privacy-error" class={errorText} hidden></p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-md">
+                <button
+                    type="submit"
+                    class="bg-primary text-on-primary font-label-bold text-label-bold px-xl py-md min-h-[48px] rounded-full pill-shadow hover:bg-surface-tint transition-all active:scale-95 disabled:cursor-not-allowed"
+                    data-submit
+                >
+                    Send enquiry
+                </button>
+                <p data-form-status role="status" aria-live="polite" class="text-body-md text-on-surface-variant"></p>
+            </div>
+        </fieldset>
+    </form>
+
+    <div data-form-success tabindex="-1" class="flex flex-col items-start gap-sm" hidden>
+        <p class="font-headline-md text-headline-md text-on-surface">Thank you — we've received your enquiry.</p>
+        <p class="font-body-md text-body-md text-on-surface-variant">
+            One of the organisers will get back to you by email. If you don't hear from us within a couple of weeks,
+            please check your spam folder or message us on Facebook or Instagram.
+        </p>
+    </div>
+
+    <div id="volunteer-privacy" class="mt-lg pt-lg border-t border-surface-variant text-label-sm text-on-surface-variant flex flex-col gap-xs">
+        <p class="font-label-bold text-label-bold text-on-surface">How we use your details</p>
+        <p>
+            We use your name, email and message only to reply to your enquiry and to arrange volunteering with you.
+            We won't add you to a mailing list or share your details outside the Cork Vegans organising team.
+        </p>
+        <p>
+            The form is delivered to us by Formspree, a form service based in the United States, which processes and
+            stores submissions on our behalf. Ask us at any time to see or delete the details you sent, and we'll do so.
+        </p>
+    </div>
+</div>
+
+<script>
+    import { initVolunteerForm } from "../scripts/volunteer-form.ts";
+    document.querySelectorAll<HTMLFormElement>("[data-volunteer-form]").forEach(initVolunteerForm);
+</script>
