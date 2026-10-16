@@ -7,6 +7,7 @@ const pages = [
     { path: "/stories/page/2/", h1: "Stories & Updates" },
     { path: "/stories/example-community-picnic/", h1: "Example: A sunny community picnic" },
     { path: "/support/", h1: "Support Cork Vegans" },
+    { path: "/resources/", h1: "Useful links" },
     { path: "/about/", h1: "About Cork Vegans" },
 ];
 
@@ -49,14 +50,30 @@ test.describe("navigation", () => {
         test.skip(isMobile, "desktop navigation");
         await page.goto("/");
         const nav = page.getByRole("navigation", { name: "Main" });
-        for (const [label, path] of [["Events", "/events/"], ["Stories", "/stories/"], ["About", "/about/"]]) {
+        for (const [label, path] of [["Events", "/events/"], ["Stories", "/stories/"], ["Resources", "/resources/"], ["About", "/about/"]]) {
             await nav.getByRole("link", { name: label }).click();
             await expect(page).toHaveURL(path);
             await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: label })).toHaveAttribute("aria-current", "page");
         }
-        await nav.getByRole("link", { name: "Get connected" }).click();
-        await expect(page).toHaveURL("/#communityLinks");
-        await expect(page.locator("#communityLinks")).toBeInViewport();
+        await expect(nav.getByRole("link", { name: "Get connected" })).toHaveCount(0);
+    });
+
+    test("header stays full height on desktop when scrolling", async ({ page, isMobile }) => {
+        test.skip(isMobile, "desktop behaviour");
+        await page.goto("/about/");
+        await page.mouse.wheel(0, 1500);
+        await expect(page.locator("#siteHeader")).toHaveClass(/shadow-md/);
+        await expect(page.locator("#headerLogo")).toHaveClass(/h-\[48px\]/);
+        expect(Math.round((await page.locator("#headerLogo").boundingBox())!.height)).toBe(48);
+    });
+
+    test("header shrinks on mobile when scrolling", async ({ page, isMobile }) => {
+        test.skip(!isMobile, "mobile behaviour");
+        await page.goto("/about/");
+        await page.evaluate(() => window.scrollTo(0, 1500));
+        await expect(page.locator("#headerLogo")).toHaveClass(/h-\[36px\]/);
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await expect(page.locator("#headerLogo")).toHaveClass(/h-\[48px\]/);
     });
 
     test("'Support us' is the primary header action on every page", async ({ page }) => {
@@ -130,11 +147,34 @@ test.describe("navigation", () => {
         await expect(page).toHaveURL(/#main$/);
     });
 
-    test("footer links and 'Get connected' resolve from inner pages", async ({ page }) => {
+    test("footer has site links, then social links at the very bottom", async ({ page }) => {
         await page.goto("/about/");
-        await page.locator("footer").getByRole("link", { name: "Get connected" }).click();
-        await expect(page).toHaveURL("/#communityLinks");
-        await expect(page.locator("#communityLinks")).toBeInViewport();
+        const footer = page.locator("footer");
+        await expect(footer.getByRole("navigation", { name: "Footer" }).getByRole("link")).toHaveText(["Events", "Stories", "Resources", "About", "Support us"]);
+        const socials = footer.getByRole("list", { name: "Cork Vegans on social media" }).getByRole("link");
+        await expect(socials).toHaveCount(3);
+        for (const [name, href] of [["Meetup", "https://www.meetup.com/corkvegans/"], ["Facebook", "https://www.facebook.com/corkvegans/"], ["Instagram", "https://www.instagram.com/corkvegans"]]) {
+            const link = footer.getByRole("link", { name: new RegExp(`on ${name}`) });
+            await expect(link).toHaveAttribute("href", href);
+            await expect(link).toHaveAttribute("rel", /noopener/);
+        }
+        const socialTop = (await socials.first().boundingBox())!.y;
+        const copyrightBottom = await footer.getByText(/© \d{4} Cork Vegans/).evaluate((el) => el.getBoundingClientRect().bottom + window.scrollY);
+        expect(socialTop + 0).toBeGreaterThan(copyrightBottom - (await page.evaluate(() => window.scrollY)));
+        await footer.getByRole("navigation", { name: "Footer" }).getByRole("link", { name: "Resources" }).click();
+        await expect(page).toHaveURL("/resources/");
+    });
+
+    test("resources page lists external links safely", async ({ page }) => {
+        await page.goto("/resources/");
+        const tiles = page.locator("main ul a");
+        await expect(tiles).toHaveCount(2);
+        await expect(page.getByRole("link", { name: /WhatsApp community/ })).toHaveAttribute("href", "https://chat.whatsapp.com/GLVQxJC9qCFK4xGSUafwo3");
+        await expect(page.getByRole("link", { name: /Cork vegan food map/ })).toHaveAttribute("href", "https://maps.app.goo.gl/2pRjVTprqDZsYrKp8");
+        for (const tile of await tiles.all()) {
+            await expect(tile).toHaveAttribute("target", "_blank");
+            await expect(tile).toHaveAttribute("rel", /noopener/);
+        }
     });
 });
 

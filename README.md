@@ -11,10 +11,11 @@ Eventbrite, when configured) every few hours.
 
 | URL | Page |
 | --- | --- |
-| `/` | Home: hero, intro, next events, latest stories, support, community links |
+| `/` | Home: hero, intro, next events, latest stories, support |
 | `/events/` | All upcoming events (Meetup + Eventbrite) |
 | `/stories/` | Stories & Updates (paginated at `/stories/page/2/` …) |
 | `/stories/<slug>/` | Individual story, with social preview metadata and share buttons |
+| `/resources/` | Useful links: WhatsApp community, Cork vegan food map |
 | `/support/` | Donate (`#donate`) and volunteer (`#volunteer`) |
 | `/about/` | About Cork Vegans |
 
@@ -25,6 +26,13 @@ Eventbrite, when configured) every few hours.
 - **[Administrator guide](docs/ADMIN-GUIDE.md)**: deployment, events,
   CMS access, donations, the volunteer form, troubleshooting and costs.
 - **[Audit and architecture](docs/AUDIT.md)**: why the site is built this way.
+
+## Sample stories
+
+`src/content/sample-stories/` holds example stories so the Stories pages
+have content while you preview locally. **The live deploy leaves them out**
+(`CV_HIDE_SAMPLES=1`), and editors don't see them in Pages CMS. Delete that
+folder and `src/assets/sample-stories/` once real stories exist.
 
 ## Development
 

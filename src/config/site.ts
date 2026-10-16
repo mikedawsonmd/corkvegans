@@ -42,8 +42,51 @@ export const links = {
 export const nav = [
     { href: "/events/", label: "Events" },
     { href: "/stories/", label: "Stories" },
+    { href: "/resources/", label: "Resources" },
     { href: "/about/", label: "About" },
-    { href: "/#communityLinks", label: "Get connected" },
+];
+
+/** Social profiles, shown as icons in the footer. */
+export const socials = [
+    { label: "Meetup", href: links.meetup, icon: "/images/socials/meetup.png", color: "rgb(255, 74, 121)" },
+    { label: "Facebook", href: links.facebook, icon: "/images/socials/facebook.png", color: "#1877F2" },
+    {
+        label: "Instagram",
+        href: links.instagram,
+        icon: "/images/socials/insta.png",
+        color: "linear-gradient(to top right, #f9ce34, #ee2a7b, #6228d7)",
+    },
+];
+
+/**
+ * Links on the Resources page. To add one, copy an entry and change it.
+ * - `image`: a small white icon in public/images/socials/, or leave it out
+ *   and set `icon` to any Material Symbols name (https://fonts.google.com/icons).
+ * - `color`: background colour of the icon circle.
+ * Only https links are shown.
+ */
+export const resources: {
+    title: string;
+    description: string;
+    href: string;
+    image?: string;
+    icon?: string;
+    color: string;
+}[] = [
+    {
+        title: "WhatsApp community",
+        description: "Chat with other members, hear about meetups first and ask for vegan tips around Cork.",
+        href: links.whatsapp,
+        image: "/images/socials/whatsapp.png",
+        color: "#25D366",
+    },
+    {
+        title: "Cork vegan food map",
+        description: "Our map of vegan and vegan-friendly places to eat in and around Cork.",
+        href: links.foodMap,
+        image: "/images/socials/foodmap.png",
+        color: "#417660",
+    },
 ];
 
 /** The primary button in the top-right of the header. */

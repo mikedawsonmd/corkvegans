@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const paths = ["/", "/events/", "/stories/", "/stories/example-community-picnic/", "/support/", "/about/", "/no-such-page/"];
+const paths = ["/", "/events/", "/stories/", "/stories/example-community-picnic/", "/support/", "/resources/", "/about/", "/no-such-page/"];
 
 test.describe("buttons use the shared style", () => {
     for (const path of paths) {

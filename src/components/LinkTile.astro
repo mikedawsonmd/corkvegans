@@ -1,33 +1,40 @@
 ---
-/** Rounded social/resource tile used in "Get connected" and "Resources". */
+/** Rounded resource tile (the original "Get connected" / "Resources" tile design). */
 interface Props {
     href: string;
-    icon: string;
     label: string;
     sublabel: string;
-    /** Inline style or class for the icon circle background. */
-    circleClass?: string;
-    circleStyle?: string;
+    /** Small white image icon, e.g. /images/socials/whatsapp.png */
+    image?: string;
+    /** Material Symbols icon name, used when there is no image. */
+    icon?: string;
+    /** Background of the icon circle (any CSS colour or gradient). */
+    color: string;
 }
-const { href, icon, label, sublabel, circleClass = "", circleStyle } = Astro.props;
+const { href, label, sublabel, image, icon = "link", color } = Astro.props;
 ---
 
 <a
-    class="bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
+    class="h-full bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center text-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
     href={href}
     target="_blank"
     rel="noopener noreferrer"
 >
     <div
-        class:list={[
-            "w-16 h-16 rounded-full flex items-center justify-center text-white mb-sm group-hover:rotate-12 transition-transform",
-            circleClass,
-        ]}
-        style={circleStyle}
+        class="w-16 h-16 rounded-full flex items-center justify-center text-white mb-sm group-hover:rotate-12 transition-transform"
+        style={`background: ${color}`}
     >
-        <img alt="" class="w-[32px] h-[32px] object-contain" src={icon} width="32" height="32" loading="lazy" />
+        {
+            image ? (
+                <img alt="" class="w-[32px] h-[32px] object-contain" src={image} width="32" height="32" loading="lazy" />
+            ) : (
+                <span class="material-symbols-outlined text-[32px]" aria-hidden="true">
+                    {icon}
+                </span>
+            )
+        }
     </div>
     <span class="font-label-bold text-headline-md text-on-surface">{label}</span>
-    <span class="text-label-sm text-on-surface-variant">{sublabel}</span>
+    <span class="text-body-md text-on-surface-variant">{sublabel}</span>
     <span class="sr-only">(opens in a new tab)</span>
 </a>

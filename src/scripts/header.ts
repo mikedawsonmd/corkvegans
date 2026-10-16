@@ -9,27 +9,33 @@ const logo = document.getElementById("headerLogo");
 const button = document.getElementById("headerButton");
 
 // ── Sticky header state ───────────────────────────────────────────────────
+// On scroll the header gains a shadow everywhere, but only shrinks on
+// mobile; on larger screens it stays full height.
+const mobile = window.matchMedia("(max-width: 767px)");
+
 function setHeaderState() {
     if (!header || !headerInner || !logo || !button) return;
     const isScrolled = window.scrollY > 40;
+    const compact = isScrolled && mobile.matches;
 
     header.classList.toggle("shadow-md", isScrolled);
     header.classList.toggle("bg-surface/95", isScrolled);
     header.classList.toggle("bg-surface/80", !isScrolled);
 
-    headerInner.classList.toggle("py-sm", isScrolled);
-    headerInner.classList.toggle("py-lg", !isScrolled);
+    headerInner.classList.toggle("py-sm", compact);
+    headerInner.classList.toggle("py-lg", !compact);
 
-    logo.classList.toggle("h-[36px]", isScrolled);
-    logo.classList.toggle("h-[48px]", !isScrolled);
+    logo.classList.toggle("h-[36px]", compact);
+    logo.classList.toggle("h-[48px]", !compact);
 
-    button.classList.toggle("px-md", isScrolled);
-    button.classList.toggle("py-xs", isScrolled);
-    button.classList.toggle("px-lg", !isScrolled);
-    button.classList.toggle("py-sm", !isScrolled);
+    button.classList.toggle("px-md", compact);
+    button.classList.toggle("py-xs", compact);
+    button.classList.toggle("px-lg", !compact);
+    button.classList.toggle("py-sm", !compact);
 }
 
 window.addEventListener("scroll", setHeaderState, { passive: true });
+mobile.addEventListener("change", setHeaderState);
 setHeaderState();
 
 // ── Smooth anchor scrolling (respects prefers-reduced-motion) ────────────

@@ -1,7 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import AboutIntro from "../components/AboutIntro.astro";
-import ConnectSections from "../components/ConnectSections.astro";
 import EventList from "../components/EventList.astro";
 import SectionHeading from "../components/SectionHeading.astro";
 import StoryCard from "../components/StoryCard.astro";
@@ -36,8 +35,8 @@ const button = "cv-btn cv-btn-md cv-btn-primary";
                 <a class="cv-btn cv-btn-lg cv-btn-primary" href="#events">
                     Upcoming events
                 </a>
-                <a class="cv-btn cv-btn-lg cv-btn-on-image" href="#communityLinks">
-                    Get connected
+                <a class="cv-btn cv-btn-lg cv-btn-on-image" href="/resources/">
+                    Resources
                 </a>
             </div>
         </div>
@@ -85,6 +84,4 @@ const button = "cv-btn cv-btn-md cv-btn-primary";
     }
 
     <SupportTeaser />
-
-    <ConnectSections />
 </BaseLayout>

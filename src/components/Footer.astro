@@ -1,5 +1,5 @@
 ---
-import { headerCta, nav } from "../config/site";
+import { headerCta, nav, socials } from "../config/site";
 
 const year = new Date().getFullYear();
 const footerLinks = [...nav, headerCta];
@@ -14,12 +14,12 @@ const linkClass =
 >
     <div
         data-surface="dark"
-        class="flex flex-col md:flex-row items-center justify-between gap-md px-xl py-lg w-[calc(100%-2*theme(spacing.margin-mobile))] max-w-7xl mx-auto bg-primary text-on-primary shadow-lg mb-md rounded-lg"
+        class="flex flex-col gap-lg px-xl py-lg w-[calc(100%-2*theme(spacing.margin-mobile))] max-w-7xl mx-auto bg-primary text-on-primary shadow-lg mb-md rounded-lg"
     >
-        <div class="flex items-center gap-sm">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-md">
             <a
                 href="/"
-                class="flex items-center gap-sm transition-transform duration-200 active:scale-95"
+                class="flex items-center gap-sm shrink-0 transition-transform duration-200 active:scale-95"
                 aria-label="Cork Vegans home"
                 ><img
                     alt="Cork Vegans logo"
@@ -30,25 +30,43 @@ const linkClass =
                     loading="lazy"
                 />
             </a>
+
+            <nav aria-label="Footer">
+                <ul class="flex flex-wrap justify-center gap-x-lg gap-y-sm">
+                    {
+                        footerLinks.map((item) => (
+                            <li>
+                                <a class={linkClass} href={item.href}>
+                                    {item.label}
+                                </a>
+                            </li>
+                        ))
+                    }
+                </ul>
+            </nav>
+
+            <p class="font-body-md text-body-md text-on-surface-variant !text-on-primary/80">© {year} Cork Vegans</p>
         </div>
 
-        <nav aria-label="Footer">
-            <ul class="flex flex-wrap justify-center gap-x-lg gap-y-sm">
+        <div class="border-t border-white/20 pt-lg flex justify-center">
+            <ul class="flex items-center gap-md" aria-label="Cork Vegans on social media">
                 {
-                    footerLinks.map((item) => (
+                    socials.map((s) => (
                         <li>
-                            <a class={linkClass} href={item.href}>
-                                {item.label}
+                            <a
+                                href={s.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="flex items-center justify-center w-[44px] h-[44px] rounded-full ring-2 ring-white/30 hover:ring-white transition-all hover:scale-110 active:scale-95"
+                                style={`background: ${s.color}`}
+                            >
+                                <img src={s.icon} alt="" width="22" height="22" class="w-[22px] h-[22px] object-contain" loading="lazy" />
+                                <span class="sr-only">Cork Vegans on {s.label} (opens in a new tab)</span>
                             </a>
                         </li>
                     ))
                 }
             </ul>
-        </nav>
-        <div class="flex flex-col items-center gap-sm">
-            <p class="font-body-md text-body-md text-on-surface-variant !text-on-primary/80">
-                © {year} Cork Vegans
-            </p>
         </div>
     </div>
 </footer>

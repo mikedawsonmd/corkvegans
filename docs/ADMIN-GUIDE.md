@@ -23,8 +23,8 @@ Editors only need [CONTENT-EDITOR-GUIDE.md](CONTENT-EDITOR-GUIDE.md).
   (`tailwind.config.mjs`) and `src/styles/global.css`.
 - **Content:** stories are Markdown files in `src/content/stories/`, and
   their images are in `src/assets/stories/`.
-- **Settings:** links, donation URLs and the form endpoint are in
-  `src/config/site.ts`.
+- **Settings:** in `src/config/site.ts`: navigation, social links (footer
+  icons), the Resources page links, donation URLs and the form endpoint.
 
 | Path | What it is |
 | --- | --- |
@@ -182,7 +182,26 @@ Routing, which means a DNS change.
 
 ---
 
-## 3. Managing editors (Pages CMS)
+## 3. Everyday site changes
+
+| To change… | Edit in `src/config/site.ts` |
+| --- | --- |
+| Resources page links | `resources`: copy an entry, then set the title, description, `https://` link and icon colour. Use `image` for a small white icon in `public/images/socials/`, or `icon` for any [Material Symbols](https://fonts.google.com/icons) name. |
+| Footer social icons | `socials` (and the URLs in `links`) |
+| Top navigation | `nav`. The green "Support us" button is `headerCta`. |
+
+Commit to `main` and the site updates after the deploy.
+
+**Header behaviour:** the header gains a shadow when you scroll. It only
+shrinks on phones (under 768px wide); on larger screens it stays full height.
+
+**Sample stories:** `src/content/sample-stories/` holds example stories for
+local previews. The deploy workflow sets `CV_HIDE_SAMPLES=1`, so they are
+never published, and a post-build check fails the deploy if one slips
+through. Delete the folder (and `src/assets/sample-stories/`) once real
+stories exist.
+
+## 4. Managing editors (Pages CMS)
 
 - **Add an editor:** in Pages CMS, open the project → **Settings /
   Collaborators** → invite their email. They don't need a GitHub account.
@@ -203,7 +222,7 @@ Routing, which means a DNS change.
 
 ---
 
-## 4. Events
+## 5. Events
 
 - **Meetup** comes from the group's public iCal feed
   (`https://www.meetup.com/corkvegans/events/ical/`). No login or key is
@@ -233,7 +252,7 @@ Routing, which means a DNS change.
 
 ---
 
-## 5. Deployments and rollback
+## 6. Deployments and rollback
 
 - **See deploys:** GitHub → Actions → **Deploy site**. Each run's summary
   shows the event sync table and the site checks (pages checked, stories
@@ -252,7 +271,7 @@ Routing, which means a DNS change.
 
 ---
 
-## 6. Troubleshooting builds
+## 7. Troubleshooting builds
 
 | Symptom | Likely cause / fix |
 | --- | --- |
@@ -277,7 +296,7 @@ npm run test:e2e       # browser tests (needs: npx playwright install chromium)
 
 ---
 
-## 7. Free-tier limits and costs
+## 8. Free-tier limits and costs
 
 All services are free today. Expected recurring cost: **€0/month**.
 
@@ -294,7 +313,7 @@ Re-check these terms once a year.
 
 ---
 
-## 8. Security notes and residual risks
+## 9. Security notes and residual risks
 
 - No secrets in the repository. The only credential, the Eventbrite token,
   lives in GitHub Actions secrets. The workflows run with read-only

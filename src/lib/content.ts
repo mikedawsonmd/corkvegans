@@ -6,24 +6,31 @@
 import type { ImageMetadata } from "astro";
 import { collectStories, storyImageKey, type Story } from "./stories.ts";
 
-// Set CV_FIXTURES=1 to build with the test fixtures instead of real content
-// (used by the automated tests only; never in production).
+type Files = Record<string, string>;
+type Images = Record<string, ImageMetadata>;
+
+// CV_FIXTURES=1: build with the automated-test fixtures instead of real content.
+// CV_HIDE_SAMPLES=1: leave out the sample stories (set by the live deploy).
 const useFixtures = process.env.CV_FIXTURES === "1";
+const showSamples = !useFixtures && process.env.CV_HIDE_SAMPLES !== "1";
 
-const rawFiles = useFixtures
-    ? import.meta.glob<string>("/tests/fixtures/stories/*.md", { query: "?raw", import: "default", eager: true })
-    : import.meta.glob<string>("/src/content/stories/*.md", { query: "?raw", import: "default", eager: true });
+const realFiles: Files = import.meta.glob<string>("/src/content/stories/*.md", { query: "?raw", import: "default", eager: true });
+const sampleFiles: Files = import.meta.glob<string>("/src/content/sample-stories/*.md", { query: "?raw", import: "default", eager: true });
+const fixtureFiles: Files = import.meta.glob<string>("/tests/fixtures/stories/*.md", { query: "?raw", import: "default", eager: true });
 
-const images: Record<string, ImageMetadata> = useFixtures
-    ? Object.fromEntries(
-          Object.entries(
-              import.meta.glob<ImageMetadata>("/tests/fixtures/assets/stories/**/*.{jpg,jpeg,png,webp}", { import: "default", eager: true }),
-          ).map(([key, image]) => [key.replace("/tests/fixtures/assets/stories/", "/src/assets/stories/"), image]),
-      )
-    : import.meta.glob<ImageMetadata>("/src/assets/stories/**/*.{jpg,jpeg,png,webp,avif,gif,JPG,JPEG,PNG,WEBP}", {
-          import: "default",
-          eager: true,
-      });
+const realImages: Images = import.meta.glob<ImageMetadata>("/src/assets/stories/**/*.{jpg,jpeg,png,webp,avif,gif,JPG,JPEG,PNG,WEBP}", {
+    import: "default",
+    eager: true,
+});
+const sampleImages: Images = import.meta.glob<ImageMetadata>("/src/assets/sample-stories/**/*.{jpg,jpeg,png,webp}", { import: "default", eager: true });
+const fixtureImages: Images = Object.fromEntries(
+    Object.entries(import.meta.glob<ImageMetadata>("/tests/fixtures/assets/stories/**/*.{jpg,jpeg,png,webp}", { import: "default", eager: true })).map(
+        ([key, image]) => [key.replace("/tests/fixtures/assets/stories/", "/src/assets/stories/"), image],
+    ),
+);
+
+const rawFiles: Files = useFixtures ? fixtureFiles : { ...realFiles, ...(showSamples ? sampleFiles : {}) };
+const images: Images = useFixtures ? fixtureImages : { ...realImages, ...(showSamples ? sampleImages : {}) };
 
 let cache: Story[] | null = null;
 

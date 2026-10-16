@@ -13,6 +13,7 @@ export const GET: APIRoute = () => {
         { loc: "/stories/", lastmod: stories[0] ? isoDate(stories[0].updatedAt ?? stories[0].publishedAt) : undefined },
         ...Array.from({ length: Math.max(0, pages - 1) }, (_, i) => ({ loc: `/stories/page/${i + 2}/` })),
         ...stories.map((s) => ({ loc: `/stories/${s.slug}/`, lastmod: isoDate(s.updatedAt ?? s.publishedAt) })),
+        { loc: "/resources/" },
         { loc: "/support/" },
         { loc: "/about/" },
     ];
