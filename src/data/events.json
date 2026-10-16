@@ -1,0 +1,231 @@
+{
+  "generatedAt": "2026-10-16T17:00:08.910Z",
+  "sources": {
+    "meetup": {
+      "enabled": true,
+      "ok": true,
+      "attemptedAt": "2026-10-16T17:00:08.910Z",
+      "lastSuccessAt": "2026-10-16T17:00:08.910Z",
+      "count": 10
+    },
+    "eventbrite": {
+      "enabled": false,
+      "ok": true,
+      "attemptedAt": null,
+      "lastSuccessAt": null,
+      "count": 0
+    }
+  },
+  "events": [
+    {
+      "id": "meetup:316851291",
+      "source": "meetup",
+      "title": "Monthly Social - My Goodness",
+      "summary": "Meeting new people can feel like a big step, so this event is focused on making making it as easy and accessible as possible for new and reconnecting members! Join us for our monthly social event - this month, this will be the at My Goodness Cafe (Co-op) The plan: We'll meet at…",
+      "start": "2026-11-07T11:00:00.000Z",
+      "end": "2026-11-07T12:00:00.000Z",
+      "timeZone": "Europe/Dublin",
+      "allDay": false,
+      "location": {
+        "name": null,
+        "address": null,
+        "online": false
+      },
+      "image": null,
+      "url": "https://www.meetup.com/corkvegans/events/316851291/",
+      "registrationUrl": "https://www.meetup.com/corkvegans/events/316851291/",
+      "status": "scheduled",
+      "isFree": null,
+      "alsoListedOn": []
+    },
+    {
+      "id": "meetup:hqdnbvyjcpbrb",
+      "source": "meetup",
+      "title": "Indoor Climbing at Awesome Walls",
+      "summary": "Join us for some indoor climbing in Awesome Walls! Shoes available for rent at the climbing centre. 🧗 Please note: You will need to complete the Bouldering Induction. Online booking only available 48 hours in advance, after that you’ll need to call 0214867060 to book a slot…",
+      "start": "2026-11-13T17:00:00.000Z",
+      "end": "2026-11-13T20:00:00.000Z",
+      "timeZone": "Europe/Dublin",
+      "allDay": false,
+      "location": {
+        "name": null,
+        "address": null,
+        "online": false
+      },
+      "image": null,
+      "url": "https://www.meetup.com/corkvegans/events/hqdnbvyjcpbrb/",
+      "registrationUrl": "https://www.meetup.com/corkvegans/events/hqdnbvyjcpbrb/",
+      "status": "scheduled",
+      "isFree": null,
+      "alsoListedOn": []
+    },
+    {
+      "id": "meetup:cmcnbvyjcqbhb",
+      "source": "meetup",
+      "title": "Monthly Social - My Goodness",
+      "summary": "Meeting new people can feel like a big step, so this event is focused on making making it as easy and accessible as possible for new and reconnecting members! Join us for our monthly social event - this month, this will be the at My Goodness Cafe (Co-op) The plan: We'll meet at…",
+      "start": "2026-12-05T11:00:00.000Z",
+      "end": "2026-12-05T12:00:00.000Z",
+      "timeZone": "Europe/Dublin",
+      "allDay": false,
+      "location": {
+        "name": null,
+        "address": null,
+        "online": false
+      },
+      "image": null,
+      "url": "https://www.meetup.com/corkvegans/events/cmcnbvyjcqbhb/",
+      "registrationUrl": "https://www.meetup.com/corkvegans/events/cmcnbvyjcqbhb/",
+      "status": "scheduled",
+      "isFree": null,
+      "alsoListedOn": []
+    },
+    {
+      "id": "meetup:hqdnbvyjcqbpb",
+      "source": "meetup",
+      "title": "Indoor Climbing at Awesome Walls",
+      "summary": "Join us for some indoor climbing in Awesome Walls! Shoes available for rent at the climbing centre. 🧗 Please note: You will need to complete the Bouldering Induction. Online booking only available 48 hours in advance, after that you’ll need to call 0214867060 to book a slot…",
+      "start": "2026-12-11T17:00:00.000Z",
+      "end": "2026-12-11T20:00:00.000Z",
+      "timeZone": "Europe/Dublin",
+      "allDay": false,
+      "location": {
+        "name": null,
+        "address": null,
+        "online": false
+      },
+      "image": null,
+      "url": "https://www.meetup.com/corkvegans/events/hqdnbvyjcqbpb/",
+      "registrationUrl": "https://www.meetup.com/corkvegans/events/hqdnbvyjcqbpb/",
+      "status": "scheduled",
+      "isFree": null,
+      "alsoListedOn": []
+    },
+    {
+      "id": "meetup:cmcnbvykccbdb",
+      "source": "meetup",
+      "title": "Monthly Social - My Goodness",
+      "summary": "Meeting new people can feel like a big step, so this event is focused on making making it as easy and accessible as possible for new and reconnecting members! Join us for our monthly social event - this month, this will be the at My Goodness Cafe (Co-op) The plan: We'll meet at…",
+      "start": "2027-01-02T11:00:00.000Z",
+      "end": "2027-01-02T12:00:00.000Z",
+      "timeZone": "Europe/Dublin",
+      "allDay": false,
+      "location": {
+        "name": null,
+        "address": null,
+        "online": false
+      },
+      "image": null,
+      "url": "https://www.meetup.com/corkvegans/events/cmcnbvykccbdb/",
+      "registrationUrl": "https://www.meetup.com/corkvegans/events/cmcnbvykccbdb/",
+      "status": "scheduled",
+      "isFree": null,
+      "alsoListedOn": []
+    },
+    {
+      "id": "meetup:hqdnbvykccblb",
+      "source": "meetup",
+      "title": "Indoor Climbing at Awesome Walls",
+      "summary": "Join us for some indoor climbing in Awesome Walls! Shoes available for rent at the climbing centre. 🧗 Please note: You will need to complete the Bouldering Induction. Online booking only available 48 hours in advance, after that you’ll need to call 0214867060 to book a slot…",
+      "start": "2027-01-08T17:00:00.000Z",
+      "end": "2027-01-08T20:00:00.000Z",
+      "timeZone": "Europe/Dublin",
+      "allDay": false,
+      "location": {
+        "name": null,
+        "address": null,
+        "online": false
+      },
+      "image": null,
+      "url": "https://www.meetup.com/corkvegans/events/hqdnbvykccblb/",
+      "registrationUrl": "https://www.meetup.com/corkvegans/events/hqdnbvykccblb/",
+      "status": "scheduled",
+      "isFree": null,
+      "alsoListedOn": []
+    },
+    {
+      "id": "meetup:cmcnbvykcdbjb",
+      "source": "meetup",
+      "title": "Monthly Social - My Goodness",
+      "summary": "Meeting new people can feel like a big step, so this event is focused on making making it as easy and accessible as possible for new and reconnecting members! Join us for our monthly social event - this month, this will be the at My Goodness Cafe (Co-op) The plan: We'll meet at…",
+      "start": "2027-02-06T11:00:00.000Z",
+      "end": "2027-02-06T12:00:00.000Z",
+      "timeZone": "Europe/Dublin",
+      "allDay": false,
+      "location": {
+        "name": null,
+        "address": null,
+        "online": false
+      },
+      "image": null,
+      "url": "https://www.meetup.com/corkvegans/events/cmcnbvykcdbjb/",
+      "registrationUrl": "https://www.meetup.com/corkvegans/events/cmcnbvykcdbjb/",
+      "status": "scheduled",
+      "isFree": null,
+      "alsoListedOn": []
+    },
+    {
+      "id": "meetup:hqdnbvykcdbqb",
+      "source": "meetup",
+      "title": "Indoor Climbing at Awesome Walls",
+      "summary": "Join us for some indoor climbing in Awesome Walls! Shoes available for rent at the climbing centre. 🧗 Please note: You will need to complete the Bouldering Induction. Online booking only available 48 hours in advance, after that you’ll need to call 0214867060 to book a slot…",
+      "start": "2027-02-12T17:00:00.000Z",
+      "end": "2027-02-12T20:00:00.000Z",
+      "timeZone": "Europe/Dublin",
+      "allDay": false,
+      "location": {
+        "name": null,
+        "address": null,
+        "online": false
+      },
+      "image": null,
+      "url": "https://www.meetup.com/corkvegans/events/hqdnbvykcdbqb/",
+      "registrationUrl": "https://www.meetup.com/corkvegans/events/hqdnbvykcdbqb/",
+      "status": "scheduled",
+      "isFree": null,
+      "alsoListedOn": []
+    },
+    {
+      "id": "meetup:cmcnbvykcfbjb",
+      "source": "meetup",
+      "title": "Monthly Social - My Goodness",
+      "summary": "Meeting new people can feel like a big step, so this event is focused on making making it as easy and accessible as possible for new and reconnecting members! Join us for our monthly social event - this month, this will be the at My Goodness Cafe (Co-op) The plan: We'll meet at…",
+      "start": "2027-03-06T11:00:00.000Z",
+      "end": "2027-03-06T12:00:00.000Z",
+      "timeZone": "Europe/Dublin",
+      "allDay": false,
+      "location": {
+        "name": null,
+        "address": null,
+        "online": false
+      },
+      "image": null,
+      "url": "https://www.meetup.com/corkvegans/events/cmcnbvykcfbjb/",
+      "registrationUrl": "https://www.meetup.com/corkvegans/events/cmcnbvykcfbjb/",
+      "status": "scheduled",
+      "isFree": null,
+      "alsoListedOn": []
+    },
+    {
+      "id": "meetup:hqdnbvykcfbqb",
+      "source": "meetup",
+      "title": "Indoor Climbing at Awesome Walls",
+      "summary": "Join us for some indoor climbing in Awesome Walls! Shoes available for rent at the climbing centre. 🧗 Please note: You will need to complete the Bouldering Induction. Online booking only available 48 hours in advance, after that you’ll need to call 0214867060 to book a slot…",
+      "start": "2027-03-12T17:00:00.000Z",
+      "end": "2027-03-12T20:00:00.000Z",
+      "timeZone": "Europe/Dublin",
+      "allDay": false,
+      "location": {
+        "name": null,
+        "address": null,
+        "online": false
+      },
+      "image": null,
+      "url": "https://www.meetup.com/corkvegans/events/hqdnbvykcfbqb/",
+      "registrationUrl": "https://www.meetup.com/corkvegans/events/hqdnbvykcfbqb/",
+      "status": "scheduled",
+      "isFree": null,
+      "alsoListedOn": []
+    }
+  ]
+}

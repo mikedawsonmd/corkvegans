@@ -1,0 +1,132 @@
+---
+/**
+ * Event card — same layout as the original homepage card (logo panel with
+ * date badge on the left, details and pill button on the right), extended
+ * for Eventbrite, cancellations, locations and optional images.
+ *
+ * The whole card is clickable via a "stretched" title link, so the
+ * secondary "also on" link can sit inside without nesting links.
+ */
+import { dateBadge, formatEventDate, formatEventTimeRange } from "../lib/events/format";
+import { eventEndsAt } from "../lib/events/merge";
+import { SOURCE_LABELS, type CvEvent } from "../lib/events/types";
+
+interface Props {
+    event: CvEvent;
+    showSummary?: boolean;
+    hidden?: boolean;
+    headingLevel?: "h2" | "h3";
+}
+
+const { event, showSummary = false, hidden = false, headingLevel = "h3" } = Astro.props;
+const Heading = headingLevel;
+const badge = dateBadge(event.start);
+const cancelled = event.status === "cancelled";
+const sourceLabel = SOURCE_LABELS[event.source];
+const cta = cancelled ? `View on ${sourceLabel}` : event.source === "eventbrite" ? "Register on Eventbrite" : "View on Meetup";
+const location = event.location.online ? "Online event" : [event.location.name, event.location.address].filter(Boolean).join(", ");
+---
+
+<li data-event-card data-event-end={eventEndsAt(event)} hidden={hidden || undefined}>
+    <article
+        class="group relative flex flex-col md:flex-row bg-surface border border-surface-variant rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 focus-within:shadow-xl"
+    >
+        <!-- Left: image or logo panel with date badge -->
+        <div class="md:w-1/3 h-48 md:h-auto md:min-h-[180px] relative overflow-hidden flex items-center justify-center" style="background:#ffffff">
+            {
+                event.image ? (
+                    <img
+                        alt={event.image.alt}
+                        class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        src={event.image.url}
+                        loading="lazy"
+                        decoding="async"
+                        referrerpolicy="no-referrer"
+                    />
+                ) : (
+                    <img
+                        alt=""
+                        class="w-32 h-auto object-contain transition-transform duration-500 group-hover:scale-110 opacity-80"
+                        src="/images/logo.png"
+                        width="466"
+                        height="332"
+                        loading="lazy"
+                    />
+                )
+            }
+            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-md py-sm rounded-lg text-center shadow-md" aria-hidden="true">
+                <span class="block font-label-bold text-label-sm text-secondary uppercase">{badge.month}</span>
+                <span class="block font-headline-md text-headline-md text-on-surface">{badge.day}</span>
+            </div>
+        </div>
+
+        <!-- Right: event details -->
+        <div class="md:w-2/3 p-lg flex flex-col justify-between gap-md">
+            <div class="flex flex-col gap-sm">
+                <div class="flex flex-wrap items-center gap-sm">
+                    {
+                        cancelled && (
+                            <span class="bg-error-container text-on-error-container font-label-bold text-label-sm uppercase tracking-wide px-sm py-xs rounded-full">
+                                Cancelled
+                            </span>
+                        )
+                    }
+                    <span class="text-label-sm text-on-surface-variant">via {sourceLabel}</span>
+                    {event.isFree === true && <span class="bg-primary-fixed text-on-primary-fixed font-label-bold text-label-sm px-sm py-xs rounded-full">Free</span>}
+                </div>
+                <Heading class:list={["font-headline-md text-headline-md text-on-surface", cancelled && "line-through decoration-2"]}>
+                    <a
+                        href={event.registrationUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="after:absolute after:inset-0 after:content-[''] focus:outline-none focus-visible:after:outline focus-visible:after:outline-[3px] focus-visible:after:outline-offset-[-3px] focus-visible:after:outline-on-surface focus-visible:after:rounded-lg"
+                    >
+                        {event.title}<span class="sr-only">{cancelled ? " (cancelled)" : ""} — {cta} (opens in a new tab)</span>
+                    </a>
+                </Heading>
+                <p class="flex items-center gap-xs text-on-surface-variant">
+                    <span class="material-symbols-outlined text-[20px]" aria-hidden="true">schedule</span>
+                    <span class="text-label-sm">
+                        <time datetime={event.start}>{formatEventDate(event.start)} · {formatEventTimeRange(event)}</time>
+                    </span>
+                </p>
+                {
+                    location && (
+                        <p class="flex items-center gap-xs text-on-surface-variant">
+                            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">
+                                {event.location.online ? "videocam" : "location_on"}
+                            </span>
+                            <span class="text-label-sm">{location}</span>
+                        </p>
+                    )
+                }
+                {showSummary && event.summary && <p class="font-body-md text-body-md text-on-surface-variant cv-clamp-3">{event.summary}</p>}
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-sm">
+                {
+                    event.alsoListedOn.length > 0 ? (
+                        <p class="relative z-10 text-label-sm text-on-surface-variant">
+                            Also on{" "}
+                            {event.alsoListedOn.map((l, i) => (
+                                <>
+                                    {i > 0 && ", "}
+                                    <a href={l.url} target="_blank" rel="noopener noreferrer" class="font-label-bold text-primary underline underline-offset-2">
+                                        {SOURCE_LABELS[l.source]}<span class="sr-only"> (opens in a new tab)</span>
+                                    </a>
+                                </>
+                            ))}
+                        </p>
+                    ) : (
+                        <span />
+                    )
+                }
+                <span
+                    class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold text-label-bold group-hover:bg-surface-tint transition-colors"
+                    aria-hidden="true"
+                >
+                    {cta}
+                </span>
+            </div>
+        </div>
+    </article>
+</li>

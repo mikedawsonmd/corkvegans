@@ -1,0 +1,37 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import EventList from "../../components/EventList.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import { getEventsAsOf, getSnapshot, getUpcomingEvents } from "../../lib/events/data";
+import { links } from "../../config/site";
+
+const events = getUpcomingEvents();
+const eventbriteEnabled = getSnapshot().sources.eventbrite?.enabled ?? false;
+const description = "All upcoming Cork Vegans events — socials, dining, potlucks, walks and more — from Meetup and Eventbrite.";
+---
+
+<BaseLayout title="Events" description={description}>
+    <PageHeader
+        eyebrow="What's on"
+        title="Upcoming events"
+        intro="Socials, dining out, potlucks, walks and more. Everyone is welcome — vegan or just veg-curious."
+    />
+    <section class="pb-xl bg-surface" aria-label="Event listings">
+        <div class="max-w-5xl mx-auto px-margin-mobile">
+            <EventList events={events} showSummary asOf={getEventsAsOf()} label="All upcoming events" headingLevel="h2" />
+            <p class="mt-xl text-center text-body-md text-on-surface-variant">
+                Events are listed from our
+                <a class="font-label-bold text-primary underline underline-offset-2" href={links.meetup} target="_blank" rel="noopener noreferrer">Meetup group<span class="sr-only"> (opens in a new tab)</span></a>{
+                    eventbriteEnabled && (
+                        <>
+                            {" "}and{" "}
+                            <a class="font-label-bold text-primary underline underline-offset-2" href={links.eventbrite} target="_blank" rel="noopener noreferrer">
+                                Eventbrite page<span class="sr-only"> (opens in a new tab)</span>
+                            </a>
+                        </>
+                    )
+                }. Times are shown in Irish time.
+            </p>
+        </div>
+    </section>
+</BaseLayout>

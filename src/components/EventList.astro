@@ -1,0 +1,69 @@
+---
+/**
+ * Upcoming events list. Rendered at build time from src/data/events.json;
+ * a small script then hides any events that have finished since the build,
+ * so visitors never see past events even if a scheduled refresh is late.
+ */
+import EventCard from "./EventCard.astro";
+import { links, eventSources } from "../config/site";
+import { formatTimestamp } from "../lib/events/format";
+import type { CvEvent } from "../lib/events/types";
+
+interface Props {
+    events: CvEvent[];
+    /** Maximum number of events to show (homepage preview). */
+    limit?: number;
+    showSummary?: boolean;
+    asOf: string | null;
+    label: string;
+    headingLevel?: "h2" | "h3";
+}
+
+const { events, limit, showSummary = false, asOf, label, headingLevel = "h3" } = Astro.props;
+// Render a few spare events beyond the limit so the browser can fill gaps when events end.
+const rendered = limit ? events.slice(0, limit + 3) : events;
+const staleMs = eventSources.staleAfterHours * 60 * 60 * 1000;
+---
+
+<div data-event-list data-limit={limit ?? ""} data-as-of={asOf ?? ""} data-stale-ms={staleMs}>
+    <p
+        data-stale-notice
+        class="mb-lg rounded-lg border border-tertiary-fixed-dim bg-tertiary-fixed px-lg py-md text-body-md text-on-tertiary-fixed"
+        hidden
+    >
+        This list was last updated on <span data-as-of-text>{asOf ? formatTimestamp(asOf) : "an unknown date"}</span>.
+        For the very latest events, check
+        <a class="font-label-bold underline" href={links.meetup} target="_blank" rel="noopener noreferrer">Meetup</a>.
+    </p>
+
+    <ul class="flex flex-col gap-lg" aria-label={label} data-event-items hidden={rendered.length === 0 || undefined}>
+        {rendered.map((event, i) => <EventCard event={event} showSummary={showSummary} hidden={limit !== undefined && i >= limit} headingLevel={headingLevel} />)}
+    </ul>
+
+    <div
+        data-event-empty
+        class="flex flex-col items-center justify-center gap-lg py-xl px-lg text-center bg-surface border border-surface-variant rounded-lg"
+        hidden={rendered.length > 0 || undefined}
+    >
+        <div class="w-20 h-20 rounded-full bg-surface-container-low flex items-center justify-center text-4xl" aria-hidden="true">🌿</div>
+        <div class="flex flex-col gap-sm max-w-sm">
+            <p class="font-headline-md text-headline-md text-on-surface">No upcoming events right now</p>
+            <p class="font-body-md text-body-md text-on-surface-variant">
+                We're busy planning the next one — check back soon or follow us on Meetup to get notified the moment
+                something is scheduled.
+            </p>
+        </div>
+        <a
+            href={links.meetup}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="bg-primary text-on-primary px-xl py-sm rounded-full font-label-bold text-label-bold hover:bg-surface-tint transition-all active:scale-95"
+            >Follow us on Meetup<span class="sr-only"> (opens in a new tab)</span></a
+        >
+    </div>
+</div>
+
+<script>
+    import { refreshEventLists } from "../scripts/events.ts";
+    refreshEventLists();
+</script>
