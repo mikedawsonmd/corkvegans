@@ -1,6 +1,6 @@
 ---
 /** "Community first, plants always." — the original homepage about section. */
-import Animal from "./Animal.astro";
+import { animalSpot } from "../lib/animals";
 interface Props {
     level?: "h1" | "h2";
     showMoreLink?: boolean;
@@ -19,7 +19,7 @@ const activities = [
 <section class="pt-xl pb-xl bg-surface" aria-labelledby="about-heading">
     <div class="max-w-7xl mx-auto px-margin-mobile">
         <div class="flex flex-col lg:flex-row items-center gap-xl">
-            <div class="lg:w-1/2 relative mt-lg lg:mt-0">
+            <div class="lg:w-1/2 relative mt-lg lg:mt-0" {...animalSpot("ledge", "photo", { size: 42, weight: 2 })}>
                 <div
                     class="absolute -top-10 -left-10 w-40 h-40 asymmetric-shape bg-tertiary-container opacity-20 -z-10 animate-float"
                     aria-hidden="true"
@@ -34,7 +34,6 @@ const activities = [
                     loading="lazy"
                     decoding="async"
                 />
-                <Animal name="chicken" face="left" unit={110} class="absolute z-20 bottom-full right-[14%] -mb-[3px]" />
             </div>
             <div class="lg:w-1/2 flex flex-col gap-md">
                 <Heading id="about-heading" class="font-headline-lg text-headline-lg text-on-surface">
@@ -48,7 +47,7 @@ const activities = [
                 <ul class="grid grid-cols-1 min-[400px]:grid-cols-2 gap-md mt-sm">
                     {
                         activities.map((a) => (
-                            <li class="p-md rounded-lg bg-surface-container-low border border-surface-variant flex flex-col gap-xs">
+                            <li class="relative p-md rounded-lg bg-surface-container-low border border-surface-variant flex flex-col gap-xs" {...animalSpot("corner", "activities")}>
                                 <span
                                     class="material-symbols-outlined text-primary"
                                     style="font-variation-settings: 'FILL' 1;"

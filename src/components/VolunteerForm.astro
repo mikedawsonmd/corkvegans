@@ -24,9 +24,10 @@ const input =
     "mt-xs block w-full rounded-lg border-outline bg-surface-container-lowest px-md py-sm text-body-md text-on-surface focus:border-primary focus:ring-primary aria-[invalid=true]:border-error";
 const label = "font-label-bold text-label-bold text-on-surface";
 const errorText = "mt-xs text-label-bold text-error flex items-center gap-xs";
+import { animalSpot } from "../lib/animals";
 ---
 
-<div class="bg-surface border border-surface-variant rounded-lg p-lg md:p-xl shadow-sm">
+<div class="relative bg-surface border border-surface-variant rounded-lg p-lg md:p-xl shadow-sm" {...animalSpot("ledge", "form", { size: 34, max: 2 })}>
     {
         !configured && (
             <div class="mb-lg rounded-lg border border-tertiary-fixed-dim bg-tertiary-fixed px-lg py-md text-on-tertiary-fixed" role="note">

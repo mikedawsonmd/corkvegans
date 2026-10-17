@@ -9,6 +9,7 @@ import { getEventsAsOf, getUpcomingEvents } from "../lib/events/data";
 import { getStories } from "../lib/content";
 import { organizationJsonLd } from "../lib/seo";
 import { site } from "../config/site";
+import { animalSpot } from "../lib/animals";
 
 const events = getUpcomingEvents();
 const latestStories = getStories().slice(0, 3);
@@ -20,7 +21,7 @@ const button = "cv-btn cv-btn-md cv-btn-primary";
     jsonLd={[{ "@context": "https://schema.org", "@type": "WebSite", name: site.name, url: `${site.url}/` }, organizationJsonLd()]}
 >
     <!-- Hero Section -->
-    <section class="relative min-h-[751px] flex items-center overflow-hidden" data-surface="dark">
+    <section class="relative min-h-[751px] flex items-center overflow-hidden" data-surface="dark" {...animalSpot("floor", "hero")}>
         <div class="absolute inset-0 z-0">
             <img alt="" class="w-full h-full object-cover" src="/images/hero.jpg" width="2000" height="1363" fetchpriority="high" />
             <div class="absolute inset-0 bg-black/50"></div>
@@ -51,7 +52,7 @@ const button = "cv-btn cv-btn-md cv-btn-primary";
     <!-- Events Section -->
     <section class="pt-xl pb-xl bg-surface-container-lowest" id="events" aria-labelledby="events-heading">
         <div class="max-w-7xl mx-auto px-margin-mobile">
-            <SectionHeading id="events-heading" eyebrow="What's on" title="Upcoming events" animal={{ name: "pig", face: "left" }} />
+            <SectionHeading id="events-heading" eyebrow="What's on" title="Upcoming events" />
             <EventList events={events} limit={3} asOf={getEventsAsOf()} label="Upcoming Cork Vegans events" />
             <div class="flex justify-center mt-xl">
                 <a href="/events/" class={button}>

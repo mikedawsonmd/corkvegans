@@ -23,6 +23,7 @@ const linkClass =
             footerScenes.map((scene, i) => (
                 <div
                     data-footer-scene
+                    data-animals={scene.animals.map((a) => a.name).join(",")}
                     hidden={i !== 0}
                     class:list={["cv-footer-scene", scene.side === "left" ? "left-lg md:left-xl" : "right-lg md:right-xl"]}
                     aria-hidden="true"

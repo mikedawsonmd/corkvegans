@@ -1,0 +1,74 @@
+---
+/**
+ * Scatters animal illustrations across the page: picks a few of the spots
+ * marked with animalSpot() (at most one per zone) and puts a random animal or
+ * group in each, avoiding the animals already in the footer scene. Runs inline
+ * at the end of the page, before it is first painted, so nothing jumps.
+ * See src/lib/animals.ts.
+ */
+import { animals, groupings, spotsPerPage } from "../lib/animals";
+---
+
+<script is:inline define:vars={{ art: animals, groupings, count: spotsPerPage }}>
+    const rand = (n) => Math.floor(Math.random() * n);
+    const spots = [...document.querySelectorAll("[data-animal-spot]")].filter((el) => el.getClientRects().length > 0);
+
+    // Group spots into zones, then draw zones at random (weighted).
+    const zones = new Map();
+    for (const el of spots) {
+        const zone = el.dataset.animalZone;
+        if (!zones.has(zone)) zones.set(zone, { weight: 1, spots: [] });
+        const z = zones.get(zone);
+        z.spots.push(el);
+        z.weight = Math.max(z.weight, Number(el.dataset.animalWeight || 1));
+    }
+    const pool = [...zones.values()];
+    const picks = [];
+    while (picks.length < count && pool.length) {
+        let r = Math.random() * pool.reduce((sum, z) => sum + z.weight, 0);
+        const i = pool.findIndex((z) => (r -= z.weight) < 0);
+        const [zone] = pool.splice(i < 0 ? pool.length - 1 : i, 1);
+        picks.push(zone.spots[rand(zone.spots.length)]);
+    }
+
+    // Never repeat an animal between spots; also avoid the footer's animals
+    // while there is still a choice.
+    const footer = document.querySelector("[data-footer-scene]:not([hidden])");
+    const inFooter = new Set(footer ? footer.dataset.animals.split(",") : []);
+    const used = new Set();
+    const avoids = (set) => (g) => g.every((n) => !set.has(n));
+
+    for (const spot of picks) {
+        const kind = spot.dataset.animalSpot;
+        const size = Number(spot.dataset.animalSize);
+        const max = Number(spot.dataset.animalMax);
+        const fits = groupings.filter((g) => g.length <= max).filter(avoids(used));
+        const fresh = fits.filter(avoids(inFooter));
+        const options = fresh.length ? fresh : fits;
+        if (!options.length) continue;
+        const group = options[rand(options.length)];
+        group.forEach((n) => used.add(n));
+
+        // Corners and bars sit on the right and look inward; ledges pick a
+        // side and look toward the middle; floors walk either way.
+        const side = kind === "corner" || kind === "bar" || Math.random() < 0.5 ? "right" : "left";
+        const face = kind === "floor" ? (Math.random() < 0.5 ? "left" : "right") : side === "right" ? "left" : "right";
+        const unit = size / Math.max(...group.map((n) => art[n].scale));
+
+        const wrap = document.createElement("span");
+        wrap.className = `cv-animal-group cv-animal-${kind} cv-animal-tone-${spot.dataset.animalTone}`;
+        wrap.setAttribute("aria-hidden", "true");
+        if (kind === "ledge" || kind === "floor") wrap.style[side] = `${8 + rand(20)}%`;
+
+        for (const name of face === "left" ? [...group].reverse() : group) {
+            const a = art[name];
+            const el = document.createElement("span");
+            const flip = a.facing !== "front" && a.facing !== face;
+            el.className = flip ? "cv-animal cv-animal-flip" : "cv-animal";
+            el.style.cssText = `--cv-animal-src: url(${a.src}); height: ${Math.round(unit * a.scale)}px; aspect-ratio: ${a.width} / ${a.height};`;
+            wrap.append(el);
+        }
+        spot.append(wrap);
+        if (kind === "bar") spot.style.marginTop = `${size + 2}px`;
+    }
+</script>

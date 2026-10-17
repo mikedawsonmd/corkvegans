@@ -1,5 +1,6 @@
 ---
 /** Rounded resource tile (the original "Get connected" / "Resources" tile design). */
+import { animalSpot } from "../lib/animals";
 interface Props {
     href: string;
     label: string;
@@ -15,7 +16,8 @@ const { href, label, sublabel, image, icon = "link", color } = Astro.props;
 ---
 
 <a
-    class="h-full bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center text-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
+    {...animalSpot("corner", "resources")}
+    class="relative h-full bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center text-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
     href={href}
     target="_blank"
     rel="noopener noreferrer"

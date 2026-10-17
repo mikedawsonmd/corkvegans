@@ -23,6 +23,7 @@ const { events, limit, showSummary = false, asOf, label, headingLevel = "h3" } =
 // Render a few spare events beyond the limit so the browser can fill gaps when events end.
 const rendered = limit ? events.slice(0, limit + 3) : events;
 const staleMs = eventSources.staleAfterHours * 60 * 60 * 1000;
+import { animalSpot } from "../lib/animals";
 ---
 
 <div data-event-list data-limit={limit ?? ""} data-as-of={asOf ?? ""} data-stale-ms={staleMs}>
@@ -42,7 +43,8 @@ const staleMs = eventSources.staleAfterHours * 60 * 60 * 1000;
 
     <div
         data-event-empty
-        class="flex flex-col items-center justify-center gap-lg py-xl px-lg text-center bg-surface border border-surface-variant rounded-lg"
+        {...animalSpot("ledge", "events-empty", { size: 34, max: 2 })}
+        class="relative flex flex-col items-center justify-center gap-lg py-xl px-lg text-center bg-surface border border-surface-variant rounded-lg"
         hidden={rendered.length > 0 || undefined}
     >
         <div class="w-20 h-20 rounded-full bg-surface-container-low flex items-center justify-center text-4xl" aria-hidden="true">🌿</div>

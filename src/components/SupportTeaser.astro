@@ -1,6 +1,7 @@
 ---
 /** Concise homepage pointer to the Support us page. */
 import SectionHeading from "./SectionHeading.astro";
+import { animalSpot } from "../lib/animals";
 
 const cards = [
     {
@@ -29,7 +30,8 @@ const cards = [
                     <li>
                         <a
                             href={c.href}
-                            class="group h-full flex flex-col gap-sm p-lg rounded-lg bg-surface-container-low border border-surface-variant hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                            {...animalSpot("corner", "support-cards")}
+                            class="group relative h-full flex flex-col gap-sm p-lg rounded-lg bg-surface-container-low border border-surface-variant hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                         >
                             <span class="material-symbols-outlined text-primary text-[32px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">
                                 {c.icon}

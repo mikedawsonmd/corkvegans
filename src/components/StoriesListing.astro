@@ -3,6 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHeader from "./PageHeader.astro";
 import StoryCard from "./StoryCard.astro";
 import type { Story } from "../lib/stories";
+import { animalSpot } from "../lib/animals";
 
 interface Props {
     stories: Story[];
@@ -23,7 +24,6 @@ const pill = "cv-btn cv-btn-sm cv-btn-secondary";
         intro="News, reviews, event recaps and stories from around Cork's vegan community."
         accent="#417660"
         eyebrowColor="#275d49"
-        animal={{ name: "cow", face: "left" }}
     />
     <section class="pb-xl bg-surface" aria-label="Stories">
         <div class="max-w-7xl mx-auto px-margin-mobile">
@@ -35,7 +35,7 @@ const pill = "cv-btn cv-btn-sm cv-btn-secondary";
                         ))}
                     </ul>
                 ) : (
-                    <div class="flex flex-col items-center justify-center gap-lg py-xl px-lg text-center bg-surface-container-low border border-surface-variant rounded-lg max-w-3xl mx-auto">
+                    <div class="relative flex flex-col items-center justify-center gap-lg py-xl px-lg text-center bg-surface-container-low border border-surface-variant rounded-lg max-w-3xl mx-auto" {...animalSpot("ledge", "stories-empty", { size: 34, max: 2 })}>
                         <div class="w-20 h-20 rounded-full bg-surface flex items-center justify-center text-4xl" aria-hidden="true">📝</div>
                         <h2 class="font-headline-md text-headline-md text-on-surface">No stories yet</h2>
                         <p class="font-body-md text-body-md text-on-surface-variant max-w-md">

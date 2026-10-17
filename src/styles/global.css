@@ -297,18 +297,40 @@ html {
 }
 
 /* ── Animal illustrations ────────────────────────────────────────────────
-   Decorative drawings from public/images/illustrations/ (see Animal.astro).
-   Mirroring uses `transform`; the hover hop uses `translate`, so the two
-   never fight.                                                            */
+   Decorative drawings from public/images/illustrations/, drawn as CSS masks
+   so they take the current text colour (see Animal.astro, AnimalSpots.astro
+   and src/lib/animals.ts). Mirroring uses `transform`; the hover hop uses
+   `translate`, so the two never fight.                                     */
 .cv-animal {
     display: block;
-    max-width: none;
-    user-select: none;
+    flex: none;
+    background-color: currentColor;
+    -webkit-mask: var(--cv-animal-src) center / contain no-repeat;
+    mask: var(--cv-animal-src) center / contain no-repeat;
     transition: translate 0.25s ease;
+    /* Purely decorative: no selecting, dragging or long-press "save image". */
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
 }
 
 .cv-animal-flip {
     transform: scaleX(-1);
+}
+
+/* Colours for each kind of surface. */
+.cv-animal-tone-soft {
+    color: #417660;
+}
+
+.cv-animal-tone-muted {
+    color: #8fb3a2;
+}
+
+.cv-animal-tone-light {
+    color: #fff4e6;
+    opacity: 0.85;
 }
 
 /* Footer: the animals stand on the top edge of the green panel. */
@@ -319,6 +341,7 @@ html {
     display: flex;
     align-items: flex-end;
     gap: 6px;
+    color: #1f3b31;
 }
 
 @media (min-width: 768px) {
@@ -331,11 +354,32 @@ html {
     translate: 0 -5px;
 }
 
-/* Section headings: an animal standing on the short coloured bar. */
-.cv-bar-animal {
+/* Animals placed around the page by AnimalSpots.astro. */
+.cv-animal-group {
     position: absolute;
+    z-index: 20;
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    pointer-events: none;
+}
+
+.cv-animal-ledge {
+    bottom: calc(100% - 1px);
+}
+
+.cv-animal-corner {
+    top: 14px;
+    right: 16px;
+}
+
+.cv-animal-bar {
     bottom: 100%;
     right: -6px;
+}
+
+.cv-animal-floor {
+    bottom: 0;
 }
 
 /* 404: the basking shark drifts gently. */

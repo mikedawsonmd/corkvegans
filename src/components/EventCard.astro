@@ -10,6 +10,7 @@
 import { dateBadge, formatEventDate, formatEventTimeRange } from "../lib/events/format";
 import { eventEndsAt } from "../lib/events/merge";
 import { SOURCE_LABELS, type CvEvent } from "../lib/events/types";
+import { animalSpot } from "../lib/animals";
 
 interface Props {
     event: CvEvent;
@@ -61,7 +62,7 @@ const location = event.location.online ? "Online event" : [event.location.name, 
         </div>
 
         <!-- Right: event details -->
-        <div class="md:w-2/3 p-lg flex flex-col justify-between gap-md">
+        <div class="relative md:w-2/3 p-lg flex flex-col justify-between gap-md" {...animalSpot("corner", "events")}>
             <div class="flex flex-col gap-sm">
                 <div class="flex flex-wrap items-center gap-sm">
                     {

@@ -1,10 +1,11 @@
 ---
 /**
- * One decorative animal illustration. Its height is `unit` (the height a cow
- * would be) times the animal's scale, so animals shown together stay in
- * proportion. A parent can override `unit` responsively by setting the
- * --cv-animal-unit CSS variable (the footer does this). Set `face` to mirror
- * the drawing so it looks left or right.
+ * One decorative animal illustration, drawn as a CSS mask so it takes the
+ * current text colour. Its height is `unit` (the height a cow would be) times
+ * the animal's scale, so animals shown together stay in proportion. A parent
+ * can override `unit` responsively by setting the --cv-animal-unit CSS
+ * variable (the footer does this). Set `face` to mirror the drawing so it
+ * looks left or right.
  */
 import { animals, isFlipped, type AnimalName, type Facing } from "../lib/animals";
 
@@ -20,15 +21,8 @@ const { name, face, unit = 64, class: className = "" } = Astro.props;
 const art = animals[name];
 ---
 
-<img
-    src={art.src}
-    alt=""
+<span
     aria-hidden="true"
-    width={art.width}
-    height={art.height}
-    loading="lazy"
-    decoding="async"
-    draggable="false"
     class:list={["cv-animal", isFlipped(name, face) && "cv-animal-flip", className]}
-    style={`height: calc(var(--cv-animal-unit, ${unit}px) * ${art.scale}); width: auto;`}
-/>
+    style={`--cv-animal-src: url(${art.src}); height: calc(var(--cv-animal-unit, ${unit}px) * ${art.scale}); aspect-ratio: ${art.width} / ${art.height};`}
+></span>
