@@ -192,6 +192,16 @@ Routing, which means a DNS change.
 
 Commit to `main` and the site updates after the deploy.
 
+**Animal illustrations:** the drawings live in `public/images/illustrations/`
+and are listed in `src/lib/animals.ts`, with each animal's size relative to
+the cow so groups stay in proportion. The footer picks one of `footerScenes`
+at random on each page load (never the same one twice in a row); add, remove
+or reorder scenes there. A section title can show an animal standing on its
+coloured bar with `animal={{ name: "pig", face: "left" }}` on `PageHeader` or
+`SectionHeading`. To add a new drawing, use a single-colour SVG with the feet
+touching the bottom edge, then add it to `animals` with its width, height,
+scale and the way it faces.
+
 **Header behaviour:** the header gains a shadow when you scroll. It only
 shrinks on phones (under 768px wide); on larger screens it stays full height.
 

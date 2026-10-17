@@ -51,7 +51,7 @@ const button = "cv-btn cv-btn-md cv-btn-primary";
     <!-- Events Section -->
     <section class="pt-xl pb-xl bg-surface-container-lowest" id="events" aria-labelledby="events-heading">
         <div class="max-w-7xl mx-auto px-margin-mobile">
-            <SectionHeading id="events-heading" eyebrow="What's on" title="Upcoming events" />
+            <SectionHeading id="events-heading" eyebrow="What's on" title="Upcoming events" animal={{ name: "pig", face: "left" }} />
             <EventList events={events} limit={3} asOf={getEventsAsOf()} label="Upcoming Cork Vegans events" />
             <div class="flex justify-center mt-xl">
                 <a href="/events/" class={button}>

@@ -2,8 +2,12 @@
 /**
  * The site's section heading pattern: small uppercase eyebrow, large title,
  * short coloured bar. The bar keeps the original colour; the eyebrow text uses
- * a slightly darker shade so it meets WCAG AA contrast.
+ * a slightly darker shade so it meets WCAG AA contrast. An optional animal
+ * illustration can stand on the bar.
  */
+import Animal from "./Animal.astro";
+import { animals, type Placement } from "../lib/animals";
+
 interface Props {
     eyebrow?: string;
     title: string;
@@ -14,6 +18,8 @@ interface Props {
     eyebrowColor?: string;
     intro?: string;
     id?: string;
+    /** Decorative animal standing on the bar. */
+    animal?: Placement;
 }
 
 const {
@@ -24,8 +30,13 @@ const {
     eyebrowColor = "#d42a4a",
     intro,
     id,
+    animal,
 } = Astro.props;
 const Heading = level;
+
+// Solo animals are drawn at a similar size, whatever their real-life scale.
+const animalHeight = 36;
+const animalUnit = animal ? animalHeight / animals[animal.name].scale : 0;
 ---
 
 <div class="flex flex-col items-center text-center gap-sm mb-xl">
@@ -37,6 +48,12 @@ const Heading = level;
         )
     }
     <Heading id={id} class="font-headline-lg text-headline-lg text-on-surface">{title}</Heading>
-    <div class="h-1.5 w-20 rounded-full mt-xs" style={`background-color: ${accent}`} aria-hidden="true"></div>
+    <div
+        class="relative h-1.5 w-20 rounded-full mt-xs"
+        style={`background-color: ${accent};${animal ? ` margin-top: ${animalHeight + 2}px;` : ""}`}
+        aria-hidden="true"
+    >
+        {animal && <Animal name={animal.name} face={animal.face} unit={animalUnit} class="cv-bar-animal" />}
+    </div>
     {intro && <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mt-sm">{intro}</p>}
 </div>

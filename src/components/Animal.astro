@@ -1,0 +1,34 @@
+---
+/**
+ * One decorative animal illustration. Its height is `unit` (the height a cow
+ * would be) times the animal's scale, so animals shown together stay in
+ * proportion. A parent can override `unit` responsively by setting the
+ * --cv-animal-unit CSS variable (the footer does this). Set `face` to mirror
+ * the drawing so it looks left or right.
+ */
+import { animals, isFlipped, type AnimalName, type Facing } from "../lib/animals";
+
+interface Props {
+    name: AnimalName;
+    face?: Facing;
+    /** Cow-equivalent height in px. */
+    unit?: number;
+    class?: string;
+}
+
+const { name, face, unit = 64, class: className = "" } = Astro.props;
+const art = animals[name];
+---
+
+<img
+    src={art.src}
+    alt=""
+    aria-hidden="true"
+    width={art.width}
+    height={art.height}
+    loading="lazy"
+    decoding="async"
+    draggable="false"
+    class:list={["cv-animal", isFlipped(name, face) && "cv-animal-flip", className]}
+    style={`height: calc(var(--cv-animal-unit, ${unit}px) * ${art.scale}); width: auto;`}
+/>

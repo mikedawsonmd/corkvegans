@@ -1,6 +1,7 @@
 ---
 /** Top-of-page heading block for inner pages, using the site's section heading pattern. */
 import SectionHeading from "./SectionHeading.astro";
+import type { Placement } from "../lib/animals";
 
 interface Props {
     eyebrow?: string;
@@ -8,6 +9,7 @@ interface Props {
     intro?: string;
     accent?: string;
     eyebrowColor?: string;
+    animal?: Placement;
 }
 const props = Astro.props;
 ---

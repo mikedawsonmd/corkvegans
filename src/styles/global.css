@@ -295,3 +295,62 @@ html {
     padding: 8px 12px;
     text-align: left;
 }
+
+/* ── Animal illustrations ────────────────────────────────────────────────
+   Decorative drawings from public/images/illustrations/ (see Animal.astro).
+   Mirroring uses `transform`; the hover hop uses `translate`, so the two
+   never fight.                                                            */
+.cv-animal {
+    display: block;
+    max-width: none;
+    user-select: none;
+    transition: translate 0.25s ease;
+}
+
+.cv-animal-flip {
+    transform: scaleX(-1);
+}
+
+/* Footer: the animals stand on the top edge of the green panel. */
+.cv-footer-scene {
+    --cv-animal-unit: 60px;
+    position: absolute;
+    bottom: calc(100% - 1px);
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+@media (min-width: 768px) {
+    .cv-footer-scene {
+        --cv-animal-unit: 76px;
+    }
+}
+
+.cv-footer-scene .cv-animal:hover {
+    translate: 0 -5px;
+}
+
+/* Section headings: an animal standing on the short coloured bar. */
+.cv-bar-animal {
+    position: absolute;
+    bottom: 100%;
+    right: -6px;
+}
+
+/* 404: the basking shark drifts gently. */
+@keyframes cv-swim {
+    0%,
+    100% {
+        translate: 0 0;
+        rotate: 0deg;
+    }
+    50% {
+        translate: 8px -8px;
+        rotate: -3deg;
+    }
+}
+
+.cv-swim {
+    animation: cv-swim 5s ease-in-out infinite;
+}
