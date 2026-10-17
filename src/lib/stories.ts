@@ -33,7 +33,18 @@ export interface StoryProblem {
 export const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export const DEFAULT_AUTHOR = "Cork Vegans";
 export const DEFAULT_CATEGORY = "Stories";
+/** Stories shown at first on the Stories page; "Show more" reveals the next batch. */
 export const STORIES_PER_PAGE = 12;
+
+/** The category's value in Stories page addresses, e.g. /stories/?category=reviews. */
+export function categorySlug(category: string): string {
+    return slugify(category);
+}
+
+/** Link to the Stories page filtered to one category. */
+export function categoryUrl(category: string): string {
+    return `/stories/?category=${categorySlug(category)}`;
+}
 
 export function slugify(value: string): string {
     return value

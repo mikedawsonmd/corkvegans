@@ -1,6 +1,6 @@
 ---
 import StoryImage from "./StoryImage.astro";
-import { formatStoryDate, isoDate, type Story } from "../lib/stories";
+import { categorySlug, categoryUrl, formatStoryDate, isoDate, type Story } from "../lib/stories";
 import { animalSpot as spot } from "../lib/animals";
 
 interface Props {
@@ -12,9 +12,18 @@ interface Props {
 
 const { story, headingLevel = "h3", animalSpot = false } = Astro.props;
 const Heading = headingLevel;
+// Read by the Stories page filters (src/scripts/story-filters.ts).
+const searchText = [story.title, story.description, story.author, story.category].join(" ").toLowerCase();
 ---
 
-<li class="h-full">
+<li
+    class="h-full"
+    data-story
+    data-category={categorySlug(story.category)}
+    data-date={isoDate(story.publishedAt)}
+    data-title={story.title}
+    data-text={searchText}
+>
     <article
         {...(animalSpot ? spot("ledge", "stories", { size: 32, max: 2, hop: true }) : {})}
         class="group relative h-full flex flex-col bg-surface border border-surface-variant rounded-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 focus-within:shadow-xl"
@@ -30,9 +39,13 @@ const Heading = headingLevel;
         </div>
         <div class="flex flex-col gap-sm p-lg flex-1">
             <div class="flex flex-wrap items-center gap-sm text-label-sm text-on-surface-variant">
-                <span class="bg-surface-container-high text-on-surface font-label-bold uppercase tracking-wide px-sm py-xs rounded-full">
+                <a
+                    href={categoryUrl(story.category)}
+                    class="relative z-10 bg-surface-container-high text-on-surface font-label-bold uppercase tracking-wide px-sm py-xs rounded-full hover:bg-surface-variant"
+                    aria-label={`More ${story.category} stories`}
+                >
                     {story.category}
-                </span>
+                </a>
                 <time datetime={isoDate(story.publishedAt)}>{formatStoryDate(story.publishedAt)}</time>
             </div>
             <Heading class="font-headline-md text-headline-md text-on-surface">

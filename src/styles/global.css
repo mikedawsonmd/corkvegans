@@ -143,6 +143,16 @@ html {
         @apply cursor-default bg-surface-container-high text-on-surface-variant active:scale-100;
     }
 
+    /* Toggle buttons (aria-pressed), e.g. the Stories page category filter:
+       a secondary button that turns primary when selected. */
+    .cv-btn-secondary[aria-pressed="true"] {
+        @apply border-primary bg-primary text-on-primary hover:border-surface-tint hover:bg-surface-tint;
+    }
+
+    .cv-btn-count {
+        @apply text-label-sm opacity-75;
+    }
+
     .cv-btn .material-symbols-outlined {
         font-size: 20px;
     }

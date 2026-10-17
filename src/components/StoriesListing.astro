@@ -1,23 +1,35 @@
 ---
+/**
+ * The Stories page: every published story, newest first, with category,
+ * search and sort controls (src/scripts/story-filters.ts) and "Show more".
+ * Without JavaScript the controls stay hidden and every story is listed.
+ */
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHeader from "./PageHeader.astro";
 import StoryCard from "./StoryCard.astro";
-import type { Story } from "../lib/stories";
+import { categorySlug, STORIES_PER_PAGE, type Story } from "../lib/stories";
 import { animalSpot } from "../lib/animals";
+import { storyCategories } from "../config/site";
 
 interface Props {
     stories: Story[];
-    currentPage: number;
-    lastPage: number;
 }
 
-const { stories, currentPage, lastPage } = Astro.props;
-const pageUrl = (n: number) => (n <= 1 ? "/stories/" : `/stories/page/${n}/`);
+const { stories } = Astro.props;
 const description = "Stories, news, reviews and updates from the Cork Vegans community.";
-const pill = "cv-btn cv-btn-sm cv-btn-secondary";
+
+// Category chips: only categories that have stories, in the editors' order.
+const counts = new Map<string, number>();
+for (const s of stories) counts.set(s.category, (counts.get(s.category) ?? 0) + 1);
+const order: readonly string[] = storyCategories;
+const rank = (c: string) => (order.includes(c) ? order.indexOf(c) : order.length);
+const categories = [...counts.keys()].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+
+const input =
+    "mt-xs block w-full rounded-lg border-outline bg-surface-container-lowest px-md py-sm text-body-md text-on-surface focus:border-primary focus:ring-primary";
 ---
 
-<BaseLayout title={currentPage > 1 ? `Stories & Updates — page ${currentPage}` : "Stories & Updates"} description={description}>
+<BaseLayout title="Stories & Updates" description={description}>
     <PageHeader
         eyebrow="Stories"
         title="Stories & Updates"
@@ -26,17 +38,90 @@ const pill = "cv-btn cv-btn-sm cv-btn-secondary";
         eyebrowColor="#275d49"
     />
     <section class="pb-xl bg-surface" aria-label="Stories">
-        <div class="max-w-7xl mx-auto px-margin-mobile">
+        <div class="max-w-7xl mx-auto px-margin-mobile" data-stories-root data-batch={STORIES_PER_PAGE}>
             {
                 stories.length > 0 ? (
-                    <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
-                        {stories.map((story, i) => (
-                            <StoryCard story={story} headingLevel="h2" animalSpot={i === 0} />
-                        ))}
-                    </ul>
+                    <>
+                        <div data-story-filters hidden class="mb-xl flex flex-col gap-md">
+                            <div class="flex flex-col md:flex-row md:items-end gap-md">
+                                <form role="search" class="flex-1" aria-label="Stories">
+                                    <label for="story-search" class="font-label-bold text-label-bold text-on-surface">
+                                        Search stories
+                                    </label>
+                                    <div class="relative">
+                                        <span
+                                            class="material-symbols-outlined pointer-events-none absolute left-md top-1/2 mt-[2px] -translate-y-1/2 text-on-surface-variant"
+                                            aria-hidden="true"
+                                        >
+                                            search
+                                        </span>
+                                        <input
+                                            id="story-search"
+                                            type="search"
+                                            data-story-search
+                                            autocomplete="off"
+                                            placeholder="e.g. pizza, potluck, Douglas"
+                                            class={`${input} pl-[48px]`}
+                                        />
+                                    </div>
+                                </form>
+                                <div class="md:w-56">
+                                    <label for="story-sort" class="font-label-bold text-label-bold text-on-surface">
+                                        Sort by
+                                    </label>
+                                    <select id="story-sort" data-story-sort class={input}>
+                                        <option value="newest">Newest first</option>
+                                        <option value="oldest">Oldest first</option>
+                                        <option value="title">Title (A–Z)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div role="group" aria-label="Filter by category" class="flex flex-wrap gap-sm">
+                                <button type="button" class="cv-btn cv-btn-sm cv-btn-secondary" data-category-chip="" data-label="all categories" aria-pressed="true">
+                                    All <span class="cv-btn-count">{stories.length}</span>
+                                </button>
+                                {categories.map((c) => (
+                                    <button type="button" class="cv-btn cv-btn-sm cv-btn-secondary" data-category-chip={categorySlug(c)} data-label={c} aria-pressed="false">
+                                        {c} <span class="cv-btn-count">{counts.get(c)}</span>
+                                    </button>
+                                ))}
+                            </div>
+                            <p data-story-count role="status" aria-live="polite" class="text-body-md text-on-surface-variant" />
+                        </div>
+
+                        <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg" data-story-list>
+                            {stories.map((story, i) => (
+                                <StoryCard story={story} headingLevel="h2" animalSpot={i === 0} />
+                            ))}
+                        </ul>
+
+                        <div
+                            data-story-none
+                            hidden
+                            class="flex flex-col items-center gap-md py-xl px-lg text-center bg-surface-container-low border border-surface-variant rounded-lg max-w-3xl mx-auto"
+                        >
+                            <p class="font-headline-md text-headline-md text-on-surface">No stories match</p>
+                            <p class="font-body-md text-body-md text-on-surface-variant">Try another word or category.</p>
+                            <button type="button" data-story-clear class="cv-btn cv-btn-md cv-btn-secondary">
+                                Clear filters
+                            </button>
+                        </div>
+
+                        <div class="mt-xl flex justify-center">
+                            <button type="button" data-story-more hidden class="cv-btn cv-btn-md cv-btn-secondary">
+                                Show more stories
+                                <span class="material-symbols-outlined" aria-hidden="true">expand_more</span>
+                            </button>
+                        </div>
+                    </>
                 ) : (
-                    <div class="relative flex flex-col items-center justify-center gap-lg py-xl px-lg text-center bg-surface-container-low border border-surface-variant rounded-lg max-w-3xl mx-auto" {...animalSpot("ledge", "stories-empty", { size: 34, max: 2 })}>
-                        <div class="w-20 h-20 rounded-full bg-surface flex items-center justify-center text-4xl" aria-hidden="true">📝</div>
+                    <div
+                        class="relative flex flex-col items-center justify-center gap-lg py-xl px-lg text-center bg-surface-container-low border border-surface-variant rounded-lg max-w-3xl mx-auto"
+                        {...animalSpot("ledge", "stories-empty", { size: 34, max: 2 })}
+                    >
+                        <div class="w-20 h-20 rounded-full bg-surface flex items-center justify-center text-4xl" aria-hidden="true">
+                            📝
+                        </div>
                         <h2 class="font-headline-md text-headline-md text-on-surface">No stories yet</h2>
                         <p class="font-body-md text-body-md text-on-surface-variant max-w-md">
                             Our first stories are on the way. In the meantime, come along to one of our events.
@@ -47,26 +132,13 @@ const pill = "cv-btn cv-btn-sm cv-btn-secondary";
                     </div>
                 )
             }
-
-            {
-                lastPage > 1 && (
-                    <nav aria-label="Stories pages" class="mt-xl flex flex-wrap items-center justify-center gap-md">
-                        {currentPage > 1 && (
-                            <a href={pageUrl(currentPage - 1)} class={pill} rel="prev">
-                                <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>Newer stories
-                            </a>
-                        )}
-                        <span class="text-body-md text-on-surface-variant">
-                            Page {currentPage} of {lastPage}
-                        </span>
-                        {currentPage < lastPage && (
-                            <a href={pageUrl(currentPage + 1)} class={pill} rel="next">
-                                Older stories<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
-                            </a>
-                        )}
-                    </nav>
-                )
-            }
         </div>
     </section>
 </BaseLayout>
+
+<script>
+    import { initStoryFilters } from "../scripts/story-filters.ts";
+    document.querySelectorAll<HTMLElement>("[data-stories-root]").forEach((root) => {
+        if (root.querySelector("[data-story-list]")) initStoryFilters(root);
+    });
+</script>

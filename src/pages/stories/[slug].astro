@@ -8,7 +8,7 @@ import StoryImage from "../../components/StoryImage.astro";
 import { getStories, getStoryImage } from "../../lib/content";
 import { enhanceStoryHtml, renderStoryMarkdown } from "../../lib/markdown";
 import { articleJsonLd } from "../../lib/seo";
-import { formatStoryDate, isoDate, relatedStories, storyImageKey, type Story } from "../../lib/stories";
+import { categoryUrl, formatStoryDate, isoDate, relatedStories, storyImageKey, type Story } from "../../lib/stories";
 import { site } from "../../config/site";
 
 export const getStaticPaths = (() =>
@@ -65,9 +65,13 @@ const updated = story.updatedAt;
                 <span class="group-hover:underline underline-offset-4">All stories</span>
             </a>
             <div class="mt-md flex flex-wrap items-center gap-sm">
-                <span class="bg-surface-container-high text-on-surface font-label-bold text-label-sm uppercase tracking-wide px-sm py-xs rounded-full">
+                <a
+                    href={categoryUrl(story.category)}
+                    class="bg-surface-container-high text-on-surface font-label-bold text-label-sm uppercase tracking-wide px-sm py-xs rounded-full hover:bg-surface-variant"
+                    aria-label={`More ${story.category} stories`}
+                >
                     {story.category}
-                </span>
+                </a>
             </div>
             <h1 class="mt-md font-headline-lg-mobile text-headline-lg-mobile md:font-display-lg md:text-display-lg text-on-surface">
                 {story.title}

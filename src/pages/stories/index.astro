@@ -1,13 +1,6 @@
 ---
 import StoriesListing from "../../components/StoriesListing.astro";
 import { getStories } from "../../lib/content";
-import { STORIES_PER_PAGE } from "../../lib/stories";
-
-const all = getStories();
 ---
 
-<StoriesListing
-    stories={all.slice(0, STORIES_PER_PAGE)}
-    currentPage={1}
-    lastPage={Math.max(1, Math.ceil(all.length / STORIES_PER_PAGE))}
-/>
+<StoriesListing stories={getStories()} />

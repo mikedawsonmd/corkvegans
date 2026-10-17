@@ -33,7 +33,7 @@ Bookmark **https://app.pagescms.org**. That's the only address you need.
 | --- | --- |
 | **Title** | The headline, e.g. *"Our autumn potluck at the Quay Co-op"*. |
 | **Short summary** | One or two sentences. This appears on the story card **and** in the preview when someone shares the link on WhatsApp, Facebook, etc. |
-| **Category** | Community, News, Reviews, Events, Guides or Stories. |
+| **Category** | Community, News, Reviews, Events, Guides or Stories. Readers can filter the Stories page by category, so pick the closest match. |
 | **Author** | Your name, or leave it as *Cork Vegans*. |
 | **Publish date** | The date shown on the story. |
 | **Last updated** | Leave empty, unless you make a big change to a story that's already published. |

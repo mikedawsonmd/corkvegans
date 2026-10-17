@@ -67,7 +67,7 @@ layout (logo panel + date badge + details + pill CTA).
 ```
 /                     Home (hero, intro, next events, latest stories, support teaser, get connected, resources)
 /events/              All upcoming events (Meetup + Eventbrite)
-/stories/             Stories & Updates (paginated: /stories/page/2/ …)
+/stories/             Stories & Updates (all stories; category, search and sort filters)
 /stories/[slug]/      Individual story
 /support/             Support us (#donate, #volunteer)
 /about/               About Cork Vegans

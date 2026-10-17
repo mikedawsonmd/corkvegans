@@ -1,18 +1,90 @@
 import { expect, test } from "@playwright/test";
 
-test("stories listing shows published stories only, newest first, with pagination", async ({ page }) => {
+test("stories listing shows published stories only, newest first, 12 at a time", async ({ page }) => {
     await page.goto("/stories/");
-    const cards = page.locator("main article");
+    const cards = page.locator("main article:visible");
     await expect(cards).toHaveCount(12);
     await expect(cards.first()).toContainText("Example: Review without a featured image");
     await expect(page.getByText("This draft must never be published")).toHaveCount(0);
     await expect(page.getByText("Published but missing a date")).toHaveCount(0);
     await expect(cards.first()).toContainText("Reviews");
     await expect(cards.first().locator("time")).toHaveText("1 October 2026");
+    await expect(page.getByRole("status")).toHaveText("13 stories");
 
-    await page.getByRole("link", { name: "Older stories" }).click();
-    await expect(page).toHaveURL("/stories/page/2/");
-    await expect(page.locator("main article")).toHaveCount(1);
+    await page.getByRole("button", { name: "Show more stories" }).click();
+    await expect(cards).toHaveCount(13);
+    await expect(page.getByRole("button", { name: "Show more stories" })).toBeHidden();
+});
+
+test("filters stories by category, with a shareable address", async ({ page }) => {
+    await page.goto("/stories/");
+    const chips = page.getByRole("group", { name: "Filter by category" });
+    await expect(chips.getByRole("button")).toHaveText(["All 13", "Community 1", "News 11", "Reviews 1"]);
+
+    await chips.getByRole("button", { name: /Reviews/ }).click();
+    await expect(page).toHaveURL("/stories/?category=reviews");
+    await expect(chips.getByRole("button", { name: /Reviews/ })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator("main article:visible")).toHaveCount(1);
+    await expect(page.getByRole("status")).toHaveText("1 story in Reviews");
+
+    await page.goBack();
+    await expect(page).toHaveURL("/stories/");
+    await expect(page.locator("main article:visible")).toHaveCount(12);
+
+    // Opening a filtered address directly applies it.
+    await page.goto("/stories/?category=community");
+    await expect(page.locator("main article:visible")).toHaveCount(1);
+    await expect(page.locator("main article:visible")).toContainText("A sunny community picnic");
+});
+
+test("searches titles, summaries and authors, and clears back to everything", async ({ page }) => {
+    await page.goto("/stories/");
+    await page.getByLabel("Search stories").fill("picnic");
+    await expect(page.locator("main article:visible")).toHaveCount(1);
+    await expect(page).toHaveURL("/stories/?q=picnic");
+    await expect(page.getByRole("status")).toHaveText("1 story matching “picnic”");
+
+    await page.getByLabel("Search stories").fill("Test Author");
+    await expect(page.locator("main article:visible").first()).toBeVisible();
+
+    await page.getByLabel("Search stories").fill("zzzz no such story");
+    await expect(page.getByText("No stories match")).toBeVisible();
+    await page.getByRole("button", { name: "Clear filters" }).click();
+    await expect(page.locator("main article:visible")).toHaveCount(12);
+    await expect(page.getByLabel("Search stories")).toHaveValue("");
+    await expect(page).toHaveURL("/stories/");
+});
+
+test("sorts oldest first and by title", async ({ page }) => {
+    await page.goto("/stories/");
+    const titles = page.locator("main article:visible h2");
+
+    await page.getByLabel("Sort by").selectOption("oldest");
+    await expect(page).toHaveURL("/stories/?sort=oldest");
+    const oldest = await titles.allTextContents();
+    await page.getByLabel("Sort by").selectOption("newest");
+    const newest = await titles.allTextContents();
+    expect(oldest[0]).not.toBe(newest[0]);
+
+    await page.getByLabel("Sort by").selectOption("title");
+    const byTitle = (await titles.allTextContents()).map((t) => t.trim());
+    expect(byTitle).toEqual([...byTitle].sort((a, b) => a.localeCompare(b, "en", { sensitivity: "base" })));
+});
+
+test("category labels link to the filtered list", async ({ page }) => {
+    await page.goto("/stories/example-community-picnic/");
+    await page.getByRole("link", { name: "More Community stories" }).click();
+    await expect(page).toHaveURL("/stories/?category=community");
+    await expect(page.locator("main article:visible")).toHaveCount(1);
+});
+
+test("without JavaScript every story is listed and the controls stay hidden", async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const page = await context.newPage();
+    await page.goto("/stories/");
+    await expect(page.locator("main article")).toHaveCount(13);
+    await expect(page.getByLabel("Search stories")).toBeHidden();
+    await context.close();
 });
 
 test("drafts and invalid stories are not built", async ({ request }) => {

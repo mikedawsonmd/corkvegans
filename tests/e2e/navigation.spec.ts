@@ -4,7 +4,6 @@ const pages = [
     { path: "/", h1: "Welcome to Cork Vegans" },
     { path: "/events/", h1: "Upcoming events" },
     { path: "/stories/", h1: "Stories & Updates" },
-    { path: "/stories/page/2/", h1: "Stories & Updates" },
     { path: "/stories/example-community-picnic/", h1: "Example: A sunny community picnic" },
     { path: "/support/", h1: "Support Cork Vegans" },
     { path: "/resources/", h1: "Useful links" },
@@ -93,7 +92,7 @@ test.describe("navigation", () => {
         test.skip(isMobile, "desktop layout");
         await page.setViewportSize({ width: 1920, height: 1400 });
         const positions = new Set<string>();
-        for (const path of ["/", "/stories/page/2/", "/no-such-page/", "/about/"]) {
+        for (const path of ["/", "/events/", "/no-such-page/", "/about/"]) {
             await page.goto(path);
             positions.add(await page.evaluate(() => {
                 const logo = document.getElementById("headerLogo")!.getBoundingClientRect();
