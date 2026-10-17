@@ -56,16 +56,16 @@ export function isFlipped(name: AnimalName, face?: Facing): boolean {
 export const spotsPerPage = 2;
 
 /** Two placements must be at least this far apart vertically (px), so a
- *  heading and the container right below it never both get animals. */
+ *  page header and the card right below it never both get animals. */
 export const minSpotGap = 300;
 
 /**
  * Where the animals sit:
  *   ledge – standing on the element's top edge (images, cards)
- *   bar   – standing on a section heading's coloured bar
- *   floor – walking along the element's bottom edge, inside it (hero)
+ *   floor – walking along the element's bottom edge, inside it (the hero,
+ *           page headers, and the wide margins at the foot of sections)
  */
-export type SpotKind = "ledge" | "bar" | "floor";
+export type SpotKind = "ledge" | "floor";
 
 /**
  * Colour, chosen to sit gently on the surface behind:
@@ -76,21 +76,23 @@ export type Tone = "soft" | "light";
 
 const spotDefaults: Record<SpotKind, { size: number; max: number; tone: Tone }> = {
     ledge: { size: 38, max: 3, tone: "soft" },
-    bar: { size: 34, max: 2, tone: "soft" },
-    floor: { size: 46, max: 3, tone: "light" },
+    floor: { size: 34, max: 3, tone: "soft" },
 };
 
 /**
  * Attributes that mark an element as a possible animal spot. The element
- * must be `position: relative`. Spots sharing a `zone` (e.g. every section
- * heading) count as one choice. `size` is the height in px of the tallest
- * animal; `max` the largest group; `weight` makes a zone more (or less)
- * likely to be picked.
+ * must be `position: relative`. Spots sharing a `zone` count as one choice.
+ * `size` is the height in px of the tallest animal; `max` the largest group;
+ * `weight` makes a zone more (or less) likely to be picked. Floors stay in the
+ * outer part of the width (the wide margins on desktop); `room` makes a floor
+ * add bottom padding when used, so the animals never touch the content.
+ * `hop` is for cards that lift on hover: put the spot on the element that
+ * moves and the animals ride along, each giving a little hop.
  */
 export function animalSpot(
     kind: SpotKind,
     zone: string,
-    options: { size?: number; max?: number; tone?: Tone; weight?: number } = {},
+    options: { size?: number; max?: number; tone?: Tone; weight?: number; room?: boolean; hop?: boolean } = {},
 ) {
     const { size, max, tone } = { ...spotDefaults[kind], ...options };
     return {
@@ -100,5 +102,7 @@ export function animalSpot(
         "data-animal-max": String(max),
         "data-animal-tone": tone,
         ...(options.weight ? { "data-animal-weight": String(options.weight) } : {}),
+        ...(options.room ? { "data-animal-room": "" } : {}),
+        ...(options.hop ? { "data-animal-hop": "" } : {}),
     };
 }

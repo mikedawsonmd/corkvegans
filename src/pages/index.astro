@@ -21,7 +21,7 @@ const button = "cv-btn cv-btn-md cv-btn-primary";
     jsonLd={[{ "@context": "https://schema.org", "@type": "WebSite", name: site.name, url: `${site.url}/` }, organizationJsonLd()]}
 >
     <!-- Hero Section -->
-    <section class="relative min-h-[751px] flex items-center overflow-hidden" data-surface="dark" {...animalSpot("floor", "hero")}>
+    <section class="relative min-h-[751px] flex items-center overflow-hidden" data-surface="dark" {...animalSpot("floor", "hero", { size: 46, tone: "light" })}>
         <div class="absolute inset-0 z-0">
             <img alt="" class="w-full h-full object-cover" src="/images/hero.jpg" width="2000" height="1363" fetchpriority="high" />
             <div class="absolute inset-0 bg-black/50"></div>
@@ -50,7 +50,7 @@ const button = "cv-btn cv-btn-md cv-btn-primary";
     <AboutIntro showMoreLink />
 
     <!-- Events Section -->
-    <section class="pt-xl pb-xl bg-surface-container-lowest" id="events" aria-labelledby="events-heading">
+    <section class="relative pt-xl pb-xl bg-surface-container-lowest" id="events" aria-labelledby="events-heading" {...animalSpot("floor", "events-foot")}>
         <div class="max-w-7xl mx-auto px-margin-mobile">
             <SectionHeading id="events-heading" eyebrow="What's on" title="Upcoming events" />
             <EventList events={events} limit={3} asOf={getEventsAsOf()} label="Upcoming Cork Vegans events" />

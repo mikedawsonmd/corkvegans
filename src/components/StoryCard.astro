@@ -6,7 +6,7 @@ import { animalSpot as spot } from "../lib/animals";
 interface Props {
     story: Story;
     headingLevel?: "h2" | "h3";
-    /** An animal may stand on this card (use on the first card only). */
+    /** Animals may stand on this card (use on the first card only). */
     animalSpot?: boolean;
 }
 
@@ -14,11 +14,12 @@ const { story, headingLevel = "h3", animalSpot = false } = Astro.props;
 const Heading = headingLevel;
 ---
 
-<li class:list={["h-full", animalSpot && "relative"]} {...(animalSpot ? spot("ledge", "stories", { size: 32, max: 2 }) : {})}>
+<li class="h-full">
     <article
-        class="group relative h-full flex flex-col bg-surface border border-surface-variant rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 focus-within:shadow-xl"
+        {...(animalSpot ? spot("ledge", "stories", { size: 32, max: 2, hop: true }) : {})}
+        class="group relative h-full flex flex-col bg-surface border border-surface-variant rounded-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 focus-within:shadow-xl"
     >
-        <div class="overflow-hidden">
+        <div class="overflow-hidden rounded-t-[23px]">
             <StoryImage
                 src={story.featuredImage}
                 alt={story.featuredImageAlt}

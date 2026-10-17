@@ -1,6 +1,7 @@
 ---
 /** Concise homepage pointer to the Support us page. */
 import SectionHeading from "./SectionHeading.astro";
+import { animalSpot } from "../lib/animals";
 
 const cards = [
     {
@@ -20,7 +21,7 @@ const cards = [
 ];
 ---
 
-<section class="pt-xl pb-xl bg-surface-container-lowest" aria-labelledby="support-heading">
+<section class="relative pt-xl pb-xl bg-surface-container-lowest" aria-labelledby="support-heading" {...animalSpot("floor", "support-foot")}>
     <div class="max-w-7xl mx-auto px-margin-mobile">
         <SectionHeading id="support-heading" eyebrow="Get involved" title="Support Cork Vegans" accent="#417660" eyebrowColor="#275d49" />
         <ul class="grid grid-cols-1 md:grid-cols-2 gap-lg max-w-5xl mx-auto">

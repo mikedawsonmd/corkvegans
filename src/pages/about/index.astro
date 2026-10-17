@@ -4,6 +4,7 @@ import AboutIntro from "../../components/AboutIntro.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import SupportTeaser from "../../components/SupportTeaser.astro";
 import { organizationJsonLd } from "../../lib/seo";
+import { animalSpot } from "../../lib/animals";
 
 const description =
     "Cork Vegans is a community for vegans and the veg-curious in Cork — coffee meetups, dining events, potlucks, outdoor adventures and more.";
@@ -12,7 +13,7 @@ const description =
 <BaseLayout title="About" description={description} jsonLd={[organizationJsonLd()]}>
     <PageHeader eyebrow="About us" title="About Cork Vegans" />
     <AboutIntro />
-    <section class="pt-xl pb-xl bg-surface-container-lowest" aria-labelledby="join-heading">
+    <section class="relative pt-xl pb-xl bg-surface-container-lowest" aria-labelledby="join-heading" {...animalSpot("floor", "join-foot")}>
         <div class="max-w-5xl mx-auto px-margin-mobile flex flex-col items-center text-center gap-md">
             <h2 id="join-heading" class="font-headline-lg text-headline-lg text-on-surface">Come along</h2>
             <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">

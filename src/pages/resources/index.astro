@@ -3,7 +3,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import LinkTile from "../../components/LinkTile.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import { resources } from "../../config/site";
-import { animalSpot } from "../../lib/animals";
 
 const items = resources.filter((r) => /^https:\/\//.test(r.href));
 const description = "Useful links for vegans in Cork: our WhatsApp community, the Cork vegan food map and more.";
@@ -22,11 +21,8 @@ const description = "Useful links for vegans in Cork: our WhatsApp community, th
             <ul class="flex flex-wrap justify-center gap-md max-w-5xl mx-auto">
                 {
                     items.map((r, i) => (
-                        <li
-                            class="relative w-full md:w-[calc((100%-16px)/2)] lg:w-[calc((100%-32px)/3)]"
-                            {...(i === 0 ? animalSpot("ledge", "resources", { size: 32, max: 2 }) : {})}
-                        >
-                            <LinkTile href={r.href} label={r.title} sublabel={r.description} image={r.image} icon={r.icon} color={r.color} />
+                        <li class="w-full md:w-[calc((100%-16px)/2)] lg:w-[calc((100%-32px)/3)]">
+                            <LinkTile href={r.href} label={r.title} sublabel={r.description} image={r.image} icon={r.icon} color={r.color} animalSpot={i === 0} />
                         </li>
                     ))
                 }

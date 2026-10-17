@@ -1,5 +1,7 @@
 ---
 /** Rounded resource tile (the original "Get connected" / "Resources" tile design). */
+import { animalSpot as spot } from "../lib/animals";
+
 interface Props {
     href: string;
     label: string;
@@ -10,12 +12,15 @@ interface Props {
     icon?: string;
     /** Background of the icon circle (any CSS colour or gradient). */
     color: string;
+    /** Animals may stand on this tile (use on the first tile only). */
+    animalSpot?: boolean;
 }
-const { href, label, sublabel, image, icon = "link", color } = Astro.props;
+const { href, label, sublabel, image, icon = "link", color, animalSpot = false } = Astro.props;
 ---
 
 <a
-    class="h-full bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center text-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
+    {...(animalSpot ? spot("ledge", "resources", { size: 32, max: 2, hop: true }) : {})}
+    class="relative h-full bg-white/90 backdrop-blur hover:bg-white transition-all p-lg rounded-lg flex flex-col items-center text-center gap-sm shadow-md hover:scale-105 active:scale-95 group"
     href={href}
     target="_blank"
     rel="noopener noreferrer"

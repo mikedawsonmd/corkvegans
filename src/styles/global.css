@@ -376,13 +376,48 @@ html {
     bottom: calc(100% - 1px);
 }
 
-.cv-animal-bar {
-    bottom: 100%;
-    right: -6px;
-}
-
 .cv-animal-floor {
     bottom: 0;
+}
+
+/* On plain backgrounds a floor group gets a little patch of ground, so it
+   never looks like it's floating where two sections share a colour. */
+.cv-animal-floor.cv-animal-tone-soft {
+    bottom: 6px;
+}
+
+.cv-animal-floor.cv-animal-tone-soft::after {
+    content: "";
+    position: absolute;
+    left: -14px;
+    right: -14px;
+    bottom: -3px;
+    height: 3px;
+    border-radius: 3px;
+    background: currentColor;
+    opacity: 0.3;
+}
+
+/* Cards that lift on hover carry their animals, who each give a little hop
+   (height and delay vary per animal, set by AnimalSpots.astro). */
+@keyframes cv-hop {
+    0%,
+    100% {
+        translate: 0 0;
+    }
+    30% {
+        translate: 0 var(--cv-hop, -7px);
+    }
+    55% {
+        translate: 0 0;
+    }
+    72% {
+        translate: 0 calc(var(--cv-hop, -7px) * 0.3);
+    }
+}
+
+[data-animal-hop]:hover > .cv-animal-group > .cv-animal {
+    animation: cv-hop 0.6s cubic-bezier(0.3, 0.7, 0.4, 1) var(--cv-hop-delay, 0ms) both;
 }
 
 /* 404: the basking shark drifts gently. */

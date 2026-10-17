@@ -26,7 +26,8 @@ import { animals, minSpotGap, roamingAnimals, spotsPerPage } from "../lib/animal
                 const a = art[name];
                 const el = document.createElement("span");
                 el.className = a.facing !== "front" && a.facing !== face ? "cv-animal cv-animal-flip" : "cv-animal";
-                el.style.cssText = `--cv-animal-src: url(${a.src}); height: ${height(a.scale)}; aspect-ratio: ${a.width} / ${a.height};`;
+                // Each animal hops a little differently (see .cv-animal-hop).
+                el.style.cssText = `--cv-animal-src: url(${a.src}); height: ${height(a.scale)}; aspect-ratio: ${a.width} / ${a.height}; --cv-hop: -${5 + rand(5)}px; --cv-hop-delay: ${rand(160)}ms;`;
                 return el;
             }),
         );
@@ -94,19 +95,21 @@ import { animals, minSpotGap, roamingAnimals, spotsPerPage } from "../lib/animal
         groups++;
         inPage++;
 
-        // Bars sit on the right and look inward; ledges pick a side and look
-        // toward the middle; floors walk either way.
+        // Ledges pick a side and look toward the middle; floors keep to the
+        // outer part of the width (the wide margins on desktop) and walk
+        // either way.
         const kind = spot.dataset.animalSpot;
-        const side = kind === "bar" || Math.random() < 0.5 ? "right" : "left";
+        const size = Number(spot.dataset.animalSize);
+        const side = Math.random() < 0.5 ? "right" : "left";
         const face = kind === "floor" ? (Math.random() < 0.5 ? "left" : "right") : side === "right" ? "left" : "right";
-        const unit = Number(spot.dataset.animalSize) / Math.max(...group.map((n) => art[n].scale));
+        const unit = size / Math.max(...group.map((n) => art[n].scale));
 
         const wrap = document.createElement("span");
         wrap.className = `cv-animal-group cv-animal-${kind} cv-animal-tone-${spot.dataset.animalTone}`;
         wrap.setAttribute("aria-hidden", "true");
-        if (kind === "ledge" || kind === "floor") wrap.style[side] = `${12 + rand(18)}%`;
+        wrap.style[side] = kind === "floor" ? `${4 + rand(12)}%` : `${12 + rand(18)}%`;
         draw(wrap, group, face, (scale) => `${Math.round(unit * scale)}px`);
         spot.append(wrap);
-        if (kind === "bar") spot.style.marginTop = `${Number(spot.dataset.animalSize) + 2}px`;
+        if ("animalRoom" in spot.dataset) spot.style.paddingBottom = `${parseFloat(getComputedStyle(spot).paddingBottom) + size}px`;
     }
 </script>

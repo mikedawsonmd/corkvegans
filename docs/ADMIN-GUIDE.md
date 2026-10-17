@@ -202,7 +202,7 @@ shuffled and dealt out, so **no animal appears twice on a page**:
   (up to `spotsPerPage`). A lone animal is only used when nothing else is
   showing.
 - Places closer than `minSpotGap` (300px) to one already used are skipped,
-  so a heading and the container right below it never both get animals.
+  so a page header and the card right below it never both get animals.
 
 With the current five farm animals that usually means the footer plus one
 group on the page; each new drawing adds variety and, eventually, a second
@@ -212,10 +212,11 @@ it faces; it joins the groups automatically. `roams: false` keeps one out (the
 shark only appears on the 404 page).
 
 Places an animal may appear are marked in the components with
-`animalSpot(kind, zone)`: standing on top of an image or card (`ledge`), on a
-heading's coloured bar (`bar`) or walking along the bottom of the homepage
-photo (`floor`). Spots with the same `zone` (e.g. every section heading) count
-as one place. The colour adapts to the surface (`tone`). Remove the attribute
+`animalSpot(kind, zone)`: standing on top of an image or card (`ledge`), or
+walking along the bottom of a section (`floor`) — the homepage photo, the
+inner page headers, and the foot of some full-width sections, where they keep
+to the outer edges (the wide margins on desktop). Spots with the same `zone`
+count as one place. The colour adapts to the surface (`tone`). Remove the attribute
 to stop animals appearing somewhere.
 
 **Header behaviour:** the header gains a shadow when you scroll. It only
