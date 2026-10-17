@@ -6,3 +6,6 @@ playwright-report/
 .env
 .env.*
 dist-fixtures/
+
+# macOS folder metadata
+.DS_Store
