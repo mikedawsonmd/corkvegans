@@ -245,6 +245,42 @@ shrinks on phones (under 768px wide); on larger screens it stays full height.
   (`settings.commit.identity: user`). See GitHub → repository → Commits, or
   the history of a file in `src/content/stories/`.
 
+### Guest contributors (one-off stories)
+
+Pages CMS has no temporary links or "submit for review" role, so a guest
+contributor is simply invited, writes a draft, and has their access removed
+once the story is out:
+
+1. **Invite** their email under **Settings → Collaborators**.
+2. **Send them the message below** with the quick-start guide
+   (`docs/CONTRIBUTOR-QUICKSTART.md`; on GitHub, open the file and share its
+   link).
+3. When they say it's ready, **review the draft** in Pages CMS: tidy it up,
+   check the photos and image description, then untick **Draft** and save.
+4. **Remove them** from Collaborators once the story is published (or keep
+   them if they'd like to write again).
+
+Guests can technically edit or publish any story. Draft-by-default and the
+saved history (every change is recorded and can be undone) are the safety
+net, so only invite people you trust.
+
+**Invite message to copy and send:**
+
+> Hi! Thanks so much for offering to write for Cork Vegans. 🌱
+>
+> You'll get an email from **Pages CMS** inviting you to our *corkvegans*
+> project (check spam if it's not there). To write your story:
+>
+> 1. Go to **https://app.pagescms.org**, enter this email address and click
+>    the sign-in link you're sent. No password or GitHub account is needed.
+> 2. Open **Stories**, add a new entry, and fill in the form.
+> 3. **Leave "Draft" ticked**, save, and message me when it's ready. I'll
+>    review it and publish it.
+>
+> There's a 10-minute guide here: [link to CONTRIBUTOR-QUICKSTART.md]
+>
+> Any questions, just ask!
+
 ---
 
 ## 5. Events

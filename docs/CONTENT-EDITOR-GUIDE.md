@@ -97,6 +97,10 @@ Keep paragraphs short. They're easier to read on a phone.
 
 New stories start as drafts, so nothing goes live by accident.
 
+**Guest contributors** (people invited to write one story) leave Draft
+ticked and tell an organiser when it's ready. An organiser reviews it and
+publishes. Guests have their own short guide: `docs/CONTRIBUTOR-QUICKSTART.md`.
+
 > **Important: drafts are not private.** The website's files are stored in a
 > public GitHub repository, so anyone who knows where to look can read a
 > draft there. Don't put anything confidential in a story, even in a draft.

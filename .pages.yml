@@ -108,7 +108,7 @@ content:
         label: "Draft — hidden from the website (untick to publish)"
         type: boolean
         default: true
-        description: "While ticked, the story does not appear on corkvegans.ie. Note: drafts are still visible to anyone who looks at the public GitHub repository."
+        description: "Guest contributors: leave this ticked and tell an organiser your story is ready. They'll review it and publish. While ticked, the story doesn't appear on corkvegans.ie, but drafts are still visible to anyone who looks at the public GitHub repository."
 
       - name: body
         label: Story
