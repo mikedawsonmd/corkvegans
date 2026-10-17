@@ -194,21 +194,29 @@ Commit to `main` and the site updates after the deploy.
 
 **Animal illustrations:** the drawings live in `public/images/illustrations/`
 and are listed in `src/lib/animals.ts`, with each animal's size relative to
-the cow so groups stay in proportion. On each page load:
+the cow so groups stay in proportion. On each page load the animals are
+shuffled and dealt out, so **no animal appears twice on a page**:
 
-- the footer shows one of `footerScenes` (never the same one twice in a row);
-- two more animals or small groups (from `groupings`) appear in random
-  places around the page, never repeating an animal (`spotsPerPage`).
+- the footer gets a group of 2–3 (never the same group twice in a row);
+- then groups of 2–3 go to places around the page while animals remain
+  (up to `spotsPerPage`). A lone animal is only used when nothing else is
+  showing.
+- Places closer than `minSpotGap` (300px) to one already used are skipped,
+  so a heading and the container right below it never both get animals.
+
+With the current five farm animals that usually means the footer plus one
+group on the page; each new drawing adds variety and, eventually, a second
+group. To add a drawing, use a single-colour SVG with the feet touching the
+bottom edge and add it to `animals` with its width, height, scale and the way
+it faces; it joins the groups automatically. `roams: false` keeps one out (the
+shark only appears on the 404 page).
 
 Places an animal may appear are marked in the components with
-`animalSpot(kind, zone)`: standing on top of an image, card or list of cards
-(`ledge`), on a heading's coloured bar (`bar`) or walking along the bottom of
-the homepage photo (`floor`). Spots with the same `zone` (e.g. every section
-heading) count as one place. The colour adapts to
-the surface (`tone`). Remove the attribute to stop animals appearing
-somewhere. To add a new drawing, use a single-colour SVG with the feet
-touching the bottom edge, then add it to `animals` with its width, height,
-scale and the way it faces.
+`animalSpot(kind, zone)`: standing on top of an image or card (`ledge`), on a
+heading's coloured bar (`bar`) or walking along the bottom of the homepage
+photo (`floor`). Spots with the same `zone` (e.g. every section heading) count
+as one place. The colour adapts to the surface (`tone`). Remove the attribute
+to stop animals appearing somewhere.
 
 **Header behaviour:** the header gains a shadow when you scroll. It only
 shrinks on phones (under 768px wide); on larger screens it stays full height.

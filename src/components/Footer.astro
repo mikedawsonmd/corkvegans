@@ -1,7 +1,6 @@
 ---
 import Animal from "./Animal.astro";
 import { headerCta, nav, socials } from "../config/site";
-import { footerScenes } from "../lib/animals";
 
 const year = new Date().getFullYear();
 const footerLinks = [...nav, headerCta];
@@ -18,40 +17,12 @@ const linkClass =
         data-surface="dark"
         class="relative flex flex-col gap-lg px-xl py-lg w-[calc(100%-2*theme(spacing.margin-mobile))] max-w-7xl mx-auto bg-primary text-on-primary shadow-lg mb-md rounded-lg"
     >
-        <!-- Animals standing on the panel: a different scene on each page load -->
-        {
-            footerScenes.map((scene, i) => (
-                <div
-                    data-footer-scene
-                    data-animals={scene.animals.map((a) => a.name).join(",")}
-                    hidden={i !== 0}
-                    class:list={["cv-footer-scene", scene.side === "left" ? "left-lg md:left-xl" : "right-lg md:right-xl"]}
-                    aria-hidden="true"
-                >
-                    {scene.animals.map((a) => (
-                        <Animal name={a.name} face={a.face} />
-                    ))}
-                </div>
-            ))
-        }
-        <script is:inline>
-            (() => {
-                const scenes = document.querySelectorAll("[data-footer-scene]");
-                if (scenes.length < 2) return;
-                const key = "cv-footer-scene";
-                let last = -1;
-                try {
-                    last = Number(localStorage.getItem(key) ?? -1);
-                } catch {}
-                // Pick any scene except the one shown last time.
-                let pick = Math.floor(Math.random() * (scenes.length - 1));
-                if (last >= 0 && pick >= last) pick++;
-                scenes.forEach((el, i) => (el.hidden = i !== pick));
-                try {
-                    localStorage.setItem(key, String(pick));
-                } catch {}
-            })();
-        </script>
+        <!-- Animals standing on the panel: a random group on each page load
+             (AnimalSpots.astro); this pair shows if scripts don't run. -->
+        <div data-animal-footer class="cv-footer-scene" aria-hidden="true">
+            <Animal name="pig" face="right" />
+            <Animal name="chicken" face="right" />
+        </div>
         <div class="flex flex-col md:flex-row items-center justify-between gap-md">
             <a
                 href="/"

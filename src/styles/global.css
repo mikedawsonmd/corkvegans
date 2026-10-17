@@ -334,15 +334,27 @@ html {
     --cv-animal-unit: 60px;
     position: absolute;
     bottom: calc(100% - 1px);
+    left: 24px;
     display: flex;
     align-items: flex-end;
     gap: 6px;
     color: #1f3b31;
 }
 
+.cv-footer-scene.is-right {
+    left: auto;
+    right: 24px;
+}
+
 @media (min-width: 768px) {
     .cv-footer-scene {
         --cv-animal-unit: 76px;
+        left: 40px;
+    }
+
+    .cv-footer-scene.is-right {
+        left: auto;
+        right: 40px;
     }
 }
 
