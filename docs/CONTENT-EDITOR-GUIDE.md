@@ -47,8 +47,8 @@ Bookmark **https://app.pagescms.org**. That's the only address you need.
 The **web address** of the story is created from the title the first time
 you save, e.g. `corkvegans.ie/stories/our-autumn-potluck-at-the-quay-co-op/`.
 It **doesn't change** if you later edit the title, so links that people have
-shared keep working. Before your first save, you can shorten it in the
-filename box if you like (use lowercase words separated by hyphens).
+shared keep working. If a story needs a different address, ask an
+administrator.
 
 ---
 

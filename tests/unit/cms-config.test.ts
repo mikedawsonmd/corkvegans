@@ -50,8 +50,10 @@ describe("Pages CMS configuration", () => {
         expect(fields.body.options?.media).toBe("stories");
     });
 
-    it("keeps web addresses stable after creation", () => {
-        expect(collection.filename.field).toBe("create");
+    it("names story files from the title, with no filename box for editors to get wrong", () => {
+        // Editing the box by hand (e.g. dropping ".md") makes saves fail with 'Invalid extension ""'.
+        expect(collection.filename.template).toBe("{primary}.md");
+        expect(collection.filename.field).toBe(false);
     });
 
     it("round-trips a file shaped like Pages CMS output", () => {

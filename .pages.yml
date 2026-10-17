@@ -25,9 +25,11 @@ content:
     exclude: [README.md, .gitkeep]
     filename:
       # The web address is made from the title when the story is first created
-      # and never changes afterwards, so shared links keep working.
+      # and never changes afterwards, so shared links keep working. The
+      # filename box is hidden: editing it by hand (e.g. dropping ".md") makes
+      # saves fail with 'Invalid extension ""'.
       template: "{primary}.md"
-      field: create
+      field: false
     view:
       primary: title
       fields: [title, category, publishedAt, draft]
