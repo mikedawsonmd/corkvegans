@@ -47,7 +47,7 @@ const activities = [
                 <ul class="grid grid-cols-1 min-[400px]:grid-cols-2 gap-md mt-sm">
                     {
                         activities.map((a) => (
-                            <li class="relative p-md rounded-lg bg-surface-container-low border border-surface-variant flex flex-col gap-xs" {...animalSpot("corner", "activities")}>
+                            <li class="p-md rounded-lg bg-surface-container-low border border-surface-variant flex flex-col gap-xs">
                                 <span
                                     class="material-symbols-outlined text-primary"
                                     style="font-variation-settings: 'FILL' 1;"
@@ -65,10 +65,10 @@ const activities = [
                     showMoreLink && (
                         <a
                             href="/about/"
-                            class="self-start inline-flex items-center gap-xs font-label-bold text-label-bold text-primary hover:text-surface-tint underline-offset-4 hover:underline mt-sm"
+                            class="group self-start inline-flex items-center gap-xs font-label-bold text-label-bold text-primary hover:text-surface-tint mt-sm"
                         >
-                            More about Cork Vegans
-                            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_forward</span>
+                            <span class="group-hover:underline underline-offset-4">More about Cork Vegans</span>
+                            <span class="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
                         </a>
                     )
                 }

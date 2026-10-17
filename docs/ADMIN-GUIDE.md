@@ -201,10 +201,10 @@ the cow so groups stay in proportion. On each page load:
   places around the page, never repeating an animal (`spotsPerPage`).
 
 Places an animal may appear are marked in the components with
-`animalSpot(kind, zone)`: standing on an image or card (`ledge`), sitting in a
-card's top-right corner (`corner`), on a heading's coloured bar (`bar`) or
-walking along the bottom of the homepage photo (`floor`). Spots with the same
-`zone` (e.g. all cards in one grid) count as one place. The colour adapts to
+`animalSpot(kind, zone)`: standing on top of an image, card or list of cards
+(`ledge`), on a heading's coloured bar (`bar`) or walking along the bottom of
+the homepage photo (`floor`). Spots with the same `zone` (e.g. every section
+heading) count as one place. The colour adapts to
 the surface (`tone`). Remove the attribute to stop animals appearing
 somewhere. To add a new drawing, use a single-colour SVG with the feet
 touching the bottom edge, then add it to `animals` with its width, height,

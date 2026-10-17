@@ -49,16 +49,16 @@ import { animals, groupings, spotsPerPage } from "../lib/animals";
         const group = options[rand(options.length)];
         group.forEach((n) => used.add(n));
 
-        // Corners and bars sit on the right and look inward; ledges pick a
-        // side and look toward the middle; floors walk either way.
-        const side = kind === "corner" || kind === "bar" || Math.random() < 0.5 ? "right" : "left";
+        // Bars sit on the right and look inward; ledges pick a side and look
+        // toward the middle; floors walk either way.
+        const side = kind === "bar" || Math.random() < 0.5 ? "right" : "left";
         const face = kind === "floor" ? (Math.random() < 0.5 ? "left" : "right") : side === "right" ? "left" : "right";
         const unit = size / Math.max(...group.map((n) => art[n].scale));
 
         const wrap = document.createElement("span");
         wrap.className = `cv-animal-group cv-animal-${kind} cv-animal-tone-${spot.dataset.animalTone}`;
         wrap.setAttribute("aria-hidden", "true");
-        if (kind === "ledge" || kind === "floor") wrap.style[side] = `${8 + rand(20)}%`;
+        if (kind === "ledge" || kind === "floor") wrap.style[side] = `${12 + rand(18)}%`;
 
         for (const name of face === "left" ? [...group].reverse() : group) {
             const a = art[name];

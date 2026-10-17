@@ -1,18 +1,20 @@
 ---
 import StoryImage from "./StoryImage.astro";
 import { formatStoryDate, isoDate, type Story } from "../lib/stories";
-import { animalSpot } from "../lib/animals";
+import { animalSpot as spot } from "../lib/animals";
 
 interface Props {
     story: Story;
     headingLevel?: "h2" | "h3";
+    /** An animal may stand on this card (use on the first card only). */
+    animalSpot?: boolean;
 }
 
-const { story, headingLevel = "h3" } = Astro.props;
+const { story, headingLevel = "h3", animalSpot = false } = Astro.props;
 const Heading = headingLevel;
 ---
 
-<li class="h-full">
+<li class:list={["h-full", animalSpot && "relative"]} {...(animalSpot ? spot("ledge", "stories", { size: 32, max: 2 }) : {})}>
     <article
         class="group relative h-full flex flex-col bg-surface border border-surface-variant rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 focus-within:shadow-xl"
     >
@@ -25,7 +27,7 @@ const Heading = headingLevel;
                 class="aspect-[1200/630] transition-transform duration-500 group-hover:scale-105"
             />
         </div>
-        <div class="relative flex flex-col gap-sm p-lg flex-1" {...animalSpot("corner", "stories")}>
+        <div class="flex flex-col gap-sm p-lg flex-1">
             <div class="flex flex-wrap items-center gap-sm text-label-sm text-on-surface-variant">
                 <span class="bg-surface-container-high text-on-surface font-label-bold uppercase tracking-wide px-sm py-xs rounded-full">
                     {story.category}

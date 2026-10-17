@@ -69,8 +69,8 @@ const button = "cv-btn cv-btn-md cv-btn-primary";
                 <div class="max-w-7xl mx-auto px-margin-mobile">
                     <SectionHeading id="stories-heading" eyebrow="Stories & updates" title="Latest stories" accent="#417660" eyebrowColor="#275d49" />
                     <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
-                        {latestStories.map((story) => (
-                            <StoryCard story={story} />
+                        {latestStories.map((story, i) => (
+                            <StoryCard story={story} animalSpot={i === 0} />
                         ))}
                     </ul>
                     <div class="flex justify-center mt-xl">

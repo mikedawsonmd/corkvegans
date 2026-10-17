@@ -37,7 +37,7 @@ import { animalSpot } from "../lib/animals";
         <a class="font-label-bold underline" href={links.meetup} target="_blank" rel="noopener noreferrer">Meetup</a>.
     </p>
 
-    <ul class="flex flex-col gap-lg" aria-label={label} data-event-items hidden={rendered.length === 0 || undefined}>
+    <ul class="relative flex flex-col gap-lg" aria-label={label} {...animalSpot("ledge", "events", { size: 32, max: 2 })} data-event-items hidden={rendered.length === 0 || undefined}>
         {rendered.map((event, i) => <EventCard event={event} showSummary={showSummary} hidden={limit !== undefined && i >= limit} headingLevel={headingLevel} />)}
     </ul>
 

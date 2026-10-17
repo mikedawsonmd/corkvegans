@@ -30,8 +30,8 @@ const pill = "cv-btn cv-btn-sm cv-btn-secondary";
             {
                 stories.length > 0 ? (
                     <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
-                        {stories.map((story) => (
-                            <StoryCard story={story} headingLevel="h2" />
+                        {stories.map((story, i) => (
+                            <StoryCard story={story} headingLevel="h2" animalSpot={i === 0} />
                         ))}
                     </ul>
                 ) : (

@@ -324,10 +324,6 @@ html {
     color: #417660;
 }
 
-.cv-animal-tone-muted {
-    color: #8fb3a2;
-}
-
 .cv-animal-tone-light {
     color: #fff4e6;
     opacity: 0.85;
@@ -366,11 +362,6 @@ html {
 
 .cv-animal-ledge {
     bottom: calc(100% - 1px);
-}
-
-.cv-animal-corner {
-    top: 14px;
-    right: 16px;
 }
 
 .cv-animal-bar {

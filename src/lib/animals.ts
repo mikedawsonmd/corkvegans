@@ -91,24 +91,21 @@ export const groupings: AnimalName[][] = [
 
 /**
  * Where the animals sit:
- *   ledge  – standing on the element's top edge (images, cards with space above)
- *   corner – sitting inside the element's top-right corner (cards)
+ *   ledge  – standing on the element's top edge (images, cards, lists of cards)
  *   bar    – standing on a section heading's coloured bar
  *   floor  – walking along the element's bottom edge, inside it (hero)
  */
-export type SpotKind = "ledge" | "corner" | "bar" | "floor";
+export type SpotKind = "ledge" | "bar" | "floor";
 
 /**
  * Colour, chosen to sit gently on the surface behind:
  *   soft  – the page background
- *   muted – inside light cards
  *   light – on photos and dark panels
  */
-export type Tone = "soft" | "muted" | "light";
+export type Tone = "soft" | "light";
 
 const spotDefaults: Record<SpotKind, { size: number; max: number; tone: Tone }> = {
     ledge: { size: 38, max: 3, tone: "soft" },
-    corner: { size: 26, max: 2, tone: "muted" },
     bar: { size: 34, max: 2, tone: "soft" },
     floor: { size: 46, max: 3, tone: "light" },
 };
