@@ -45,6 +45,28 @@ for (const path of ["/", "/about/", "/events/", "/stories/", "/support/", "/reso
     });
 }
 
+test("animals never stand at the bottom of a section followed by one of the same colour", async ({ page }) => {
+    // On these pages every section boundary is white on white.
+    for (const path of ["/events/", "/about/"]) {
+        for (let i = 0; i < 5; i++) {
+            await page.goto(path);
+            expect(await page.locator(".cv-animal-floor").count()).toBe(0);
+        }
+    }
+});
+
+test("floor animals take the colour of the section below", async ({ page }) => {
+    for (let i = 0; i < 20; i++) {
+        await page.goto("/resources/");
+        const floor = page.locator(".cv-animal-floor");
+        if ((await floor.count()) === 0) continue;
+        const [animal, ground] = await floor.evaluate((g) => [getComputedStyle(g).color, getComputedStyle(g.parentElement!.nextElementSibling!).backgroundColor]);
+        expect(animal).toBe(ground);
+        return;
+    }
+    throw new Error("the resources header never got animals in 20 loads");
+});
+
 test("animal illustrations are decorative and can't be dragged or saved", async ({ page }) => {
     await page.goto("/support/");
     expect(await page.locator("img[src*='/illustrations/']").count()).toBe(0);

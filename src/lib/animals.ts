@@ -63,20 +63,20 @@ export const minSpotGap = 300;
  * Where the animals sit:
  *   ledge – standing on the element's top edge (images, cards)
  *   floor – walking along the element's bottom edge, inside it (the hero,
- *           page headers, and the wide margins at the foot of sections)
+ *           page headers, the foot of sections), keeping to the outer edges.
+ *           Floors take the colour of the section below, as if growing out
+ *           of it, and are only used where that colour differs from the
+ *           section's own (never white on white, where they'd float).
  */
 export type SpotKind = "ledge" | "floor";
 
-/**
- * Colour, chosen to sit gently on the surface behind:
- *   soft  – the page background
- *   light – on photos and dark panels
- */
-export type Tone = "soft" | "light";
+/** Colour for ledges: `soft` green on the page background. (Floors take the
+ *  colour of the section below instead.) */
+export type Tone = "soft";
 
 const spotDefaults: Record<SpotKind, { size: number; max: number; tone: Tone }> = {
     ledge: { size: 38, max: 3, tone: "soft" },
-    floor: { size: 34, max: 3, tone: "soft" },
+    floor: { size: 48, max: 3, tone: "soft" },
 };
 
 /**

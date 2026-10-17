@@ -26,8 +26,9 @@ import { animals, minSpotGap, roamingAnimals, spotsPerPage } from "../lib/animal
                 const a = art[name];
                 const el = document.createElement("span");
                 el.className = a.facing !== "front" && a.facing !== face ? "cv-animal cv-animal-flip" : "cv-animal";
-                // Each animal hops a little differently (see .cv-animal-hop).
-                el.style.cssText = `--cv-animal-src: url(${a.src}); height: ${height(a.scale)}; aspect-ratio: ${a.width} / ${a.height}; --cv-hop: -${5 + rand(5)}px; --cv-hop-delay: ${rand(160)}ms;`;
+                // Each animal hops and tilts a little differently (see cv-hop).
+                const tilt = (3 + rand(5)) * (Math.random() < 0.5 ? -1 : 1);
+                el.style.cssText = `--cv-animal-src: url(${a.src}); height: ${height(a.scale)}; aspect-ratio: ${a.width} / ${a.height}; --cv-hop: -${5 + rand(5)}px; --cv-tilt: ${tilt}deg; --cv-hop-delay: ${rand(160)}ms;`;
                 return el;
             }),
         );
@@ -62,7 +63,31 @@ import { animals, minSpotGap, roamingAnimals, spotsPerPage } from "../lib/animal
     }
 
     // ── Spots around the page ──
-    const spots = [...document.querySelectorAll("[data-animal-spot]")].filter((el) => el.getClientRects().length > 0);
+    // A floor takes the colour of whatever comes next (the next section, or
+    // the footer), and is only used if that differs clearly from its own
+    // background — never white on white, where the animals would float.
+    const rgba = (el) => (getComputedStyle(el).backgroundColor.match(/[\d.]+/g) || [0, 0, 0, 0]).map(Number);
+    function nextSurface(el) {
+        for (let node = el; node && node !== document.body; node = node.parentElement) {
+            for (let next = node.nextElementSibling; next; next = next.nextElementSibling) {
+                if (next.tagName !== "SCRIPT" && next.getClientRects().length && (rgba(next)[3] ?? 1) > 0) return next;
+            }
+        }
+        return null;
+    }
+    const groundOf = new Map();
+    const usable = (el) => {
+        if (!el.getClientRects().length) return false;
+        if (el.dataset.animalSpot !== "floor") return true;
+        const next = nextSurface(el);
+        if (!next) return false;
+        const [r, g, b, a = 1] = rgba(el);
+        const [nr, ng, nb] = rgba(next);
+        if (a > 0 && Math.hypot(r - nr, g - ng, b - nb) < 24) return false;
+        groundOf.set(el, getComputedStyle(next).backgroundColor);
+        return true;
+    };
+    const spots = [...document.querySelectorAll("[data-animal-spot]")].filter(usable);
     const anchor = (el) => pageY(el, el.dataset.animalSpot === "floor" ? "bottom" : "top");
     const zones = new Map();
     for (const el of spots) {
@@ -105,7 +130,8 @@ import { animals, minSpotGap, roamingAnimals, spotsPerPage } from "../lib/animal
         const unit = size / Math.max(...group.map((n) => art[n].scale));
 
         const wrap = document.createElement("span");
-        wrap.className = `cv-animal-group cv-animal-${kind} cv-animal-tone-${spot.dataset.animalTone}`;
+        wrap.className = `cv-animal-group cv-animal-${kind}` + (kind === "floor" ? "" : ` cv-animal-tone-${spot.dataset.animalTone}`);
+        if (kind === "floor") wrap.style.color = groundOf.get(spot);
         wrap.setAttribute("aria-hidden", "true");
         wrap.style[side] = kind === "floor" ? `${4 + rand(12)}%` : `${12 + rand(18)}%`;
         draw(wrap, group, face, (scale) => `${Math.round(unit * scale)}px`);

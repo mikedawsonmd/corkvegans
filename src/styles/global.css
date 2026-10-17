@@ -307,6 +307,7 @@ html {
     background-color: currentColor;
     -webkit-mask: var(--cv-animal-src) center / contain no-repeat;
     mask: var(--cv-animal-src) center / contain no-repeat;
+    transform-origin: 50% 100%;
     transition: translate 0.25s ease;
     /* Purely decorative: no selecting, dragging or long-press "save image". */
     user-select: none;
@@ -322,11 +323,6 @@ html {
 /* Colours for each kind of surface. */
 .cv-animal-tone-soft {
     color: #417660;
-}
-
-.cv-animal-tone-light {
-    color: #fff4e6;
-    opacity: 0.85;
 }
 
 /* Footer: the animals stand on the top edge of the green panel. */
@@ -380,39 +376,25 @@ html {
     bottom: 0;
 }
 
-/* On plain backgrounds a floor group gets a little patch of ground, so it
-   never looks like it's floating where two sections share a colour. */
-.cv-animal-floor.cv-animal-tone-soft {
-    bottom: 6px;
-}
-
-.cv-animal-floor.cv-animal-tone-soft::after {
-    content: "";
-    position: absolute;
-    left: -14px;
-    right: -14px;
-    bottom: -3px;
-    height: 3px;
-    border-radius: 3px;
-    background: currentColor;
-    opacity: 0.3;
-}
-
 /* Cards that lift on hover carry their animals, who each give a little hop
-   (height and delay vary per animal, set by AnimalSpots.astro). */
+   and tilt (height, tilt and delay vary per animal, set by AnimalSpots.astro). */
 @keyframes cv-hop {
     0%,
     100% {
         translate: 0 0;
+        rotate: 0deg;
     }
     30% {
         translate: 0 var(--cv-hop, -7px);
+        rotate: var(--cv-tilt, 5deg);
     }
     55% {
         translate: 0 0;
+        rotate: calc(var(--cv-tilt, 5deg) * -0.4);
     }
     72% {
         translate: 0 calc(var(--cv-hop, -7px) * 0.3);
+        rotate: calc(var(--cv-tilt, 5deg) * 0.15);
     }
 }
 

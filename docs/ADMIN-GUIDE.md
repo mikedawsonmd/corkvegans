@@ -215,8 +215,10 @@ Places an animal may appear are marked in the components with
 `animalSpot(kind, zone)`: standing on top of an image or card (`ledge`), or
 walking along the bottom of a section (`floor`) — the homepage photo, the
 inner page headers, and the foot of some full-width sections, where they keep
-to the outer edges (the wide margins on desktop). Spots with the same `zone`
-count as one place. The colour adapts to the surface (`tone`). Remove the attribute
+to the outer edges (the wide margins on desktop). Floor animals are larger,
+take the colour of the section below (as if growing out of it), and are only
+used where that section's colour clearly differs — never white on white.
+Spots with the same `zone` count as one place. Remove the attribute
 to stop animals appearing somewhere.
 
 **Header behaviour:** the header gains a shadow when you scroll. It only
