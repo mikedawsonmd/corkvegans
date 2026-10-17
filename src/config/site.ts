@@ -114,15 +114,14 @@ export const donations = fixtures
       };
 
 /**
- * Volunteer enquiry form — REQUIRES OWNER SETUP.
+ * Volunteer enquiry form: the Formspree "Volunteer enquiries" form, which
+ * emails each enquiry to the organisers' inbox.
  *
- * Paste the Formspree endpoint, e.g. "https://formspree.io/f/abcdwxyz".
  * The endpoint ID is public by design (it is visible in every form's HTML);
- * it is not a secret. While empty, the form is shown as "not yet open" and
- * cannot be submitted.
+ * it is not a secret. Set it to "" to show the form as "not yet open".
  */
 export const volunteerForm = {
-    endpoint: fixtures ? "https://formspree.io/f/testfixture" : "",
+    endpoint: fixtures ? "https://formspree.io/f/testfixture" : "https://formspree.io/f/mwlvyppw",
 };
 
 /** Event sources used by scripts/sync-events.ts. */

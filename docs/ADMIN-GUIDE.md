@@ -143,10 +143,12 @@ point. Organisers should confirm they're accurate before relying on them.
 The page deliberately makes no claim about charity status or tax relief.
 Only add those if they've been verified.
 
-### 2.7 Volunteer form (**requires owner setup**)
+### 2.7 Volunteer form (**set up**)
 
-Until this is done, the form shows "Online volunteer sign-up isn't open yet"
-and can't be submitted.
+The form posts to the Formspree form "Volunteer enquiries"
+(`https://formspree.io/f/mwlvyppw`), which emails each enquiry to the
+organisers' inbox. Without an endpoint, the form shows "Online volunteer
+sign-up isn't open yet" and can't be submitted. These were the setup steps:
 
 1. Create a free account at **https://formspree.io** using an organisers'
    shared email address. Notifications go there.
