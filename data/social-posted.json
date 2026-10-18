@@ -1,3 +1,10 @@
 {
-  "stories": {}
+  "stories": {
+    "hello-world": {
+      "instagram": {
+        "id": "17914318449494546",
+        "postedAt": "2026-10-18T15:21:02.395Z"
+      }
+    }
+  }
 }
