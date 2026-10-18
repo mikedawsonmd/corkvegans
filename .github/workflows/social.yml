@@ -57,6 +57,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # The stories come from the deployed commit (above), but the record of
+      # what's already been posted must always be the newest one on main, so
+      # re-runs and overlapping runs can never post a story twice.
+      - name: Use the latest record of posts
+        run: |
+          git fetch --no-tags origin main
+          git show origin/main:data/social-posted.json > data/social-posted.json
+
       - name: Post to Facebook and Instagram
         run: node scripts/post-social.ts
         env:
@@ -67,10 +75,15 @@ jobs:
           FORCE: ${{ github.event_name == 'workflow_dispatch' && inputs.force || '' }}
 
       # Runs even if one platform failed, so successful posts are never
-      # forgotten (and never repeated).
+      # forgotten (and never repeated). The record is saved on top of the
+      # latest main, whichever commit the stories were read from.
       - name: Record successful posts
         if: always() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run)
         run: |
+          cp data/social-posted.json "$RUNNER_TEMP/social-posted.json"
+          git fetch --no-tags origin main
+          git checkout --force -B save-record origin/main
+          cp "$RUNNER_TEMP/social-posted.json" data/social-posted.json
           if git diff --quiet -- data/social-posted.json; then
             echo "No new posts to record."
             exit 0
