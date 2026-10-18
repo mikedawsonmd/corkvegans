@@ -93,6 +93,15 @@ export function scrub(text: string, token?: string): string {
 
 export class GraphError extends Error {}
 
+/** What to do about Meta's permission and token errors (codes 10, 200–299, 190). */
+export function tokenHint(code: number | undefined): string {
+    if (code === 190) return ". The Page access token has expired or been revoked: make a new one (docs/social-publishing.md, step 1.4) and update META_PAGE_ACCESS_TOKEN.";
+    if (code === 10 || (code !== undefined && code >= 200 && code < 300)) {
+        return ". The Page access token is missing a permission. Make a new Page token with pages_manage_posts, pages_read_engagement, instagram_basic and instagram_content_publish (docs/social-publishing.md, step 1.4) and update META_PAGE_ACCESS_TOKEN.";
+    }
+    return "";
+}
+
 type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
 
 /** Calls the Graph API. The token goes in the request body or query, never in logs. */
@@ -115,7 +124,7 @@ export async function graph(
     if (!res.ok || body.error) {
         const e = body.error ?? {};
         const code = [e.code && `code ${e.code}`, e.error_subcode && `subcode ${e.error_subcode}`, e.fbtrace_id && `trace ${e.fbtrace_id}`].filter(Boolean).join(", ");
-        throw new GraphError(scrub(`${e.message ?? `HTTP ${res.status}`}${code ? ` (${code})` : ""}`, token));
+        throw new GraphError(scrub(`${e.message ?? `HTTP ${res.status}`}${code ? ` (${code})` : ""}${tokenHint(e.code)}`, token));
     }
     return body as Record<string, unknown>;
 }
@@ -178,6 +187,8 @@ export interface RunOptions {
     now?: () => Date;
     siteUrl?: string;
     print?: (line: string) => void;
+    /** Saves the record; called after every successful post (never in dry runs). */
+    save?: (log: PostedLog) => void;
 }
 
 export interface RunResult {
@@ -253,6 +264,8 @@ export async function run(opts: RunOptions): Promise<RunResult> {
                         : await postToInstagram(fetchImpl, creds, story, { siteUrl, sleep: opts.sleep });
                 log.stories[story.slug] = { ...log.stories[story.slug], [platform]: { id, postedAt: now().toISOString() } };
                 result.changed = true;
+                // Save straight away, so an interrupted run never forgets a post.
+                opts.save?.(log);
                 result.posted.push({ slug: story.slug, platform, id });
                 print(`    ✓ posted (${id})`);
             } catch (err) {
@@ -298,9 +311,8 @@ async function main() {
         dryRun,
         force,
         hasPhoto: hasPhotoFile,
+        save: dryRun ? undefined : (log) => writeFileSync(LOG_FILE, `${JSON.stringify(log, null, 2)}\n`),
     });
-
-    if (result.changed && !dryRun) writeFileSync(LOG_FILE, `${JSON.stringify(result.log, null, 2)}\n`);
 
     const lines = [
         `Posted: ${result.posted.length}, failed: ${result.failures.length}, skipped: ${result.skipped.length}`,

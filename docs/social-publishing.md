@@ -157,6 +157,18 @@ Posts are recorded in `data/social-posted.json` (story → post IDs and
 times). That record is how a story is never posted twice. Don't edit it,
 unless you deliberately want a story posted again: remove its entry.
 
+### Reposting a story (e.g. it went out with the wrong photo)
+
+1. Delete the post on Facebook or Instagram.
+2. On GitHub, open `data/social-posted.json` → pencil icon → delete that
+   platform's entry for the story, e.g. the `"instagram": { … }` block
+   under `"hello-world"` (keep the commas and brackets valid). Commit the
+   change.
+3. That commit deploys the site, and the next run posts the story again on
+   that platform only, with whatever the story has now.
+
+### When a post fails
+
 If one platform fails (e.g. Instagram), the other's post is still recorded,
 and the next run retries **only** the failed platform. Runs happen after
 every deploy, at least every 6 hours. The error message in the run

@@ -21,7 +21,7 @@ interface Call {
 }
 
 /** A fake Meta Graph API (and live site) that records every call. */
-function fakeMeta(overrides: { live?: boolean; igStatus?: string[]; failOn?: RegExp; errorMessage?: string } = {}) {
+function fakeMeta(overrides: { live?: boolean; igStatus?: string[]; failOn?: RegExp; errorMessage?: string; errorCode?: number } = {}) {
     const calls: Call[] = [];
     const statuses = [...(overrides.igStatus ?? ["FINISHED"])];
     const fetchImpl = async (url: string, init: RequestInit = {}) => {
@@ -30,7 +30,9 @@ function fakeMeta(overrides: { live?: boolean; igStatus?: string[]; failOn?: Reg
         calls.push({ method, url, body });
         const json = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status });
         if (method === "HEAD") return new Response(null, { status: overrides.live === false ? 404 : 200 });
-        if (overrides.failOn?.test(url)) return json({ error: { message: overrides.errorMessage ?? "Something broke", code: 100, fbtrace_id: "abc" } }, 400);
+        if (overrides.failOn?.test(url)) {
+            return json({ error: { message: overrides.errorMessage ?? "Something broke", code: overrides.errorCode ?? 100, fbtrace_id: "abc" } }, 400);
+        }
         if (url.endsWith("/111/feed")) return json({ id: "111_999" });
         if (url.endsWith("/222/media")) return json({ id: "container-1" });
         if (url.includes("/container-1?")) return json({ status_code: statuses.shift() ?? "FINISHED" });
@@ -125,6 +127,29 @@ describe("posting", () => {
         const second = await run({ ...base([ticked("potluck")], first.log), fetchImpl: working.fetchImpl });
         expect(working.calls.some((c) => c.url.endsWith("/111/feed"))).toBe(false);
         expect(second.log.stories.potluck.instagram?.id).toBe("ig-777");
+    });
+
+    it("saves the record after every successful post, so an interrupted run never forgets one", async () => {
+        const saves: PostedLog[] = [];
+        const meta = fakeMeta();
+        await run({ ...base([ticked("potluck")]), fetchImpl: meta.fetchImpl, save: (log) => saves.push(structuredClone(log)) });
+        expect(saves).toHaveLength(2);
+        expect(Object.keys(saves[0].stories.potluck)).toEqual(["facebook"]);
+        expect(Object.keys(saves[1].stories.potluck).sort()).toEqual(["facebook", "instagram"]);
+    });
+
+    it("never saves in a dry run", async () => {
+        const saves: PostedLog[] = [];
+        await run({ ...base([ticked("a")]), dryRun: true, fetchImpl: fakeMeta().fetchImpl, save: (log) => saves.push(log) });
+        expect(saves).toEqual([]);
+    });
+
+    it("explains what to do about permission and token errors", async () => {
+        const denied = fakeMeta({ failOn: /\/111\/feed/, errorCode: 200, errorMessage: "(#200) If posting to a page, requires both pages_read_engagement and pages_manage_posts" });
+        const result = await run({ ...base([ticked("a")]), fetchImpl: denied.fetchImpl });
+        expect(result.failures[0]).toMatchObject({ platform: "facebook", message: expect.stringContaining("missing a permission") });
+        expect(result.failures[0].message).toContain("docs/social-publishing.md");
+        expect(result.log.stories.a.instagram?.id).toBe("ig-777");
     });
 
     it("waits for Instagram to finish processing, and fails clearly on errors", async () => {
