@@ -13,6 +13,7 @@
 import { appendFileSync, existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import sharp from "sharp";
 import { donations, site, volunteerForm } from "../src/config/site.ts";
 import { collectStories, parseStoryFile, slugify } from "../src/lib/stories.ts";
 
@@ -53,7 +54,7 @@ if (!existsSync(outDir)) {
 }
 
 // ── 1. Expected routes ───────────────────────────────────────────────────
-for (const route of ["index.html", "events/index.html", "stories/index.html", "resources/index.html", "support/index.html", "about/index.html", "404.html", "sitemap.xml", "robots.txt", "events.json", "CNAME"]) {
+for (const route of ["index.html", "events/index.html", "stories/index.html", "stories/feed.xml", "resources/index.html", "support/index.html", "about/index.html", "404.html", "sitemap.xml", "robots.txt", "events.json", "CNAME"]) {
     if (!existsSync(join(outDir, route))) fail(`Missing expected file: ${route}`);
 }
 
@@ -171,6 +172,17 @@ if (existsSync(supportFile)) {
         } else if (link || !html.includes(`data-donate-unavailable="${id}"`)) {
             fail(`support page: ${id} donation should show "Coming soon" when no link is configured`);
         }
+    }
+}
+
+// ── 5c. Social and email crops are exactly the right size ────────────────
+const cropSizes: Record<string, [number, number]> = { "share-1200x630.jpg": [1200, 630], "instagram-1080x1350.jpg": [1080, 1350] };
+for (const file of files) {
+    const size = cropSizes[file.split("/").pop() ?? ""];
+    if (!size || !relative(outDir, file).startsWith("stories/")) continue;
+    const meta = await sharp(file).metadata();
+    if (meta.format !== "jpeg" || meta.width !== size[0] || meta.height !== size[1]) {
+        fail(`${relative(outDir, file)}: expected a ${size[0]}×${size[1]} JPEG, got ${meta.width}×${meta.height} ${meta.format}`);
     }
 }
 

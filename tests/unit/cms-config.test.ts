@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
 import { storyCategories } from "../../src/config/site.ts";
-import { parseStoryFile, storyImageKey } from "../../src/lib/stories.ts";
+import { IMAGE_FOCUSES, parseStoryFile, storyImageKey } from "../../src/lib/stories.ts";
 
 const config = parse(readFileSync(new URL("../../.pages.yml", import.meta.url), "utf8"));
 const collection = config.content.find((c: { name: string }) => c.name === "stories");
@@ -18,14 +18,58 @@ describe("Pages CMS configuration", () => {
 
     it("has exactly the fields the site's story schema expects", () => {
         expect(Object.keys(fields).sort()).toEqual(
-            ["author", "body", "category", "description", "draft", "featuredImage", "featuredImageAlt", "publishedAt", "title", "updatedAt"].sort(),
+            [
+                "author",
+                "body",
+                "category",
+                "description",
+                "draft",
+                "featuredImage",
+                "featuredImageAlt",
+                "igCaption",
+                "imageFocus",
+                "publishSocial",
+                "publishedAt",
+                "socialImage",
+                "summary",
+                "title",
+                "updatedAt",
+            ].sort(),
         );
         expect(fields.body.type).toBe("rich-text");
         expect(fields.body.options?.format).toBe("markdown");
     });
 
-    it("requires the fields the site needs to publish", () => {
-        for (const name of ["title", "description", "publishedAt", "category"]) expect(fields[name].required).toBe(true);
+    it("requires the fields the site needs to publish, including a photo for social media", () => {
+        for (const name of ["title", "description", "publishedAt", "category", "featuredImage", "featuredImageAlt"]) {
+            expect(fields[name].required).toBe(true);
+        }
+    });
+
+    it("never posts to social media unless an editor ticks the box", () => {
+        expect(fields.publishSocial.type).toBe("boolean");
+        expect(fields.publishSocial.default).toBe(false);
+        for (const name of ["summary", "socialImage", "igCaption", "imageFocus", "publishSocial"]) expect(fields[name].required).toBeFalsy();
+    });
+
+    it("offers the crop positions the site understands, defaulting to centre", () => {
+        const values = (fields.imageFocus.options?.values as { name: string }[]).map((v) => v.name);
+        expect(values).toEqual([...IMAGE_FOCUSES]);
+        expect(fields.imageFocus.default).toBe("centre");
+        expect(fields.socialImage.options?.media).toBe("stories");
+    });
+
+    it("keeps links out of the sharing summary", () => {
+        const pattern = fields.summary.options?.pattern as { regex: string; message: string };
+        const re = new RegExp(pattern.regex);
+        expect(re.test("Our autumn potluck was a joy.\nThanks to everyone who came!")).toBe(true);
+        expect(re.test("See https://example.com for more")).toBe(false);
+        expect(re.test("Details at www.example.ie")).toBe(false);
+        expect(pattern.message).toMatch(/links/);
+    });
+
+    it("leaves room for the Instagram sign-off within Instagram's 2,200 character limit", () => {
+        expect(Number(fields.igCaption.options?.maxlength)).toBeLessThanOrEqual(2200 - 50);
     });
 
     it("creates new stories as drafts", () => {

@@ -109,7 +109,8 @@ test("article page has content, metadata and working navigation", async ({ page 
     await expect(page.locator('meta[property="og:type"]')).toHaveAttribute("content", "article");
     await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", "https://corkvegans.ie/stories/example-community-picnic/");
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://corkvegans.ie/stories/example-community-picnic/");
-    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", /^https:\/\/corkvegans\.ie\/_astro\/.+\.jpg$/);
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", "https://corkvegans.ie/stories/example-community-picnic/share-1200x630.jpg");
+    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", "https://corkvegans.ie/stories/example-community-picnic/share-1200x630.jpg");
 
     await expect(page.getByText("By Test Author")).toBeVisible();
     await expect(page.locator("main time").first()).toHaveText("20 September 2026");
@@ -149,4 +150,36 @@ test("share actions use the article's canonical URL", async ({ page, context, br
     await share.getByRole("button", { name: "Copy link" }).click();
     await expect(share.locator("[data-share-status]")).toHaveText("Link copied to clipboard.");
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(url);
+});
+
+test("publishes a valid RSS feed of stories, linked from every page", async ({ page, request }) => {
+    await page.goto("/");
+    await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute("href", "/stories/feed.xml");
+
+    const res = await request.get("/stories/feed.xml");
+    expect(res.status()).toBe(200);
+    const parsed = await page.evaluate((text) => {
+        const doc = new DOMParser().parseFromString(text, "application/xml");
+        const items = [...doc.querySelectorAll("item")];
+        return {
+            error: doc.querySelector("parsererror")?.textContent ?? null,
+            version: doc.documentElement.getAttribute("version"),
+            count: items.length,
+            first: items[0]?.querySelector("title")?.textContent,
+            picnicImage: items.find((i) => i.querySelector("link")?.textContent?.includes("community-picnic"))?.querySelector("enclosure")?.getAttribute("url"),
+        };
+    }, await res.text());
+    expect(parsed.error).toBeNull();
+    expect(parsed.version).toBe("2.0");
+    expect(parsed.count).toBe(13);
+    expect(parsed.first).toBe("Example: Review without a featured image");
+    expect(parsed.picnicImage).toBe("https://corkvegans.ie/stories/example-community-picnic/share-1200x630.jpg");
+});
+
+test("serves the social image crops at fixed addresses", async ({ request }) => {
+    for (const file of ["share-1200x630.jpg", "instagram-1080x1350.jpg"]) {
+        const res = await request.get(`/stories/example-community-picnic/${file}`);
+        expect(res.status()).toBe(200);
+        expect(res.headers()["content-type"]).toContain("image/jpeg");
+    }
 });

@@ -54,9 +54,11 @@ administrator.
 
 ## 3. Images
 
+- Every story needs a **featured photo** and a short description of it.
 - Use **landscape** photos. **1200 × 630 pixels or larger** is ideal.
 - Keep the important part (faces, the food) **near the centre**. Social media
-  previews crop the edges.
+  previews crop the edges; if the key part is near the top or bottom, set
+  **"Keep which part of the photo when cropping?"** to match.
 - JPG, PNG or WebP files only. Photos straight from a phone are fine: the
   website automatically resizes and compresses them.
 - Only upload photos you have permission to use. Ask people before posting
@@ -158,3 +160,16 @@ Copy link) for readers.
 | Shared preview shows the wrong picture | See section 7. |
 
 Every save is recorded with your name, so nothing is ever truly lost.
+
+---
+
+## 9. Sharing on Facebook, Instagram and the newsletter
+
+Below the story text are optional **Sharing** fields: a summary for social
+media and email, a different photo, and an Instagram caption. Leave them
+empty and sensible defaults are used.
+
+Every published story goes into the newsletter feed automatically. It's
+only posted to **Facebook and Instagram** if you tick **"Sharing: post to
+Facebook and Instagram"**, and only once. Please check with an organiser
+before ticking it. Full details: `docs/social-publishing.md`, section 3.

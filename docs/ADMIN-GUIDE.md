@@ -68,7 +68,9 @@ it takes about 2 minutes.
 
 Settings → Rules → Rulesets → New branch ruleset for `main`: enable
 **Block force pushes** and **Restrict deletions**. Don't require pull
-requests, because that would stop Pages CMS from saving.
+requests, because that would stop Pages CMS from saving, and would stop the
+social posting workflow from recording what it has posted
+(`data/social-posted.json`), risking repeat posts.
 
 ### 2.4 Pages CMS
 
@@ -181,6 +183,14 @@ by email without storing), Tally (EU-based form builder, embedded form), or a
 small Cloudflare Worker with Turnstile. The existing Cloudflare account
 could host the Worker, but sending email from it needs Cloudflare Email
 Routing, which means a DNS change.
+
+### 2.8 RSS feed, Facebook and Instagram (**requires owner setup** for social)
+
+The stories RSS feed (`/stories/feed.xml`, for the email newsletter) and the
+social image crops work automatically. Posting stories to the Facebook Page
+and Instagram needs a one-off Meta setup and three GitHub secrets
+(`META_PAGE_ID`, `META_IG_USER_ID`, `META_PAGE_ACCESS_TOKEN`). Everything,
+including dry runs, is in **`docs/social-publishing.md`**.
 
 ---
 

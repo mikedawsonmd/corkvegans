@@ -3,6 +3,7 @@
  * folder through Vite, and logs content problems once per build.
  */
 
+import { resolve } from "node:path";
 import type { ImageMetadata } from "astro";
 import { collectStories, storyImageKey, type Story } from "./stories.ts";
 
@@ -40,6 +41,14 @@ export function getStories(): Story[] {
     }
     cache = stories;
     return stories;
+}
+
+/** The file on disk behind a CMS image path (for sharp), or null if missing/invalid. */
+export function getStoryImageFile(path: string | null): string | null {
+    const key = storyImageKey(path);
+    if (!key || !images[key]) return null;
+    const rel = useFixtures ? key.replace("/src/assets/stories/", "tests/fixtures/assets/stories/") : key.slice(1);
+    return resolve(process.cwd(), rel);
 }
 
 /** Resolves a CMS image path to an optimisable image, or null if missing/invalid. */

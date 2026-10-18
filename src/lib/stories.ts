@@ -22,7 +22,22 @@ export interface Story {
     featuredImageAlt: string;
     body: string;
     readingMinutes: number;
+    /** For social posts, the RSS feed and email: plain text, no links (see resolveSummary). */
+    summary: string;
+    /** Image for social posts and email: socialImage, or the featured image. */
+    socialImage: string | null;
+    /** Which part of the image to keep when cropping for social and email. */
+    imageFocus: ImageFocus;
+    /** Instagram caption override ("" = use the summary). */
+    igCaption: string;
+    /** Ticked in Pages CMS: post to Facebook and Instagram once published. */
+    publishSocial: boolean;
 }
+
+export type ImageFocus = "top" | "centre" | "bottom";
+export const IMAGE_FOCUSES: readonly ImageFocus[] = ["top", "centre", "bottom"];
+/** The summary fallback (first paragraph) is trimmed to about this many characters. */
+export const SUMMARY_FALLBACK_LENGTH = 200;
 
 export interface StoryProblem {
     file: string;
@@ -83,6 +98,48 @@ function isDraft(value: unknown): boolean {
     // Missing = published (files added by hand); Pages CMS always writes the field.
     if (value === undefined || value === null) return false;
     return value === true || value === "true";
+}
+
+/** Markdown → plain text: links become their text, bare URLs, images and formatting are removed. */
+export function plainText(markdown: string): string {
+    return markdown
+        .replace(/!\[[^\]]*\]\([^)]*\)/g, " ") // images
+        .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1") // [text](url) → text
+        .replace(/<[^>]+>/g, " ") // HTML tags
+        .replace(/\b(?:https?:\/\/|www\.)\S+/gi, " ") // bare links
+        .replace(/^\s{0,3}(?:#{1,6}|>|[-*+]|\d+[.)])\s+/gm, "") // headings, quotes, list markers
+        .replace(/(\*\*|__|\*|_|~~|`)/g, "") // emphasis and code marks
+        .replace(/\s+/g, " ")
+        .replace(/\s+([.,;:!?])/g, "$1")
+        .trim();
+}
+
+/** Shortens text to at most `max` characters, ending on a whole word with "…". */
+export function trimToWords(text: string, max: number): string {
+    if (text.length <= max) return text;
+    const cut = text.slice(0, max - 1);
+    const lastSpace = cut.lastIndexOf(" ");
+    return `${(lastSpace > max / 2 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;:.!?–—-]+$/, "")}…`;
+}
+
+/** The first paragraph of a story with any text in it (headings and image-only blocks are skipped). */
+export function firstParagraph(markdown: string): string {
+    for (const block of markdown.split(/\n\s*\n/)) {
+        if (/^\s{0,3}#{1,6}\s/.test(block)) continue;
+        const text = plainText(block);
+        if (text) return text;
+    }
+    return "";
+}
+
+/** Summary for social posts, the feed and email: summary → description → first paragraph (~200 characters). */
+export function resolveSummary(summary: string, description: string, body: string): string {
+    return plainText(summary) || plainText(description) || trimToWords(firstParagraph(body), SUMMARY_FALLBACK_LENGTH);
+}
+
+function asFocus(value: unknown): ImageFocus {
+    const v = asString(value).toLowerCase().replace("center", "centre");
+    return (IMAGE_FOCUSES as readonly string[]).includes(v) ? (v as ImageFocus) : "centre";
 }
 
 export function countWords(markdown: string): number {
@@ -149,6 +206,11 @@ export function parseStoryFile(file: string, raw: string): ParseResult {
             featuredImageAlt: asString(data.featuredImageAlt) || (featuredImage ? title : ""),
             body,
             readingMinutes: Math.max(1, Math.round(countWords(body) / 200)),
+            summary: resolveSummary(asString(data.summary), description, body),
+            socialImage: asString(data.socialImage) || featuredImage,
+            imageFocus: asFocus(data.imageFocus),
+            igCaption: asString(data.igCaption),
+            publishSocial: data.publishSocial === true || data.publishSocial === "true",
         },
     };
 }

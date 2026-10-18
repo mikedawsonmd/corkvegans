@@ -1,5 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { collectStories, parseDate, parseStoryFile, relatedStories, slugify, storyImageKey } from "../../src/lib/stories.ts";
+import {
+    collectStories,
+    firstParagraph,
+    parseDate,
+    parseStoryFile,
+    plainText,
+    relatedStories,
+    resolveSummary,
+    slugify,
+    storyImageKey,
+    SUMMARY_FALLBACK_LENGTH,
+    trimToWords,
+} from "../../src/lib/stories.ts";
 
 const story = (fields: string, body = "Hello world.") => `---\n${fields}\n---\n${body}\n`;
 const valid = story(
@@ -129,5 +141,69 @@ describe("helpers", () => {
         expect(storyImageKey("/src/assets/other/c.jpg")).toBeNull();
         expect(storyImageKey("https://example.com/a.jpg")).toBeNull();
         expect(storyImageKey(null)).toBeNull();
+    });
+});
+
+describe("sharing fields and fallbacks", () => {
+    const base = ["title: T", 'description: "The short summary."', "publishedAt: 2026-10-01", "featuredImage: /src/assets/stories/a.jpg", "draft: false"];
+    const parse = (extra: string[] = [], body = "First paragraph of the story.\n\nSecond paragraph.") => {
+        const r = parseStoryFile("x.md", story([...base, ...extra].join("\n"), body));
+        if (r.kind !== "published") throw new Error("expected a published story");
+        return r.story;
+    };
+
+    it("uses safe defaults when no sharing fields are set (existing stories keep working)", () => {
+        expect(parse()).toMatchObject({
+            summary: "The short summary.",
+            socialImage: "/src/assets/stories/a.jpg",
+            imageFocus: "centre",
+            igCaption: "",
+            publishSocial: false,
+        });
+    });
+
+    it("prefers the sharing summary, image, focus and caption when set", () => {
+        const s = parse(['summary: "A sharing summary."', "socialImage: /src/assets/stories/b.jpg", "imageFocus: top", 'igCaption: "An IG caption"', "publishSocial: true"]);
+        expect(s).toMatchObject({ summary: "A sharing summary.", socialImage: "/src/assets/stories/b.jpg", imageFocus: "top", igCaption: "An IG caption", publishSocial: true });
+    });
+
+    it("only posts when publishSocial is really ticked", () => {
+        expect(parse(["publishSocial: false"]).publishSocial).toBe(false);
+        expect(parse(['publishSocial: "yes"']).publishSocial).toBe(false);
+    });
+
+    it("accepts American spelling and ignores unknown crop positions", () => {
+        expect(parse(["imageFocus: center"]).imageFocus).toBe("centre");
+        expect(parse(["imageFocus: sideways"]).imageFocus).toBe("centre");
+    });
+
+    it("strips links from summaries", () => {
+        expect(parse(['summary: "Read [our recap](https://x.ie) or see www.x.ie today."']).summary).toBe("Read our recap or see today.");
+    });
+});
+
+describe("summary fallback from the story text", () => {
+    it("uses the first real paragraph as plain text, skipping headings and images", () => {
+        const body = "# A heading\n\n![photo](/src/assets/stories/a.jpg)\n\nWe had **a lovely** evening at [My Goodness](https://mygoodness.ie).\n\nMore.";
+        expect(resolveSummary("", "", body)).toBe("We had a lovely evening at My Goodness.");
+    });
+
+    it("trims long paragraphs to about 200 characters on a word boundary", () => {
+        const out = resolveSummary("", "", "word ".repeat(80).trim());
+        expect(out.length).toBeLessThanOrEqual(SUMMARY_FALLBACK_LENGTH);
+        expect(out.endsWith("word…")).toBe(true);
+    });
+
+    it("trims cleanly without cutting a word or leaving punctuation before the ellipsis", () => {
+        expect(trimToWords("One two three, four five", 16)).toBe("One two three…");
+        expect(trimToWords("Short enough", 50)).toBe("Short enough");
+    });
+
+    it("turns Markdown into plain text", () => {
+        expect(plainText("## Hi\n- **Bold** _and_ `code` [link](https://a.ie)")).toBe("Hi Bold and code link");
+    });
+
+    it("finds no paragraph in an empty story", () => {
+        expect(firstParagraph("")).toBe("");
     });
 });

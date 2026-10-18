@@ -8,6 +8,7 @@ import StoryImage from "../../components/StoryImage.astro";
 import { getStories, getStoryImage } from "../../lib/content";
 import { enhanceStoryHtml, renderStoryMarkdown } from "../../lib/markdown";
 import { articleJsonLd } from "../../lib/seo";
+import { CROPS, cropPath, hasSocialImage } from "../../lib/social-images";
 import { categoryUrl, formatStoryDate, isoDate, relatedStories, storyImageKey, type Story } from "../../lib/stories";
 import { site } from "../../config/site";
 
@@ -17,14 +18,15 @@ export const getStaticPaths = (() =>
 const { story } = Astro.props as { story: Story };
 const canonical = new URL(`/stories/${story.slug}/`, site.url).href;
 
-// Social image: the featured image cropped to 1200 × 630, or the branded default.
 const featured = getStoryImage(story.featuredImage);
-const shareImage = featured
+
+// Social image: the sharing photo's 1200 × 630 crop (src/lib/social-images.ts), or the branded default.
+const shareImage = hasSocialImage(story)
     ? {
-          src: (await getImage({ src: featured, width: 1200, height: 630, fit: "cover", position: "center", format: "jpg", quality: 82 })).src,
-          width: 1200,
-          height: 630,
-          alt: story.featuredImageAlt,
+          src: cropPath(story.slug, "share"),
+          width: CROPS.share.width,
+          height: CROPS.share.height,
+          alt: story.socialImage === story.featuredImage ? story.featuredImageAlt : story.title,
       }
     : site.defaultShareImage;
 const shareImageUrl = new URL(shareImage.src, site.url).href;
