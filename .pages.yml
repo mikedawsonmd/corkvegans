@@ -112,12 +112,13 @@ content:
         label: Keep which part of the photo when cropping?
         type: select
         default: centre
-        description: "Social media and email crop the photo (wide for Facebook and email, tall for Instagram). Choose the part that must stay in view, e.g. Top for faces near the top."
+        description: "Social media and email crop the photo (wide for Facebook and email, tall for Instagram). Choose the part that must stay in view, e.g. Top for faces near the top. For screenshots, flyers or anything with text, choose Whole photo so nothing is cut off."
         options:
           values:
             - { name: top, label: Top }
             - { name: centre, label: Centre }
             - { name: bottom, label: Bottom }
+            - { name: whole, label: "Whole photo (adds a green border)" }
 
       - name: draft
         label: "Draft — hidden from the website (untick to publish)"

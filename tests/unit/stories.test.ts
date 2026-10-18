@@ -173,6 +173,7 @@ describe("sharing fields and fallbacks", () => {
     });
 
     it("accepts American spelling and ignores unknown crop positions", () => {
+        expect(parse(["imageFocus: whole"]).imageFocus).toBe("whole");
         expect(parse(["imageFocus: center"]).imageFocus).toBe("centre");
         expect(parse(["imageFocus: sideways"]).imageFocus).toBe("centre");
     });

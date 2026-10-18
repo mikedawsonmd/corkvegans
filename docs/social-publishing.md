@@ -121,7 +121,7 @@ In Pages CMS, below the story text, there are optional **Sharing** fields:
 | --- | --- |
 | **Sharing: summary** | 1–3 sentences used on Facebook, Instagram and in the email newsletter. Plain text, no links. If empty, the story's short summary is used. |
 | **Sharing: different photo** | A different photo for social media and email. If empty, the featured image is used. |
-| **Keep which part of the photo when cropping?** | Top, Centre or Bottom. Choose the part that must stay in view; the crops are wide for Facebook and tall for Instagram. |
+| **Keep which part of the photo when cropping?** | Top, Centre or Bottom: the part that must stay in view (the crops are wide for Facebook and tall for Instagram). **Whole photo** fits the entire image on a green border instead. Use it for screenshots, flyers or anything with text. |
 | **Sharing: Instagram caption** | Your own Instagram text. If empty, the summary is used. *"Full story at the link in our bio."* is always added at the end. |
 | **Sharing: post to Facebook and Instagram** | Tick to post this story once it's published. |
 

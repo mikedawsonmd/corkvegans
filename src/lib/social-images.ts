@@ -1,8 +1,9 @@
 /**
  * Social and email images: each story's sharing photo (socialImage, else the
  * featured image) cropped with sharp at build time, keeping the part chosen in
- * imageFocus. They're published at fixed addresses next to the story, so the
- * RSS feed and the social posting script can find them:
+ * imageFocus, or fitted whole on a green border ("whole"). They're published
+ * at fixed addresses next to the story, so the RSS feed and the social
+ * posting script can find them:
  *
  *   /stories/<slug>/share-1200x630.jpg      Open Graph, Facebook, email
  *   /stories/<slug>/instagram-1080x1350.jpg Instagram (4:5)
@@ -29,6 +30,24 @@ export function hasSocialImage(story: Story): boolean {
     return getStoryImageFile(story.socialImage) !== null;
 }
 
+/** Border colour and margin for "Whole photo" (brand primary green). */
+const BORDER = { r: 39, g: 93, b: 73 };
+const MARGIN = 0.06; // of the shorter side
+
+/** The whole photo, shrunk to fit inside the frame, centred on a green background. */
+async function wholePhoto(file: string, width: number, height: number): Promise<Buffer> {
+    const pad = Math.round(Math.min(width, height) * MARGIN);
+    const inner = await sharp(file)
+        .rotate()
+        .resize(width - 2 * pad, height - 2 * pad, { fit: "inside" })
+        .flatten({ background: "#ffffff" })
+        .toBuffer();
+    return sharp({ create: { width, height, channels: 3, background: BORDER } })
+        .composite([{ input: inner, gravity: "centre" }])
+        .jpeg({ quality: 82, mozjpeg: true })
+        .toBuffer();
+}
+
 // The feed needs each file's size, so crops are made once per build and reused.
 const made = new Map<string, Promise<Buffer>>();
 
@@ -40,12 +59,15 @@ export function socialCrop(story: Story, kind: CropKind): Promise<Buffer> {
         const file = getStoryImageFile(story.socialImage);
         if (!file) throw new Error(`Story "${story.slug}" has no sharing photo to crop.`);
         const { width, height } = CROPS[kind];
-        crop = sharp(file)
-            .rotate() // respect phone camera orientation
-            .resize(width, height, { fit: "cover", position: story.imageFocus })
-            .flatten({ background: "#ffffff" }) // transparent PNGs get a white background
-            .jpeg({ quality: 82, mozjpeg: true })
-            .toBuffer();
+        crop =
+            story.imageFocus === "whole"
+                ? wholePhoto(file, width, height)
+                : sharp(file)
+                      .rotate() // respect phone camera orientation
+                      .resize(width, height, { fit: "cover", position: story.imageFocus })
+                      .flatten({ background: "#ffffff" }) // transparent PNGs get a white background
+                      .jpeg({ quality: 82, mozjpeg: true })
+                      .toBuffer();
         made.set(key, crop);
     }
     return crop;

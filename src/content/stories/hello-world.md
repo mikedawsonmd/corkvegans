@@ -7,7 +7,7 @@ author: Cork Vegans
 publishedAt: 2026-10-18
 featuredImage: /src/assets/stories/frame-3.jpg
 featuredImageAlt: "Emma's wonderful animal illustrations "
-imageFocus: centre
+imageFocus: whole
 draft: false
 summary: >-
   Our website has had a refresh! 🌱 

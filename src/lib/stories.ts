@@ -34,8 +34,9 @@ export interface Story {
     publishSocial: boolean;
 }
 
-export type ImageFocus = "top" | "centre" | "bottom";
-export const IMAGE_FOCUSES: readonly ImageFocus[] = ["top", "centre", "bottom"];
+/** "whole" fits the entire photo inside the crop on a green border (for screenshots, flyers, text). */
+export type ImageFocus = "top" | "centre" | "bottom" | "whole";
+export const IMAGE_FOCUSES: readonly ImageFocus[] = ["top", "centre", "bottom", "whole"];
 /** The summary fallback (first paragraph) is trimmed to about this many characters. */
 export const SUMMARY_FALLBACK_LENGTH = 200;
 
