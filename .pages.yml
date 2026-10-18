@@ -45,6 +45,12 @@ content:
         delete: "Delete story {filename} (via Pages CMS by {userName})"
         rename: "Rename story {oldFilename} to {newFilename} (via Pages CMS by {userName})"
     fields:
+      - name: draft
+        label: "Draft: hidden from the website (untick to publish)"
+        type: boolean
+        default: true
+        description: "Untick and save to publish. The story goes live on corkvegans.ie a few minutes later. Guest contributors: leave this ticked and tell an organiser your story is ready. Drafts are hidden from the website, but anyone looking at the public GitHub repository can see them."
+
       - name: title
         label: Title
         type: string
@@ -120,12 +126,6 @@ content:
             - { name: bottom, label: Bottom }
             - { name: whole, label: "Whole photo (adds a green border)" }
 
-      - name: draft
-        label: "Draft — hidden from the website (untick to publish)"
-        type: boolean
-        default: true
-        description: "Guest contributors: leave this ticked and tell an organiser your story is ready. They'll review it and publish. While ticked, the story doesn't appear on corkvegans.ie, but drafts are still visible to anyone who looks at the public GitHub repository."
-
       - name: body
         label: Story
         type: rich-text
@@ -134,37 +134,41 @@ content:
           media: stories
           switcher: false
 
-      # ── Sharing: social media and the email newsletter (all optional) ──
-      - name: summary
-        label: "Sharing: summary (optional)"
-        type: text
-        description: "1–3 sentences for Facebook, Instagram and the email newsletter. Plain text, no links. Leave empty to use the short summary above."
-        options:
-          maxlength: 300
-          pattern:
-            regex: "^(?![\\s\\S]*(https?://|www\\.))[\\s\\S]*$"
-            message: "Please leave out links. We add the link to the story automatically."
+      # ── Posting to Facebook and Instagram ──
+      # Pages CMS can't show fields conditionally, so this is a list of at most
+      # one item: nothing shows until an editor clicks Add, and adding it is the
+      # decision to post. Removing it means the story isn't posted.
+      - name: social
+        label: Post to Facebook and Instagram
+        type: object
+        description: "To post this story to our Facebook Page and Instagram, click Add. It's posted once, a few minutes after the story is published. Leave this empty to not post. Please check with an organiser first."
+        list:
+          max: 1
+        fields:
+          - name: summary
+            label: Post text (optional)
+            type: text
+            description: "1–3 sentences for Facebook and the email newsletter. Plain text, no links. Leave empty to use the short summary."
+            options:
+              maxlength: 300
+              pattern:
+                regex: "^(?![\\s\\S]*(https?://|www\\.))[\\s\\S]*$"
+                message: "Please leave out links. We add the link to the story automatically."
 
-      - name: socialImage
-        label: "Sharing: different photo (optional)"
-        type: image
-        description: "Use a different photo for social media and email. Leave empty to use the featured image."
-        options:
-          media: stories
-          extensions: [jpg, jpeg, png, webp]
+          - name: igCaption
+            label: Instagram caption (optional)
+            type: text
+            description: "Leave empty to use the post text. \"Full story at the link in our bio.\" is added at the end automatically."
+            options:
+              maxlength: 2000
 
-      - name: igCaption
-        label: "Sharing: Instagram caption (optional)"
-        type: text
-        description: "Leave empty to use the sharing summary. \"Full story at the link in our bio.\" is added at the end automatically."
-        options:
-          maxlength: 2000
-
-      - name: publishSocial
-        label: "Sharing: post to Facebook and Instagram"
-        type: boolean
-        default: false
-        description: "Tick to post this story to our Facebook Page and Instagram once it's published (Draft unticked). It's only ever posted once. Ask an organiser before ticking this."
+          - name: image
+            label: Different photo (optional)
+            type: image
+            description: "Use a different photo for Facebook, Instagram and email. Leave empty to use the featured image. For screenshots or flyers, set the crop above to Whole photo."
+            options:
+              media: stories
+              extensions: [jpg, jpeg, png, webp]
 
 settings:
   commit:

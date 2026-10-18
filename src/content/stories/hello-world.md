@@ -1,7 +1,6 @@
 ---
 title: Welcome to the Cork Vegans website
-description: Our website has had a refresh! Take a tour of what’s new, from live
-  event listings to volunteering, and meet the illustrator behind the new look.
+description: Our website has had a refresh! Take a tour of what’s new, from live event listings to volunteering, and meet the illustrator behind the new look.
 category: News
 author: Cork Vegans
 publishedAt: 2026-10-18
@@ -9,20 +8,16 @@ featuredImage: /src/assets/stories/frame-3.jpg
 featuredImageAlt: "Emma's wonderful animal illustrations "
 imageFocus: whole
 draft: false
-summary: >-
-  Our website has had a refresh! 🌱 
+social:
+  - summary: |-
+      Our website has had a refresh! 🌱 
 
+      Live events, a new Stories section, resources and volunteering, plus beautiful illustrations by the wonderful  Emma Boruchowicz.
+    igCaption: |-
+      Our website has had a refresh! 🌱 
 
-  Live events, a new Stories section, resources and volunteering, plus beautiful
-  illustrations by the wonderful  Emma Boruchowicz.
-socialImage: /src/assets/stories/screenshot-2026-10-18-at-160345.png
-igCaption: >-
-  Our website has had a refresh! 🌱 
-
-
-  Live events, a new Stories section, resources and volunteering, plus beautiful
-  illustrations by the wonderful  Emma Boruchowicz.
-publishSocial: true
+      Live events, a new Stories section, resources and volunteering, plus beautiful illustrations by the wonderful  Emma Boruchowicz.
+    image: /src/assets/stories/screenshot-2026-10-18-at-160345.png
 ---
 Hello and welcome to the very first post on our Stories page!
 

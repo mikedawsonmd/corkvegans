@@ -138,6 +138,16 @@ export function resolveSummary(summary: string, description: string, body: strin
     return plainText(summary) || plainText(description) || trimToWords(firstParagraph(body), SUMMARY_FALLBACK_LENGTH);
 }
 
+/**
+ * The "Post to Facebook and Instagram" section: Pages CMS writes it as a list
+ * of at most one item, and adding it is the decision to post. Returns its
+ * fields, or null if there's no section (the story isn't posted).
+ */
+function socialSection(value: unknown): Record<string, unknown> | null {
+    const item = Array.isArray(value) ? value[0] : value;
+    return item && typeof item === "object" && !Array.isArray(item) ? (item as Record<string, unknown>) : null;
+}
+
 function asFocus(value: unknown): ImageFocus {
     const v = asString(value).toLowerCase().replace("center", "centre");
     return (IMAGE_FOCUSES as readonly string[]).includes(v) ? (v as ImageFocus) : "centre";
@@ -190,6 +200,7 @@ export function parseStoryFile(file: string, raw: string): ParseResult {
 
     const featuredImage = asString(data.featuredImage) || null;
     const body = parts.body.trim();
+    const social = socialSection(data.social);
 
     return {
         kind: "published",
@@ -207,11 +218,11 @@ export function parseStoryFile(file: string, raw: string): ParseResult {
             featuredImageAlt: asString(data.featuredImageAlt) || (featuredImage ? title : ""),
             body,
             readingMinutes: Math.max(1, Math.round(countWords(body) / 200)),
-            summary: resolveSummary(asString(data.summary), description, body),
-            socialImage: asString(data.socialImage) || featuredImage,
+            summary: resolveSummary(asString(social?.summary ?? data.summary), description, body),
+            socialImage: asString(social?.image ?? data.socialImage) || featuredImage,
             imageFocus: asFocus(data.imageFocus),
-            igCaption: asString(data.igCaption),
-            publishSocial: data.publishSocial === true || data.publishSocial === "true",
+            igCaption: asString(social?.igCaption ?? data.igCaption),
+            publishSocial: social !== null || data.publishSocial === true || data.publishSocial === "true",
         },
     };
 }

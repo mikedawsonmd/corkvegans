@@ -10,8 +10,8 @@ Every published story is automatically:
   - `/stories/<story>/instagram-1080x1350.jpg`, a 4:5 crop for Instagram.
 
 Stories are posted to the **Facebook Page** and **Instagram** only when an
-editor ticks **"Sharing: post to Facebook and Instagram"**, and each platform
-gets a story only once.
+editor adds the **"Post to Facebook and Instagram"** section to the story, and
+each platform gets a story only once.
 
 Setting up Facebook and Instagram posting is a one-off job for an
 administrator (section 1). After that, editors just tick a box (section 3).
@@ -115,22 +115,31 @@ ticked. Then it fails with a clear "missing secrets" message.
 
 ## 3. Posting a story to Facebook and Instagram (editors)
 
-In Pages CMS, below the story text, there are optional **Sharing** fields:
+At the bottom of the story form, below the story text, there's a section
+called **Post to Facebook and Instagram**. It's empty unless you click
+**Add**, and **adding it is what tells the website to post the story**.
+Remove it (before publishing) and the story isn't posted.
+
+Once added, it has three optional fields:
 
 | Field | What it does |
 | --- | --- |
-| **Sharing: summary** | 1–3 sentences used on Facebook, Instagram and in the email newsletter. Plain text, no links. If empty, the story's short summary is used. |
-| **Sharing: different photo** | A different photo for social media and email. If empty, the featured image is used. |
-| **Keep which part of the photo when cropping?** | Top, Centre or Bottom: the part that must stay in view (the crops are wide for Facebook and tall for Instagram). **Whole photo** fits the entire image on a green border instead. Use it for screenshots, flyers or anything with text. |
-| **Sharing: Instagram caption** | Your own Instagram text. If empty, the summary is used. *"Full story at the link in our bio."* is always added at the end. |
-| **Sharing: post to Facebook and Instagram** | Tick to post this story once it's published. |
+| **Post text** | 1–3 sentences for the Facebook post and the email newsletter. Plain text, no links. If empty, the story's short summary is used. |
+| **Instagram caption** | Your own Instagram text. If empty, the post text is used. *"Full story at the link in our bio."* is always added at the end. |
+| **Different photo** | A different photo for Facebook, Instagram and email. If empty, the featured image is used. |
+
+Further up, next to the featured image, **Keep which part of the photo when
+cropping?** applies to every shared image: Top, Centre or Bottom keeps that
+part in view (the crops are wide for Facebook and tall for Instagram).
+**Whole photo** fits the entire image on a green border instead. Use it for
+screenshots, flyers or anything with text.
 
 **To post a story:**
 
 1. Write it as usual, with a featured photo (required).
-2. Fill in the Sharing fields if you like, and tick **Sharing: post to
-   Facebook and Instagram**.
-3. Untick **Draft** and save.
+2. Under **Post to Facebook and Instagram**, click **Add** and fill in the
+   fields if you like.
+3. Untick **Draft** at the top of the form, and save.
 
 About 2–3 minutes later the website updates. Straight after that, the story
 is posted:
@@ -140,8 +149,8 @@ is posted:
 - **Instagram:** the tall crop of the photo, with the caption.
 
 Each story is posted **once**. Editing it afterwards won't post it again,
-and unticking the box doesn't delete the posts. Delete those on Facebook or
-Instagram directly.
+and removing the section afterwards doesn't delete the posts. Delete those
+on Facebook or Instagram directly.
 
 **Ask an organiser before ticking the box**, and double-check the photo and
 spelling first. Once it's posted, it's posted.
@@ -213,7 +222,7 @@ stories.
 
 | Part | File |
 | --- | --- |
-| CMS fields | `.pages.yml` (Sharing fields, `imageFocus`) |
+| CMS fields | `.pages.yml` (the `social` section, `imageFocus`) |
 | Fallbacks (summary, image, focus) | `src/lib/stories.ts` |
 | Crops (sharp) | `src/lib/social-images.ts`, `src/pages/stories/[slug]/*.jpg.ts` |
 | RSS feed | `src/lib/feed.ts`, `src/pages/stories/feed.xml.ts` |

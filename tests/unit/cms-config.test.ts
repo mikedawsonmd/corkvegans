@@ -6,8 +6,9 @@ import { IMAGE_FOCUSES, parseStoryFile, storyImageKey } from "../../src/lib/stor
 
 const config = parse(readFileSync(new URL("../../.pages.yml", import.meta.url), "utf8"));
 const collection = config.content.find((c: { name: string }) => c.name === "stories");
-const fields: Record<string, { name: string; type: string; required?: boolean; default?: unknown; options?: Record<string, unknown> }> =
-    Object.fromEntries(collection.fields.map((f: { name: string }) => [f.name, f]));
+type Field = { name: string; type: string; required?: boolean; default?: unknown; options?: Record<string, unknown>; list?: { max?: number }; fields?: Field[] };
+const fields: Record<string, Field> = Object.fromEntries(collection.fields.map((f: Field) => [f.name, f]));
+const social: Record<string, Field> = Object.fromEntries((fields.social.fields ?? []).map((f) => [f.name, f]));
 
 describe("Pages CMS configuration", () => {
     it("points at the stories folder the site reads", () => {
@@ -26,18 +27,20 @@ describe("Pages CMS configuration", () => {
                 "draft",
                 "featuredImage",
                 "featuredImageAlt",
-                "igCaption",
                 "imageFocus",
-                "publishSocial",
                 "publishedAt",
-                "socialImage",
-                "summary",
+                "social",
                 "title",
                 "updatedAt",
             ].sort(),
         );
+        expect(Object.keys(social).sort()).toEqual(["igCaption", "image", "summary"]);
         expect(fields.body.type).toBe("rich-text");
         expect(fields.body.options?.format).toBe("markdown");
+    });
+
+    it("puts the Draft switch at the top of the form", () => {
+        expect(collection.fields[0].name).toBe("draft");
     });
 
     it("requires the fields the site needs to publish, including a photo for social media", () => {
@@ -46,21 +49,23 @@ describe("Pages CMS configuration", () => {
         }
     });
 
-    it("never posts to social media unless an editor ticks the box", () => {
-        expect(fields.publishSocial.type).toBe("boolean");
-        expect(fields.publishSocial.default).toBe(false);
-        for (const name of ["summary", "socialImage", "igCaption", "imageFocus", "publishSocial"]) expect(fields[name].required).toBeFalsy();
+    it("only posts to social media when an editor adds the posting section (at most one)", () => {
+        expect(fields.social.type).toBe("object");
+        expect(fields.social.list?.max).toBe(1);
+        expect(fields.social.required).toBeFalsy();
+        expect("default" in fields.social).toBe(false);
+        for (const f of Object.values(social)) expect(f.required).toBeFalsy();
     });
 
     it("offers the crop positions the site understands, defaulting to centre", () => {
         const values = (fields.imageFocus.options?.values as { name: string }[]).map((v) => v.name);
         expect(values).toEqual([...IMAGE_FOCUSES]);
         expect(fields.imageFocus.default).toBe("centre");
-        expect(fields.socialImage.options?.media).toBe("stories");
+        expect(social.image.options?.media).toBe("stories");
     });
 
-    it("keeps links out of the sharing summary", () => {
-        const pattern = fields.summary.options?.pattern as { regex: string; message: string };
+    it("keeps links out of the post text", () => {
+        const pattern = social.summary.options?.pattern as { regex: string; message: string };
         const re = new RegExp(pattern.regex);
         expect(re.test("Our autumn potluck was a joy.\nThanks to everyone who came!")).toBe(true);
         expect(re.test("See https://example.com for more")).toBe(false);
@@ -69,7 +74,7 @@ describe("Pages CMS configuration", () => {
     });
 
     it("leaves room for the Instagram sign-off within Instagram's 2,200 character limit", () => {
-        expect(Number(fields.igCaption.options?.maxlength)).toBeLessThanOrEqual(2200 - 50);
+        expect(Number(social.igCaption.options?.maxlength)).toBeLessThanOrEqual(2200 - 50);
     });
 
     it("creates new stories as drafts", () => {

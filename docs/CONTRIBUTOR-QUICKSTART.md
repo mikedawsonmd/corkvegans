@@ -31,7 +31,7 @@ another.
      description of it in **Image description**.
    - **Story:** your story. Use the toolbar for headings, bold text, links
      and photos.
-3. **Leave "Draft" ticked.** This keeps the story off the website until an
+3. **Leave "Draft" ticked** (it's at the top of the form). This keeps the story off the website until an
    organiser has had a look.
 4. Click **Save**. You can come back and keep editing as often as you like.
 

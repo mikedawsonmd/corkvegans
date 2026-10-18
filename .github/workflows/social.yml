@@ -6,7 +6,7 @@
 #   - manually: Actions → "Post stories to social media" → "Run workflow"
 #     (choose "Dry run" to see what would be posted without posting).
 #
-# Only stories with "Sharing: post to Facebook and Instagram" ticked in
+# Only stories with the "Post to Facebook and Instagram" section added in
 # Pages CMS are posted, each platform once. Successes are recorded in
 # data/social-posted.json, which this workflow commits back to main.
 # Setup and secrets: docs/social-publishing.md.

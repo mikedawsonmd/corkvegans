@@ -31,16 +31,18 @@ Bookmark **https://app.pagescms.org**. That's the only address you need.
 
 | Field | What to put |
 | --- | --- |
+| **Draft** (at the top) | Ticked = hidden from the website. **Untick it to publish.** |
 | **Title** | The headline, e.g. *"Our autumn potluck at the Quay Co-op"*. |
 | **Short summary** | One or two sentences. This appears on the story card **and** in the preview when someone shares the link on WhatsApp, Facebook, etc. |
 | **Category** | Community, News, Reviews, Events, Guides or Stories. Readers can filter the Stories page by category, so pick the closest match. |
 | **Author** | Your name, or leave it as *Cork Vegans*. |
 | **Publish date** | The date shown on the story. |
 | **Last updated** | Leave empty, unless you make a big change to a story that's already published. |
-| **Featured image** | The main photo (see section 3). Optional, but strongly recommended. |
-| **Image description** | A short description of the photo for people who can't see it, e.g. *"Six people laughing around a table of vegan dishes"*. Fill this in whenever you add a featured image. |
-| **Draft** | Ticked = hidden from the website. **Untick it to publish.** |
+| **Featured image** | The main photo (see section 3). Required. |
+| **Image description** | A short description of the photo for people who can't see it, e.g. *"Six people laughing around a table of vegan dishes"*. Required. |
+| **Keep which part of the photo when cropping?** | Which part stays in view when the photo is cropped for link previews and social media (see section 3). |
 | **Story** | The story itself (see section 4). |
+| **Post to Facebook and Instagram** (at the bottom) | Optional. Click **Add** to also post the story to our Facebook and Instagram (see section 9). |
 
 4. Click **Save**.
 
@@ -165,11 +167,11 @@ Every save is recorded with your name, so nothing is ever truly lost.
 
 ## 9. Sharing on Facebook, Instagram and the newsletter
 
-Below the story text are optional **Sharing** fields: a summary for social
-media and email, a different photo, and an Instagram caption. Leave them
-empty and sensible defaults are used.
+Every published story goes into the newsletter feed automatically.
 
-Every published story goes into the newsletter feed automatically. It's
-only posted to **Facebook and Instagram** if you tick **"Sharing: post to
-Facebook and Instagram"**, and only once. Please check with an organiser
-before ticking it. Full details: `docs/social-publishing.md`, section 3.
+To also post it to **Facebook and Instagram**, click **Add** under **Post to
+Facebook and Instagram** at the bottom of the form. That reveals optional
+fields for the post text, an Instagram caption and a different photo; leave
+them empty and sensible defaults are used. Adding the section is what makes
+the story post (once, when it's published), so please check with an
+organiser first. Full details: `docs/social-publishing.md`, section 3.

@@ -7,8 +7,8 @@
  *   DRY_RUN=true node scripts/post-social.ts
  *   DRY_RUN=true FORCE=hello-world node scripts/post-social.ts
  *
- * Only stories with "Sharing: post to Facebook and Instagram" ticked
- * (publishSocial) are posted, and each platform only once: successes are
+ * Only stories with the "Post to Facebook and Instagram" section added in
+ * Pages CMS (publishSocial) are posted, and each platform only once: successes are
  * recorded in data/social-posted.json, which the workflow commits. A story
  * whose post failed on one platform is retried for that platform only.
  *

@@ -167,6 +167,25 @@ describe("sharing fields and fallbacks", () => {
         expect(s).toMatchObject({ summary: "A sharing summary.", socialImage: "/src/assets/stories/b.jpg", imageFocus: "top", igCaption: "An IG caption", publishSocial: true });
     });
 
+    it("posts when the 'Post to Facebook and Instagram' section is added, using its fields", () => {
+        const s = parse([
+            "social:",
+            '  - summary: "Section post text."',
+            '    igCaption: "Section caption"',
+            "    image: /src/assets/stories/c.jpg",
+        ]);
+        expect(s).toMatchObject({ publishSocial: true, summary: "Section post text.", igCaption: "Section caption", socialImage: "/src/assets/stories/c.jpg" });
+    });
+
+    it("posts with the defaults when the section is added but left empty", () => {
+        expect(parse(["social:", "  - {}"])).toMatchObject({ publishSocial: true, summary: "The short summary.", socialImage: "/src/assets/stories/a.jpg" });
+    });
+
+    it("doesn't post when the section is empty or removed", () => {
+        expect(parse(["social: []"]).publishSocial).toBe(false);
+        expect(parse(["social:"]).publishSocial).toBe(false);
+    });
+
     it("only posts when publishSocial is really ticked", () => {
         expect(parse(["publishSocial: false"]).publishSocial).toBe(false);
         expect(parse(['publishSocial: "yes"']).publishSocial).toBe(false);
