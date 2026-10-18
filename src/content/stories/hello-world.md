@@ -7,7 +7,22 @@ author: Cork Vegans
 publishedAt: 2026-10-18
 featuredImage: /src/assets/stories/frame-3.jpg
 featuredImageAlt: "Emma's wonderful animal illustrations "
+imageFocus: centre
 draft: false
+summary: >-
+  Our website has had a refresh! 🌱 
+
+
+  Live events, a new Stories section, resources and volunteering, plus beautiful
+  illustrations by the wonderful  Emma Boruchowicz.
+socialImage: /src/assets/stories/screenshot-2026-10-18-at-160345.png
+igCaption: >-
+  Our website has had a refresh! 🌱 
+
+
+  Live events, a new Stories section, resources and volunteering, plus beautiful
+  illustrations by the wonderful  Emma Boruchowicz.
+publishSocial: true
 ---
 Hello and welcome to the very first post on our Stories page!
 
