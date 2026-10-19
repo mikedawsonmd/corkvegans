@@ -192,7 +192,7 @@ and Instagram needs a one-off Meta setup and three GitHub secrets
 (`META_PAGE_ID`, `META_IG_USER_ID`, `META_PAGE_ACCESS_TOKEN`). Everything,
 including dry runs, is in **`docs/social-publishing.md`**.
 
-### 2.9 Contact form (**requires owner setup**)
+### 2.9 Contact form (**set up**: Formspree form "Contact", `meaeddlp`)
 
 The About page has a **Get in touch** form (`/about/#contact`) for
 questions, event and story ideas, recommendations, collaborations, press

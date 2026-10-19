@@ -130,7 +130,7 @@ export const volunteerForm = {
  * endpoint. While empty, the form is shown as "not open yet".
  */
 export const contactForm = {
-    endpoint: fixtures ? "https://formspree.io/f/contactfixture" : "",
+    endpoint: fixtures ? "https://formspree.io/f/contactfixture" : "https://formspree.io/f/meaeddlp",
 };
 
 /** Event sources used by scripts/sync-events.ts. */
