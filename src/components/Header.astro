@@ -8,10 +8,14 @@ const linkBase =
     "relative whitespace-nowrap font-label-bold text-label-bold rounded-full px-sm py-sm transition-colors hover:text-primary";
 ---
 
-<!-- TopAppBar -->
+<!-- TopAppBar
+     The header floats over the page (fixed) and a spacer below keeps its
+     full-size room, so when it shrinks on phones the page underneath doesn't
+     move. (A sticky header pulled the content up as it shrank, which nudged
+     the scroll position back over the shrink point and made it flicker.) -->
 <header
     id="siteHeader"
-    class="sticky top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm transition-all duration-300"
+    class="fixed inset-x-0 top-0 z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm transition-all duration-300"
 >
     <div
         id="headerInner"
@@ -103,3 +107,5 @@ const linkBase =
         </ul>
     </nav>
 </header>
+<!-- Room for the full-size header: py-lg (24px × 2) + the 48px logo. -->
+<div id="headerSpacer" class="h-[96px]" aria-hidden="true"></div>

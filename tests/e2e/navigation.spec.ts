@@ -75,6 +75,42 @@ test.describe("navigation", () => {
         await expect(page.locator("#headerLogo")).toHaveClass(/h-\[48px\]/);
     });
 
+    test("the space reserved for the header matches its full size", async ({ page }) => {
+        for (const path of ["/", "/about/", "/stories/"]) {
+            await page.goto(path);
+            const [header, spacer] = await page.evaluate(() => [
+                document.getElementById("siteHeader")!.getBoundingClientRect().height,
+                document.getElementById("headerSpacer")!.getBoundingClientRect().height,
+            ]);
+            expect(Math.abs(header - spacer)).toBeLessThanOrEqual(1);
+        }
+    });
+
+    test("header changes size once when scrolling slowly past the shrink point, without flickering", async ({ page, isMobile }) => {
+        test.skip(!isMobile, "only shrinks on mobile");
+        await page.goto("/about/");
+        await page.evaluate(() => {
+            const w = window as unknown as { changes: number };
+            w.changes = 0;
+            let last = document.getElementById("headerInner")!.classList.contains("py-sm");
+            const tick = () => {
+                const now = document.getElementById("headerInner")!.classList.contains("py-sm");
+                if (now !== last) w.changes++;
+                last = now;
+                requestAnimationFrame(tick);
+            };
+            requestAnimationFrame(tick);
+        });
+        for (let y = 0; y <= 120; y += 3) {
+            await page.evaluate((y) => window.scrollTo(0, y), y);
+            await page.waitForTimeout(16);
+        }
+        await page.waitForTimeout(800);
+        expect(await page.evaluate(() => (window as unknown as { changes: number }).changes)).toBe(1);
+        // Shrinking doesn't move the page underneath.
+        expect(Math.round(await page.evaluate(() => window.scrollY))).toBe(120);
+    });
+
     test("'Support us' is the primary header action on every page", async ({ page }) => {
         for (const path of ["/", "/events/", "/stories/", "/about/"]) {
             await page.goto(path);
