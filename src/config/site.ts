@@ -49,6 +49,7 @@ export const nav = [
 /** Social profiles, shown as icons in the footer. */
 export const socials = [
     { label: "Meetup", href: links.meetup, icon: "/images/socials/meetup.png", color: "rgb(255, 74, 121)" },
+    { label: "Eventbrite", href: links.eventbrite, icon: "/images/socials/eventbrite.png", color: "#F05537" },
     { label: "Facebook", href: links.facebook, icon: "/images/socials/facebook.png", color: "#1877F2" },
     {
         label: "Instagram",

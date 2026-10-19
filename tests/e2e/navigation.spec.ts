@@ -151,8 +151,13 @@ test.describe("navigation", () => {
         const footer = page.locator("footer");
         await expect(footer.getByRole("navigation", { name: "Footer" }).getByRole("link")).toHaveText(["Events", "Stories", "Resources", "About", "Contact", "Support us"]);
         const socials = footer.getByRole("list", { name: "Cork Vegans on social media" }).getByRole("link");
-        await expect(socials).toHaveCount(3);
-        for (const [name, href] of [["Meetup", "https://www.meetup.com/corkvegans/"], ["Facebook", "https://www.facebook.com/corkvegans/"], ["Instagram", "https://www.instagram.com/corkvegans"]]) {
+        await expect(socials).toHaveCount(4);
+        for (const [name, href] of [
+            ["Meetup", "https://www.meetup.com/corkvegans/"],
+            ["Eventbrite", "https://www.eventbrite.ie/o/cork-vegans-91797524863"],
+            ["Facebook", "https://www.facebook.com/corkvegans/"],
+            ["Instagram", "https://www.instagram.com/corkvegans"],
+        ]) {
             const link = footer.getByRole("link", { name: new RegExp(`on ${name}`) });
             await expect(link).toHaveAttribute("href", href);
             await expect(link).toHaveAttribute("rel", /noopener/);
