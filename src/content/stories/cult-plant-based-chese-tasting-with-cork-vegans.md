@@ -3,7 +3,7 @@ draft: true
 title: Cult! plant-based che*se tasting with Cork Vegans
 description: Join us at My Goodness on 28 November for a plant-based cheese
   tasting with Cult! Tickets are €5, with all proceeds supporting Cork Vegans.
-category: Stories
+category: Events
 author: Cork Vegans
 publishedAt: 2026-10-19
 featuredImage: /src/assets/stories/website.jpg
