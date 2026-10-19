@@ -10,10 +10,10 @@ featuredImage: /src/assets/stories/website.jpg
 featuredImageAlt: Selection of vegan cheeses from Cult!
 imageFocus: centre
 social:
-  - summary: Che*se lovers, this one’s for you 🧀 Taste Cult!’s plant-based cheeses
+  - summary: Cheese lovers, this one’s for you 🧀 Taste Cult!’s plant-based cheeses
       with us at My Goodness, Sat 28 Nov. €5, all for Cork Vegans.
     igCaption: >-
-      Che*se lovers, this one’s for you 🧀 Taste Cult!’s plant-based cheeses
+      Cheese lovers, this one’s for you 🧀 Taste Cult!’s plant-based cheeses
       with us at My Goodness, Sat 28 Nov. €5, all for Cork Vegans. Tickets on
       Eventbrite in our bio/linktree!
 
