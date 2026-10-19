@@ -12,8 +12,13 @@ imageFocus: centre
 social:
   - summary: Che*se lovers, this one’s for you 🧀 Taste Cult!’s plant-based cheeses
       with us at My Goodness, Sat 28 Nov. €5, all for Cork Vegans.
-    igCaption: Che*se lovers, this one’s for you 🧀 Taste Cult!’s plant-based
-      cheeses with us at My Goodness, Sat 28 Nov. €5, all for Cork Vegans.
+    igCaption: >-
+      Che*se lovers, this one’s for you 🧀 Taste Cult!’s plant-based cheeses
+      with us at My Goodness, Sat 28 Nov. €5, all for Cork Vegans. Tickets on
+      Eventbrite in our bio/linktree!
+
+
+      #CorkVegans #VeganCork #VeganCheese #VeganIreland #MyGoodness #NightCoop
     image: /src/assets/stories/instagram-post-regtangular.jpg
 ---
 Calling all cheese lovers! On Saturday 28 November, we’re teaming up with Cult!, a Belfast company making delicious plant-based cheese, for an evening of tasting at My Goodness.
