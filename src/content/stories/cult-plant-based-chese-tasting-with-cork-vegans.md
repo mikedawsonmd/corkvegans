@@ -21,7 +21,7 @@ social:
       #CorkVegans #VeganCork #VeganCheese #VeganIreland #MyGoodness #NightCoop
     image: /src/assets/stories/instagram-post-regtangular.jpg
 ---
-Calling all cheese lovers! On Saturday 28 November, we’re teaming up with Cult!, a Belfast company making delicious plant-based cheese, for an evening of tasting at My Goodness.
+Calling all cheese lovers! On Saturday 28 November, we’re teaming up with Cult!, a Bangor company making delicious plant-based cheese, for an evening of tasting at My Goodness.
 
 **What’s on**
 
