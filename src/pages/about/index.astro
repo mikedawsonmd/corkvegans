@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import AboutIntro from "../../components/AboutIntro.astro";
+import ContactForm from "../../components/ContactForm.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import SupportTeaser from "../../components/SupportTeaser.astro";
 import { organizationJsonLd } from "../../lib/seo";
@@ -8,6 +9,13 @@ import { animalSpot } from "../../lib/animals";
 
 const description =
     "Cork Vegans is a community for vegans and the veg-curious in Cork — coffee meetups, dining events, potlucks, outdoor adventures and more.";
+
+const contactReasons = [
+    { icon: "event", title: "Suggest an event", text: "An idea for a social, walk, potluck or talk." },
+    { icon: "edit_note", title: "Story ideas", text: "Something you'd like to read about, or write." },
+    { icon: "storefront", title: "Recommendations", text: "Vegan-friendly places, businesses and products in Cork." },
+    { icon: "handshake", title: "Working together", text: "Businesses, organisations and press." },
+];
 ---
 
 <BaseLayout title="About" description={description} jsonLd={[organizationJsonLd()]}>
@@ -29,5 +37,37 @@ const description =
             </a>
         </div>
     </section>
+
+    <!-- Contact -->
+    <section id="contact" class="pt-xl pb-xl bg-surface" aria-labelledby="contact-heading">
+        <div class="max-w-7xl mx-auto px-margin-mobile grid grid-cols-1 lg:grid-cols-2 gap-xl items-start">
+            <div class="flex flex-col gap-md">
+                <h2 id="contact-heading" class="font-headline-lg text-headline-lg text-on-surface">Get in touch</h2>
+                <p class="font-body-lg text-body-lg text-on-surface-variant">
+                    Got a question, an idea or a tip for us? We'd love to hear from you.
+                </p>
+                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-md mt-sm">
+                    {
+                        contactReasons.map((r) => (
+                            <li class="p-md rounded-lg bg-surface-container-low border border-surface-variant flex flex-col gap-xs">
+                                <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">
+                                    {r.icon}
+                                </span>
+                                <p class="font-label-bold text-label-bold">{r.title}</p>
+                                <p class="text-label-sm text-on-surface-variant">{r.text}</p>
+                            </li>
+                        ))
+                    }
+                </ul>
+                <p class="text-body-md text-on-surface-variant">
+                    Want to volunteer? Use the{" "}
+                    <a href="/support/#volunteer" class="font-label-bold text-primary underline underline-offset-2">volunteer form</a>{" "}
+                    instead, so it reaches the right people.
+                </p>
+            </div>
+            <ContactForm />
+        </div>
+    </section>
+
     <SupportTeaser />
 </BaseLayout>

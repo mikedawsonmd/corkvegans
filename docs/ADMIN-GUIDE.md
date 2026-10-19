@@ -192,6 +192,29 @@ and Instagram needs a one-off Meta setup and three GitHub secrets
 (`META_PAGE_ID`, `META_IG_USER_ID`, `META_PAGE_ACCESS_TOKEN`). Everything,
 including dry runs, is in **`docs/social-publishing.md`**.
 
+### 2.9 Contact form (**requires owner setup**)
+
+The About page has a **Get in touch** form (`/about/#contact`) for
+questions, event and story ideas, recommendations, collaborations, press
+and website feedback. It's separate from the volunteer form. Until it's set
+up, it shows "Our contact form isn't open yet".
+
+1. In the same Formspree account, create a **new** form called **Contact**
+   (separate from "Volunteer enquiries").
+2. In its settings, check the notification email and turn **reCAPTCHA off**.
+   The site has its own spam protection: a hidden trap field, dropping
+   anything sent within 5 seconds of opening the page, and limits on length
+   and links.
+3. Put its endpoint in `src/config/site.ts`:
+   `contactForm.endpoint: fixtures ? "…" : "https://formspree.io/f/…"`.
+4. Commit, wait for the deploy, and send a test message.
+
+Each email's subject says the topic, e.g. *"Contact: Suggest an event"*, so
+you can filter them in your inbox. Links like `/about/?topic=event#contact`
+open the form with a topic chosen; the Events, Stories and Resources pages
+use these. The topic list is in `src/scripts/contact-form.ts`. The same
+privacy checklist as the volunteer form (section 2.7) applies.
+
 ---
 
 ## 3. Everyday site changes

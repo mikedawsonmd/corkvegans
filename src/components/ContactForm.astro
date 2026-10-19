@@ -1,0 +1,133 @@
+---
+/**
+ * Contact form: questions, event and story ideas, recommendations and more.
+ * Messages go to the organisers through a hosted form service (Formspree,
+ * configured as contactForm in src/config/site.ts); nothing is stored on
+ * corkvegans.ie. Until an endpoint is configured the form is shown as "not
+ * open yet" and cannot be submitted.
+ */
+import { contactForm, links } from "../config/site";
+import { animalSpot } from "../lib/animals";
+import { CONTACT_TOPICS, MESSAGE_MAX_LENGTH } from "../scripts/contact-form";
+
+const endpoint = contactForm.endpoint.trim();
+const configured = /^https:\/\/formspree\.io\/f\/[A-Za-z0-9]+$/.test(endpoint);
+
+const input =
+    "mt-xs block w-full rounded-lg border-outline bg-surface-container-lowest px-md py-sm text-body-md text-on-surface focus:border-primary focus:ring-primary aria-[invalid=true]:border-error";
+const label = "font-label-bold text-label-bold text-on-surface";
+const hint = "mt-xs text-label-sm text-on-surface-variant";
+const errorText = "mt-xs text-label-bold text-error flex items-center gap-xs";
+---
+
+<div class="relative bg-surface border border-surface-variant rounded-lg p-lg md:p-xl shadow-sm" {...animalSpot("ledge", "contact", { size: 34, max: 2 })}>
+    {
+        !configured && (
+            <div class="mb-lg rounded-lg border border-tertiary-fixed-dim bg-tertiary-fixed px-lg py-md text-on-tertiary-fixed" role="note">
+                <p class="font-label-bold text-label-bold">Our contact form isn't open yet.</p>
+                <p class="text-body-md mt-xs">
+                    In the meantime, send us a message on{" "}
+                    <a class="font-label-bold underline" href={links.facebook} target="_blank" rel="noopener noreferrer">Facebook</a> or{" "}
+                    <a class="font-label-bold underline" href={links.instagram} target="_blank" rel="noopener noreferrer">Instagram</a>.
+                </p>
+            </div>
+        )
+    }
+
+    <form data-contact-form action={configured ? endpoint : undefined} method="POST" novalidate aria-labelledby="contact-form-title" aria-describedby="contact-privacy">
+        <h3 id="contact-form-title" class="font-headline-md text-headline-md text-on-surface mb-md">Send us a message</h3>
+
+        <div data-error-summary role="alert" tabindex="-1" class="mb-lg rounded-lg border-2 border-error bg-error-container px-lg py-md text-on-error-container" hidden>
+            <p class="font-label-bold text-label-bold">Please check the following:</p>
+            <ul class="mt-xs list-disc pl-lg text-body-md" data-error-list></ul>
+        </div>
+
+        <fieldset disabled={!configured || undefined} class="flex flex-col gap-lg disabled:opacity-60">
+            <legend class="sr-only">Your message and details</legend>
+            <p class="text-label-sm text-on-surface-variant">Fields marked <span aria-hidden="true">*</span><span class="sr-only">with an asterisk</span> are required.</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-lg">
+                <div>
+                    <label for="cf-name" class={label}>Name <span aria-hidden="true">*</span></label>
+                    <input id="cf-name" name="name" type="text" autocomplete="name" required maxlength="100" aria-describedby="cf-name-error" class={input} />
+                    <p id="cf-name-error" class={errorText} hidden></p>
+                </div>
+                <div>
+                    <label for="cf-email" class={label}>Email <span aria-hidden="true">*</span></label>
+                    <input id="cf-email" name="email" type="email" autocomplete="email" required maxlength="254" aria-describedby="cf-email-hint cf-email-error" class={input} />
+                    <p id="cf-email-hint" class={hint}>We'll only use this to reply to you.</p>
+                    <p id="cf-email-error" class={errorText} hidden></p>
+                </div>
+            </div>
+
+            <div>
+                <label for="cf-topic" class={label}>What's it about?</label>
+                <select id="cf-topic" name="topic" class={input}>
+                    {CONTACT_TOPICS.map((t) => <option value={t.id}>{t.label}</option>)}
+                </select>
+            </div>
+
+            <div>
+                <label for="cf-message" class={label}>Message <span aria-hidden="true">*</span></label>
+                <textarea id="cf-message" name="message" rows="6" required maxlength={MESSAGE_MAX_LENGTH} aria-describedby="cf-message-hint cf-message-error" class={input}></textarea>
+                <p id="cf-message-hint" class={hint} data-topic-hint aria-live="polite">{CONTACT_TOPICS[0].hint}</p>
+                <p id="cf-message-error" class={errorText} hidden></p>
+            </div>
+
+            <div>
+                <label for="cf-link" class={label}>Link <span class="font-body-md text-on-surface-variant">(optional)</span></label>
+                <input id="cf-link" name="link" type="text" inputmode="url" autocomplete="url" maxlength="300" aria-describedby="cf-link-hint cf-link-error" class={input} />
+                <p id="cf-link-hint" class={hint}>A website, event page or Instagram, if there is one.</p>
+                <p id="cf-link-error" class={errorText} hidden></p>
+            </div>
+
+            <!-- Spam trap: hidden from people, filled in by bots. -->
+            <div class="hidden" aria-hidden="true">
+                <label for="cf-gotcha">Leave this field empty</label>
+                <input id="cf-gotcha" type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
+            </div>
+
+            <div>
+                <div class="flex items-start gap-sm">
+                    <input id="cf-privacy" name="privacy" type="checkbox" value="acknowledged" required aria-describedby="cf-privacy-error" class="mt-[2px] h-5 w-5 shrink-0 rounded-[4px] border-outline text-primary focus:ring-primary" />
+                    <label for="cf-privacy" class="text-body-md text-on-surface">
+                        I understand Cork Vegans will use these details to reply to my message, as explained in the privacy note
+                        below. <span aria-hidden="true">*</span>
+                    </label>
+                </div>
+                <p id="cf-privacy-error" class={errorText} hidden></p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-md">
+                <button type="submit" class="cv-btn cv-btn-md cv-btn-primary" data-submit>Send message</button>
+                <p data-form-status role="status" aria-live="polite" class="text-body-md text-on-surface-variant"></p>
+            </div>
+        </fieldset>
+    </form>
+
+    <div data-form-success tabindex="-1" class="flex flex-col items-start gap-sm" hidden>
+        <p class="font-headline-md text-headline-md text-on-surface">Thank you, we've received your message.</p>
+        <p class="font-body-md text-body-md text-on-surface-variant">
+            One of the organisers will get back to you by email. We're all volunteers, so it may take a few days. If you
+            don't hear from us within a couple of weeks, please check your spam folder or message us on Facebook or
+            Instagram.
+        </p>
+    </div>
+
+    <div id="contact-privacy" class="mt-lg pt-lg border-t border-surface-variant text-label-sm text-on-surface-variant flex flex-col gap-xs">
+        <p class="font-label-bold text-label-bold text-on-surface">How we use your details</p>
+        <p>
+            We use your name, email and message only to reply to you. We won't add you to a mailing list or share your
+            details outside the Cork Vegans organising team.
+        </p>
+        <p>
+            The form is delivered to us by Formspree, a form service based in the United States, which processes and
+            stores messages on our behalf. Ask us at any time to see or delete what you sent, and we'll do so.
+        </p>
+    </div>
+</div>
+
+<script>
+    import { initContactForm } from "../scripts/contact-form.ts";
+    document.querySelectorAll<HTMLFormElement>("[data-contact-form]").forEach(initContactForm);
+</script>

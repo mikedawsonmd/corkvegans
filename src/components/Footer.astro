@@ -3,7 +3,7 @@ import Animal from "./Animal.astro";
 import { headerCta, nav, socials } from "../config/site";
 
 const year = new Date().getFullYear();
-const footerLinks = [...nav, headerCta];
+const footerLinks = [...nav, { label: "Contact", href: "/about/#contact" }, headerCta];
 const linkClass =
     "font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors !text-on-primary/80 hover:!text-white underline-offset-4 hover:underline";
 ---

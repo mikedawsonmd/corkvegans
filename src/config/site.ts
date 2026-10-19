@@ -124,6 +124,15 @@ export const volunteerForm = {
     endpoint: fixtures ? "https://formspree.io/f/testfixture" : "https://formspree.io/f/mwlvyppw",
 };
 
+/**
+ * Contact form (About page, #contact): the Formspree form "Contact", kept
+ * separate from volunteer enquiries. Public by design, like the volunteer
+ * endpoint. While empty, the form is shown as "not open yet".
+ */
+export const contactForm = {
+    endpoint: fixtures ? "https://formspree.io/f/contactfixture" : "",
+};
+
 /** Event sources used by scripts/sync-events.ts. */
 export const eventSources = {
     meetupIcalUrl: "https://www.meetup.com/corkvegans/events/ical/",

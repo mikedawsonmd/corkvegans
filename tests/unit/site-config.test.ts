@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { donations, links, site, volunteerForm } from "../../src/config/site.ts";
+import { contactForm, donations, links, site, volunteerForm } from "../../src/config/site.ts";
 
 describe("site configuration", () => {
     it("uses the apex domain as canonical, matching CNAME", () => {
@@ -17,8 +17,14 @@ describe("site configuration", () => {
         for (const url of [donations.oneOffUrl, donations.monthlyUrl]) expect(url === "" || url.startsWith("https://")).toBe(true);
     });
 
-    it("has a form endpoint that is empty or a Formspree form URL", () => {
-        expect(volunteerForm.endpoint === "" || /^https:\/\/formspree\.io\/f\/[A-Za-z0-9]+$/.test(volunteerForm.endpoint)).toBe(true);
+    it("has form endpoints that are empty or Formspree form URLs", () => {
+        for (const endpoint of [volunteerForm.endpoint, contactForm.endpoint]) {
+            expect(endpoint === "" || /^https:\/\/formspree\.io\/f\/[A-Za-z0-9]+$/.test(endpoint)).toBe(true);
+        }
+    });
+
+    it("keeps contact messages separate from volunteer enquiries", () => {
+        if (contactForm.endpoint) expect(contactForm.endpoint).not.toBe(volunteerForm.endpoint);
     });
 
     it("contains no credentials", () => {

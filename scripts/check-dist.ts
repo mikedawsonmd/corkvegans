@@ -14,7 +14,7 @@ import { appendFileSync, existsSync, readFileSync, readdirSync, statSync } from 
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
-import { donations, site, volunteerForm } from "../src/config/site.ts";
+import { contactForm, donations, site, volunteerForm } from "../src/config/site.ts";
 import { collectStories, parseStoryFile, slugify } from "../src/lib/stories.ts";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
@@ -183,6 +183,20 @@ for (const file of files) {
     const meta = await sharp(file).metadata();
     if (meta.format !== "jpeg" || meta.width !== size[0] || meta.height !== size[1]) {
         fail(`${relative(outDir, file)}: expected a ${size[0]}×${size[1]} JPEG, got ${meta.width}×${meta.height} ${meta.format}`);
+    }
+}
+
+// ── 5d. About page contact form reflects its configuration ───────────────
+const aboutFile = join(outDir, "about/index.html");
+if (existsSync(aboutFile)) {
+    const html = readFileSync(aboutFile, "utf8");
+    const formTag = /<form[^>]*data-contact-form[^>]*>/.exec(html)?.[0] ?? "";
+    if (!html.includes('id="contact"') || !formTag) fail("about page: missing the #contact section or its form");
+    else if (contactForm.endpoint) {
+        if (attr(formTag, "action") !== contactForm.endpoint) fail("about page: contact form does not post to the configured endpoint");
+    } else {
+        if (attr(formTag, "action")) fail("about page: contact form has an action but no endpoint is configured");
+        if (!/<fieldset[^>]*\sdisabled/.test(html)) fail("about page: unconfigured contact form should be disabled");
     }
 }
 
