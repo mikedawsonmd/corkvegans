@@ -3,7 +3,7 @@ draft: true
 title: Find your next vegan meal with the Cork vegan food map
 description: Looking for vegan food in Cork? Our free map shows vegan and
   vegan-friendly places to eat in and around the city, all in one place.
-category: Community
+category: Guides
 author: Cork Vegans
 publishedAt: 2026-10-19
 featuredImage: /src/assets/stories/mapmain.jpg
