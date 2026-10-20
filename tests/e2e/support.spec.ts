@@ -6,9 +6,22 @@ test("donation section offers one-off and monthly options via the hosted provide
     await page.goto("/support/#donate");
     await expect(page.locator("#donate")).toBeInViewport();
     await expect(page.locator('[data-donate="once"]')).toHaveAttribute("href", "https://donate.example/once");
-    await expect(page.locator('[data-donate="monthly"]')).toHaveAttribute("href", "https://donate.example/monthly");
+    const monthly = page.getByRole("group", { name: "Choose a monthly amount" }).getByRole("link");
+    await expect(monthly).toHaveCount(2);
+    await expect(monthly.first()).toHaveAccessibleName("€5 a month (continues to Test Provider)");
+    await expect(monthly.first()).toHaveAttribute("href", "https://donate.example/monthly-5");
+    await expect(page.getByRole("link", { name: /Manage or cancel your donation/ })).toHaveAttribute("href", "https://donate.example/manage");
+    await expect(page.locator("#donate a[target]")).toHaveCount(0); // same tab
     await expect(page.getByText(/never sees or stores your card details/)).toBeVisible();
     await expect(page.locator("#donate input")).toHaveCount(0); // no card fields on our site
+});
+
+test("donation thank-you page links back and is hidden from search", async ({ page }) => {
+    await page.goto("/support/thanks/");
+    await expect(page.getByRole("heading", { level: 1, name: "Thank you!" })).toBeVisible();
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex");
+    await expect(page.getByRole("link", { name: "See upcoming events" })).toHaveAttribute("href", "/events/");
+    await expect(page.getByRole("link", { name: "Go to the homepage" })).toHaveAttribute("href", "/");
 });
 
 test("volunteer anchor and form labels", async ({ page }) => {

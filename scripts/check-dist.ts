@@ -54,7 +54,7 @@ if (!existsSync(outDir)) {
 }
 
 // ── 1. Expected routes ───────────────────────────────────────────────────
-for (const route of ["index.html", "events/index.html", "stories/index.html", "stories/feed.xml", "resources/index.html", "support/index.html", "about/index.html", "404.html", "sitemap.xml", "robots.txt", "events.json", "CNAME"]) {
+for (const route of ["index.html", "events/index.html", "stories/index.html", "stories/feed.xml", "resources/index.html", "support/index.html", "support/thanks/index.html", "about/index.html", "404.html", "sitemap.xml", "robots.txt", "events.json", "CNAME"]) {
     if (!existsSync(join(outDir, route))) fail(`Missing expected file: ${route}`);
 }
 
@@ -165,14 +165,26 @@ if (existsSync(supportFile)) {
         if (attr(formTag, "action")) fail("support page: form has an action but no endpoint is configured");
         if (!/<fieldset[^>]*\sdisabled/.test(html)) fail("support page: unconfigured form should be disabled");
     }
-    for (const [id, url] of [["once", donations.oneOffUrl], ["monthly", donations.monthlyUrl]] as const) {
-        const link = new RegExp(`<a[^>]*data-donate="${id}"[^>]*>`).exec(html)?.[0];
-        if (url) {
-            if (!link || attr(link, "href") !== url) fail(`support page: ${id} donation link should point to ${url}`);
-        } else if (link || !html.includes(`data-donate-unavailable="${id}"`)) {
+    const linkFor = (marker: string) => [...html.matchAll(new RegExp(`<a[^>]*${marker}[^>]*>`, "g"))].map((m) => attr(m[0], "href"));
+    const expected = { once: donations.oneOffUrl ? [donations.oneOffUrl] : [], monthly: donations.monthly.map((m) => m.url).filter(Boolean) };
+    for (const [id, urls] of Object.entries(expected)) {
+        const hrefs = linkFor(`data-donate="${id}"`);
+        if (urls.length) {
+            if (hrefs.join(" ") !== urls.join(" ")) fail(`support page: ${id} donation links should be ${urls.join(", ")}`);
+        } else if (hrefs.length || !html.includes(`data-donate-unavailable="${id}"`)) {
             fail(`support page: ${id} donation should show "Coming soon" when no link is configured`);
         }
     }
+    if (expected.monthly.length && donations.manageUrl && linkFor("data-donate-manage")[0] !== donations.manageUrl) {
+        fail(`support page: "Manage or cancel" link should point to ${donations.manageUrl}`);
+    }
+}
+
+// ── 5b. Donation thank-you page stays out of search results ──────────────
+const thanksFile = join(outDir, "support/thanks/index.html");
+if (existsSync(thanksFile)) {
+    if (!/<meta name="robots" content="noindex"/.test(readFileSync(thanksFile, "utf8"))) fail("support/thanks: should be noindex");
+    if (sitemap.includes("/support/thanks/")) fail("support/thanks: should not be in the sitemap");
 }
 
 // ── 5c. Social and email crops are exactly the right size ────────────────

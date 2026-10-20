@@ -94,24 +94,37 @@ export const resources: {
 export const headerCta = { href: "/support/", label: "Support us" };
 
 /**
- * Donations — REQUIRES OWNER SETUP.
+ * Donations: Stripe Payment Links, managed in the Cork Vegans Stripe account.
  *
- * Use the hosted checkout links from your donation provider (for example
- * Stripe Payment Links, PayPal, Ko-fi or Buy Me a Coffee). Card details are
- * entered on the provider's site, never on corkvegans.ie.
+ * Card details are entered on Stripe's site, never on corkvegans.ie. Each
+ * payment link's confirmation page should redirect to /support/thanks/.
  *
  * Leave a URL empty to show that option as "coming soon" instead of a
- * broken link.
+ * broken link (for monthly, empty the whole `monthly` list).
  */
 export const donations = fixtures
-    ? { providerName: "Test Provider", oneOffUrl: "https://donate.example/once", monthlyUrl: "https://donate.example/monthly" }
+    ? {
+          providerName: "Test Provider",
+          oneOffUrl: "https://donate.example/once",
+          monthly: [
+              { label: "€5 a month", url: "https://donate.example/monthly-5" },
+              { label: "€10 a month", url: "https://donate.example/monthly-10" },
+          ],
+          manageUrl: "https://donate.example/manage",
+      }
     : {
           /** Shown to visitors, e.g. "Stripe" or "PayPal". */
-          providerName: "",
-          /** Hosted checkout for a one-off gift. */
-          oneOffUrl: "",
-          /** Hosted checkout for a monthly recurring gift. */
-          monthlyUrl: "",
+          providerName: "Stripe",
+          /** Hosted checkout for a one-off gift (donor chooses the amount). */
+          oneOffUrl: "https://donate.stripe.com/eVq7sFgkE5V025l9GL0co03",
+          /** Hosted checkouts for monthly recurring gifts, one button each. */
+          monthly: [
+              { label: "€5 a month", url: "https://buy.stripe.com/7sY28lc4ocjoaBR6uz0co00" },
+              { label: "€10 a month", url: "https://buy.stripe.com/fZuaER5G06Z4dO3cSX0co01" },
+              { label: "€20 a month", url: "https://buy.stripe.com/cNi9AN9Wg1EKdO3dX10co02" },
+          ],
+          /** Customer portal where monthly donors change or cancel their gift. */
+          manageUrl: "https://billing.stripe.com/p/login/7sY28lc4ocjoaBR6uz0co00",
       };
 
 /**

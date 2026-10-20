@@ -1,0 +1,20 @@
+---
+/** Where Stripe sends donors after a successful payment (set on each payment link). */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Thank you" description="Thank you for supporting Cork Vegans with a donation." noindex>
+    <section class="pt-xl pb-xl bg-surface">
+        <div class="max-w-3xl mx-auto px-margin-mobile py-xl flex flex-col items-center text-center gap-lg">
+            <span class="material-symbols-outlined text-primary text-[48px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">favorite</span>
+            <h1 class="font-headline-lg text-headline-lg text-on-surface">Thank you!</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">
+                Your donation helps keep Cork Vegans events and activities going. A receipt is on its way to you by email.
+            </p>
+            <ul class="flex flex-wrap justify-center gap-md">
+                <li><a href="/events/" class="cv-btn cv-btn-md cv-btn-primary">See upcoming events</a></li>
+                <li><a href="/" class="cv-btn cv-btn-md cv-btn-secondary">Go to the homepage</a></li>
+            </ul>
+        </div>
+    </section>
+</BaseLayout>

@@ -16,25 +16,14 @@ const donationAims = [
     { icon: "school", text: "Educational activities and resources" },
 ];
 
-const options = [
-    {
-        id: "once",
-        title: "Give once",
-        text: "Make a single donation of any amount.",
-        url: donations.oneOffUrl.trim(),
-        cta: "Donate once",
-    },
-    {
-        id: "monthly",
-        title: "Give monthly",
-        text: "Set up a regular monthly donation. You can cancel at any time through the payment provider.",
-        url: donations.monthlyUrl.trim(),
-        cta: "Donate monthly",
-    },
-];
 const isHttps = (u: string) => /^https:\/\//.test(u);
 const provider = donations.providerName.trim();
-const anyConfigured = options.some((o) => isHttps(o.url));
+const oneOffUrl = donations.oneOffUrl.trim();
+const monthly = donations.monthly.map((m) => ({ label: m.label, url: m.url.trim() })).filter((m) => isHttps(m.url));
+const manageUrl = donations.manageUrl.trim();
+const anyConfigured = isHttps(oneOffUrl) || monthly.length > 0;
+// Screen-reader hint that the button leaves the site (same tab).
+const continuesTo = provider ? ` (continues to ${provider})` : " (continues to our payment provider)";
 
 const roles = [
     { icon: "event", title: "Event organisation", text: "Plan socials, dining nights, walks and potlucks." },
@@ -83,29 +72,47 @@ const roles = [
             </div>
 
             <ul class="grid grid-cols-1 md:grid-cols-2 gap-lg">
-                {
-                    options.map((o) => (
-                        <li class="relative flex flex-col gap-md p-lg rounded-lg bg-surface border border-surface-variant shadow-sm" {...animalSpot("ledge", "donate", { size: 32, max: 2 })}>
-                            <h3 class="font-headline-md text-headline-md text-on-surface">{o.title}</h3>
-                            <p class="font-body-md text-body-md text-on-surface-variant flex-1">{o.text}</p>
-                            {isHttps(o.url) ? (
-                                <a
-                                    href={o.url}
-                                    data-donate={o.id}
-                                    class="self-start cv-btn cv-btn-md cv-btn-primary"
-                                >
-                                    {o.cta}
-                                    <span class="material-symbols-outlined" aria-hidden="true">open_in_new</span>
-                                    <span class="sr-only">{provider ? ` (continues to ${provider})` : " (continues to our payment provider)"}</span>
-                                </a>
-                            ) : (
-                                <p data-donate-unavailable={o.id} class="self-start cv-btn cv-btn-md cv-btn-placeholder">
-                                    Coming soon
+                <li class="relative flex flex-col gap-md p-lg rounded-lg bg-surface border border-surface-variant shadow-sm" {...animalSpot("ledge", "donate", { size: 32, max: 2 })}>
+                    <h3 class="font-headline-md text-headline-md text-on-surface">Give once</h3>
+                    <p class="font-body-md text-body-md text-on-surface-variant flex-1">Make a single donation of any amount.</p>
+                    {isHttps(oneOffUrl) ? (
+                        <a href={oneOffUrl} data-donate="once" class="self-start cv-btn cv-btn-md cv-btn-primary">
+                            Donate<span class="sr-only">{continuesTo}</span>
+                            <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                        </a>
+                    ) : (
+                        <p data-donate-unavailable="once" class="self-start cv-btn cv-btn-md cv-btn-placeholder">
+                            Coming soon
+                        </p>
+                    )}
+                </li>
+                <li class="relative flex flex-col gap-md p-lg rounded-lg bg-surface border border-surface-variant shadow-sm" {...animalSpot("ledge", "donate", { size: 32, max: 2 })}>
+                    <h3 class="font-headline-md text-headline-md text-on-surface">Give monthly</h3>
+                    <p class="font-body-md text-body-md text-on-surface-variant flex-1">Set up a regular monthly donation. Change or cancel any time.</p>
+                    {monthly.length > 0 ? (
+                        <>
+                            <div role="group" aria-label="Choose a monthly amount" class="flex flex-wrap gap-sm">
+                                {monthly.map((m) => (
+                                    <a href={m.url} data-donate="monthly" class="cv-btn cv-btn-md cv-btn-primary px-lg">
+                                        {m.label}<span class="sr-only">{continuesTo}</span>
+                                    </a>
+                                ))}
+                            </div>
+                            {isHttps(manageUrl) && (
+                                <p class="text-label-sm text-on-surface-variant">
+                                    Already giving monthly?{" "}
+                                    <a href={manageUrl} data-donate-manage class="font-label-bold text-primary underline underline-offset-2">
+                                        Manage or cancel your donation<span class="sr-only">{continuesTo}</span>
+                                    </a>
                                 </p>
                             )}
-                        </li>
-                    ))
-                }
+                        </>
+                    ) : (
+                        <p data-donate-unavailable="monthly" class="self-start cv-btn cv-btn-md cv-btn-placeholder">
+                            Coming soon
+                        </p>
+                    )}
+                </li>
             </ul>
 
             <p class="flex items-start gap-sm text-body-md text-on-surface-variant">
@@ -113,8 +120,8 @@ const roles = [
                 <span>
                     {
                         anyConfigured
-                            ? `Donations are handled securely by ${provider || "our payment provider"} on their own website. Cork Vegans never sees or stores your card details.`
-                            : "Online donations are coming soon. Payments will be handled securely by our payment provider on their own website — Cork Vegans will never see or store your card details."
+                            ? `Payments are handled securely by ${provider || "our payment provider"} on their own website. Cork Vegans never sees or stores your card details.`
+                            : "Online donations are coming soon. Payments will be handled securely by our payment provider on their own website. Cork Vegans will never see or store your card details."
                     }
                 </span>
             </p>

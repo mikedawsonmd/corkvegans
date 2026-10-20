@@ -14,7 +14,8 @@ describe("site configuration", () => {
     });
 
     it("has donation links that are either empty or https", () => {
-        for (const url of [donations.oneOffUrl, donations.monthlyUrl]) expect(url === "" || url.startsWith("https://")).toBe(true);
+        const urls = [donations.oneOffUrl, donations.manageUrl, ...donations.monthly.map((m) => m.url)];
+        for (const url of urls) expect(url === "" || url.startsWith("https://")).toBe(true);
     });
 
     it("has form endpoints that are empty or Formspree form URLs", () => {

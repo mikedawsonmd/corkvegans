@@ -115,29 +115,34 @@ website, and the post-build check fails the deploy if it ever does.
 
 To remove Eventbrite, delete the secret. The site falls back to Meetup only.
 
-### 2.6 Donations (**requires owner setup**)
+### 2.6 Donations (**set up**)
 
-No donation provider was found in the old site, its Linktree or elsewhere,
-so donation buttons currently show **"Coming soon"**.
+Donations use **Stripe Payment Links** in the Cork Vegans Stripe account:
+a one-off link (donor chooses the amount), three monthly links (€5, €10
+and €20) and the Stripe customer portal, where monthly donors change or
+cancel their donation. The links live in `src/config/site.ts`:
 
-1. Choose a provider that offers **hosted checkout pages** for both one-off
-   and monthly gifts. Options include Stripe Payment Links, PayPal, Ko-fi
-   and Buy Me a Coffee. Cork Vegans must own the account.
-2. Create two links: a one-off donation (ideally "customer chooses amount")
-   and a monthly subscription.
-3. Edit `src/config/site.ts`:
+```ts
+export const donations = fixtures ? { … } : {
+    providerName: "Stripe",
+    oneOffUrl: "https://donate.stripe.com/…",
+    monthly: [
+        { label: "€5 a month", url: "https://buy.stripe.com/…" },
+        …
+    ],
+    manageUrl: "https://billing.stripe.com/p/login/…",
+};
+```
 
-   ```ts
-   export const donations = fixtures ? { … } : {
-       providerName: "Stripe",
-       oneOffUrl: "https://donate.stripe.com/…",
-       monthlyUrl: "https://donate.stripe.com/…",
-   };
-   ```
+To add, remove or change a monthly amount, edit the `monthly` list and
+commit to `main`. The buttons update after the deploy. Empty a URL (or the
+whole `monthly` list) to show that option as "Coming soon".
 
-4. Commit to `main`. The buttons go live after the deploy.
+In Stripe, set each payment link's **confirmation page** to redirect to
+`https://corkvegans.ie/support/thanks/`. That page is hidden from search
+results.
 
-Card details are only ever entered on the provider's own site.
+Card details are only ever entered on Stripe's own site.
 
 **Support page wording.** The "Donations help us with things like…" list
 and the intro text in `src/pages/support/index.astro` are a starting
