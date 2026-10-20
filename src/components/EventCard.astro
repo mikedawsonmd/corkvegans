@@ -106,28 +106,24 @@ const location = event.location.online ? "Online event" : [event.location.name, 
                 }
                 {showSummary && event.summary && <p class="font-body-md text-body-md text-on-surface-variant cv-clamp-3">{event.summary}</p>}
             </div>
-            <div class="flex flex-wrap items-center justify-between gap-sm">
+            <!-- Main button (the whole card links there), then a secondary button
+                 for each other platform the event is listed on. -->
+            <div class="flex flex-wrap items-center justify-end gap-sm">
                 {
-                    event.alsoListedOn.length > 0 ? (
-                        <p class="relative z-10 text-label-sm text-on-surface-variant">
-                            Also on{" "}
-                            {event.alsoListedOn.map((l, i) => (
-                                <>
-                                    {i > 0 && ", "}
-                                    <a href={l.url} target="_blank" rel="noopener noreferrer" class="font-label-bold text-primary underline underline-offset-2">
-                                        {SOURCE_LABELS[l.source]}<span class="sr-only"> (opens in a new tab)</span>
-                                    </a>
-                                </>
-                            ))}
-                        </p>
-                    ) : (
-                        <span />
-                    )
+                    event.alsoListedOn.map((l) => (
+                        <a
+                            href={l.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-also-on={l.source}
+                            class="relative z-10 cv-btn cv-btn-sm cv-btn-secondary"
+                        >
+                            View on {SOURCE_LABELS[l.source]}
+                            <span class="sr-only"> (opens in a new tab)</span>
+                        </a>
+                    ))
                 }
-                <span
-                    class="cv-btn cv-btn-sm cv-btn-primary group-hover:bg-surface-tint"
-                    aria-hidden="true"
-                >
+                <span class="cv-btn cv-btn-sm cv-btn-primary group-hover:bg-surface-tint" aria-hidden="true">
                     {cta}
                 </span>
             </div>

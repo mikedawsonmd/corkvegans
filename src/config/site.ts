@@ -139,8 +139,11 @@ export const eventSources = {
     meetupIcalUrl: "https://www.meetup.com/corkvegans/events/ical/",
     /** Used to identify the Cork Vegans organiser within an Eventbrite organisation. */
     eventbriteOrganizerId: "91797524863",
-    /** When the same event is listed on both platforms, which listing to show first. */
-    preferredSource: "meetup" as "meetup" | "eventbrite",
+    /**
+     * When the same event is listed on both platforms, which listing is the
+     * main one (its details and its button); the other gets a secondary button.
+     */
+    preferredSource: "eventbrite" as "meetup" | "eventbrite",
     /** Show a "may be out of date" notice when event data is older than this. */
     staleAfterHours: 48,
 };
