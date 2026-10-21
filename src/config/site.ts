@@ -1,6 +1,6 @@
 /**
  * Site-wide settings. Administrators edit this file (via GitHub) to change
- * links, donation checkout URLs, the volunteer form endpoint and event sources.
+ * links, feature switches, the volunteer form endpoint and event sources.
  *
  * Nothing in this file is secret: everything here ends up in public HTML.
  * Never put API tokens or passwords in this file — use GitHub Actions secrets.
@@ -94,37 +94,57 @@ export const resources: {
 export const headerCta = { href: "/support/", label: "Support us" };
 
 /**
- * Donations: Stripe Payment Links, managed in the Cork Vegans Stripe account.
+ * Feature switches.
  *
- * Card details are entered on Stripe's site, never on corkvegans.ie. Each
- * payment link's confirmation page should redirect to /support/thanks/.
+ * payments: the on-page Stripe donation form and checkout modal
+ * (src/components/DonateForm.astro, worker/donate.js). Off since the Stripe
+ * account closed; the code is kept for membership. While it's off the
+ * Support page shows "Membership coming soon", Stripe.js is never loaded and
+ * the Worker is never called. Turning it on also needs the `donations`
+ * settings below and the Worker's PAYMENTS_ENABLED variable.
+ */
+export const features = {
+    payments: false,
+};
+
+/**
+ * Build-time setting, e.g. to try the payment form with Stripe test keys.
+ * Astro exposes .env/.env.local values on import.meta.env (the dev server
+ * doesn't copy them to process.env); plain Node scripts only have process.env.
+ */
+const env = (name: string): string =>
+    String(import.meta.env?.[name] ?? "").trim() || (typeof process !== "undefined" && process.env?.[name]?.trim()) || "";
+
+/**
+ * Payment form settings, used only when features.payments is on. The form
+ * uses Stripe Embedded Checkout; the Worker in worker/donate.js creates each
+ * Checkout Session, and card details never reach corkvegans.ie.
  *
- * Leave a URL empty to show that option as "coming soon" instead of a
- * broken link (for monthly, empty the whole `monthly` list).
+ * Everything here is public. Override the first three for a single build
+ * with PUBLIC_STRIPE_PUBLISHABLE_KEY, PUBLIC_DONATE_ENDPOINT and
+ * PUBLIC_TURNSTILE_SITE_KEY (see docs/ADMIN-GUIDE.md, "Membership and payments").
  */
 export const donations = fixtures
     ? {
           providerName: "Test Provider",
+          publishableKey: "pk_test_fixture",
+          sessionEndpoint: "https://donate.example/donate/session",
+          turnstileSiteKey: "",
           oneOffUrl: "https://donate.example/once",
-          monthly: [
-              { label: "€5 a month", url: "https://donate.example/monthly-5" },
-              { label: "€10 a month", url: "https://donate.example/monthly-10" },
-          ],
           manageUrl: "https://donate.example/manage",
       }
     : {
-          /** Shown to visitors, e.g. "Stripe" or "PayPal". */
           providerName: "Stripe",
-          /** Hosted checkout for a one-off gift (donor chooses the amount). */
-          oneOffUrl: "https://donate.stripe.com/eVq7sFgkE5V025l9GL0co03",
-          /** Hosted checkouts for monthly recurring gifts, one button each. */
-          monthly: [
-              { label: "€5 a month", url: "https://buy.stripe.com/7sY28lc4ocjoaBR6uz0co00" },
-              { label: "€10 a month", url: "https://buy.stripe.com/fZuaER5G06Z4dO3cSX0co01" },
-              { label: "€20 a month", url: "https://buy.stripe.com/cNi9AN9Wg1EKdO3dX10co02" },
-          ],
-          /** Customer portal where monthly donors change or cancel their gift. */
-          manageUrl: "https://billing.stripe.com/p/login/7sY28lc4ocjoaBR6uz0co00",
+          /** Stripe publishable key: pk_live_… (or pk_test_… while testing). Never a secret key. */
+          publishableKey: env("PUBLIC_STRIPE_PUBLISHABLE_KEY") || "",
+          /** The Worker's endpoint, ending /donate/session. */
+          sessionEndpoint: env("PUBLIC_DONATE_ENDPOINT") || "",
+          /** Cloudflare Turnstile site key. Leave empty unless the Worker has TURNSTILE_SECRET_KEY. */
+          turnstileSiteKey: env("PUBLIC_TURNSTILE_SITE_KEY") || "",
+          /** Hosted payment page, the fallback if the form can't load. Empty: no fallback link. */
+          oneOffUrl: "",
+          /** Customer portal for recurring payments. Empty: no "manage" link. */
+          manageUrl: "",
       };
 
 /**

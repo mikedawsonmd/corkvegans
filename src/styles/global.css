@@ -149,12 +149,112 @@ html {
         @apply border-primary bg-primary text-on-primary hover:border-surface-tint hover:bg-surface-tint;
     }
 
+    /* Radio buttons drawn as buttons, e.g. the donation amounts: a visually
+       hidden <input class="cv-choice sr-only"> followed by a secondary button
+       that turns primary when checked and shows the radio's focus ring. */
+    .cv-choice:checked + .cv-btn-secondary {
+        @apply border-primary bg-primary text-on-primary hover:border-surface-tint hover:bg-surface-tint;
+    }
+
+    .cv-choice:focus-visible + .cv-btn {
+        outline: 3px solid #1d1b1c;
+        outline-offset: 3px;
+    }
+
     .cv-btn-count {
         @apply text-label-sm opacity-75;
     }
 
     .cv-btn .material-symbols-outlined {
         font-size: 20px;
+    }
+}
+
+/* ── Modal dialog ──────────────────────────────────────────────────────────
+   A native <dialog class="cv-dialog"> opened with showModal(), wrapping a
+   <div class="cv-dialog-panel">, e.g. the donation checkout. The dialog is a
+   transparent full-screen layer that scrolls like a page; the panel grows to
+   fit its content, so there's no scrollbar inside the card. Mobile: the panel
+   is a full-screen sheet that slides up. From sm: a centred card up to 560px
+   wide over a dimmed backdrop. A sticky header in the panel stays put.     */
+.cv-dialog {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    background: transparent;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.cv-dialog::backdrop {
+    background: rgb(29 27 28 / 0.55);
+}
+
+.cv-dialog-panel {
+    @apply bg-surface text-on-surface;
+    min-height: 100%;
+}
+
+@media screen(sm) {
+    .cv-dialog {
+        padding: 2rem 1rem;
+    }
+
+    .cv-dialog-panel {
+        @apply rounded-lg shadow-2xl;
+        max-width: 560px;
+        min-height: 0;
+        margin: 0 auto;
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .cv-dialog,
+    .cv-dialog::backdrop {
+        transition:
+            translate 0.3s ease,
+            scale 0.2s ease,
+            opacity 0.2s ease,
+            overlay 0.3s allow-discrete,
+            display 0.3s allow-discrete;
+    }
+
+    .cv-dialog:not([open]) {
+        translate: 0 100%;
+    }
+
+    .cv-dialog:not([open])::backdrop {
+        opacity: 0;
+    }
+
+    @starting-style {
+        .cv-dialog[open] {
+            translate: 0 100%;
+        }
+
+        .cv-dialog[open]::backdrop {
+            opacity: 0;
+        }
+    }
+
+    @media screen(sm) {
+        .cv-dialog:not([open]) {
+            translate: 0 1rem;
+            scale: 0.97;
+            opacity: 0;
+        }
+
+        @starting-style {
+            .cv-dialog[open] {
+                translate: 0 1rem;
+                scale: 0.97;
+                opacity: 0;
+            }
+        }
     }
 }
 

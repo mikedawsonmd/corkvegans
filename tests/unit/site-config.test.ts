@@ -14,8 +14,12 @@ describe("site configuration", () => {
     });
 
     it("has donation links that are either empty or https", () => {
-        const urls = [donations.oneOffUrl, donations.manageUrl, ...donations.monthly.map((m) => m.url)];
-        for (const url of urls) expect(url === "" || url.startsWith("https://")).toBe(true);
+        for (const url of [donations.oneOffUrl, donations.manageUrl]) expect(url === "" || url.startsWith("https://")).toBe(true);
+    });
+
+    it("only ever exposes a Stripe publishable key, never a secret one", () => {
+        expect(donations.publishableKey === "" || /^pk_(live|test)_\w+$/.test(donations.publishableKey)).toBe(true);
+        expect(donations.sessionEndpoint === "" || /^https:\/\/.+\/donate\/session$/.test(donations.sessionEndpoint)).toBe(true);
     });
 
     it("has form endpoints that are empty or Formspree form URLs", () => {
@@ -30,6 +34,6 @@ describe("site configuration", () => {
 
     it("contains no credentials", () => {
         const source = readFileSync(new URL("../../src/config/site.ts", import.meta.url), "utf8");
-        expect(source).not.toMatch(/Bearer\s|sk_live|sk_test|gh[pousr]_|token\s*[:=]\s*"[^"]+"/i);
+        expect(source).not.toMatch(/Bearer\s|[sr]k_live|[sr]k_test|gh[pousr]_|token\s*[:=]\s*"[^"]+"/i);
     });
 });

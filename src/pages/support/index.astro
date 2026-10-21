@@ -2,28 +2,20 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import VolunteerForm from "../../components/VolunteerForm.astro";
-import { donations } from "../../config/site";
+import DonateForm from "../../components/DonateForm.astro";
+import { features, links } from "../../config/site";
 import { animalSpot } from "../../lib/animals";
 
-const description = "Support Cork Vegans by making a one-off or monthly donation, or by volunteering with the community.";
+const description = "Support Cork Vegans by volunteering with our community. Membership is coming soon, to help keep our events going.";
 
 // Wording below is a starting point. Organisers should review it before launch
 // and keep it accurate (see docs/ADMIN-GUIDE.md → "Support page wording").
-const donationAims = [
+const membershipAims = [
     { icon: "groups", text: "Organising community events, socials and potlucks" },
     { icon: "campaign", text: "Community outreach and promoting vegan living locally" },
     { icon: "accessible", text: "Making our events more accessible and welcoming" },
     { icon: "school", text: "Educational activities and resources" },
 ];
-
-const isHttps = (u: string) => /^https:\/\//.test(u);
-const provider = donations.providerName.trim();
-const oneOffUrl = donations.oneOffUrl.trim();
-const monthly = donations.monthly.map((m) => ({ label: m.label, url: m.url.trim() })).filter((m) => isHttps(m.url));
-const manageUrl = donations.manageUrl.trim();
-const anyConfigured = isHttps(oneOffUrl) || monthly.length > 0;
-// Screen-reader hint that the button leaves the site (same tab).
-const continuesTo = provider ? ` (continues to ${provider})` : " (continues to our payment provider)";
 
 const roles = [
     { icon: "event", title: "Event organisation", text: "Plan socials, dining nights, walks and potlucks." },
@@ -39,13 +31,13 @@ const roles = [
     <PageHeader
         eyebrow="Get involved"
         title="Support Cork Vegans"
-        intro="Cork Vegans is powered by its community. Whether you can give a little money or a little time, it all helps."
+        intro="Cork Vegans is powered by its community. Membership is on the way, and in the meantime there are loads of ways to lend a hand."
         accent="#417660"
         eyebrowColor="#275d49"
     >
         <nav aria-label="On this page" class="flex flex-wrap justify-center gap-md pb-lg">
-            <a href="#donate" class="cv-btn cv-btn-sm cv-btn-secondary">
-                <span class="material-symbols-outlined" aria-hidden="true">favorite</span>Donate
+            <a href="#membership" class="cv-btn cv-btn-sm cv-btn-secondary">
+                <span class="material-symbols-outlined" aria-hidden="true">card_membership</span>Membership
             </a>
             <a href="#volunteer" class="cv-btn cv-btn-sm cv-btn-secondary">
                 <span class="material-symbols-outlined" aria-hidden="true">volunteer_activism</span>Volunteer
@@ -53,15 +45,21 @@ const roles = [
         </nav>
     </PageHeader>
 
-    <!-- Donate -->
-    <section id="donate" class="relative pt-xl pb-xl bg-surface-container-lowest" aria-labelledby="donate-heading" {...animalSpot("floor", "donate-foot")}>
-        <div class="max-w-5xl mx-auto px-margin-mobile flex flex-col gap-xl">
+    <!-- Membership -->
+    <section id="membership" class="relative pt-xl pb-xl bg-surface-container-lowest" aria-labelledby="membership-heading" {...animalSpot("floor", "membership-foot")}>
+        <!-- Keeps old /support/#donate links landing here. -->
+        <span id="donate" class="absolute top-0" aria-hidden="true"></span>
+        <div class="max-w-7xl mx-auto px-margin-mobile grid grid-cols-1 lg:grid-cols-2 gap-xl items-start">
             <div class="flex flex-col gap-md">
-                <h2 id="donate-heading" class="font-headline-lg text-headline-lg text-on-surface">Donate</h2>
-                <p class="font-body-lg text-body-lg text-on-surface-variant max-w-3xl">Donations help us with things like:</p>
+                <h2 id="membership-heading" class="font-headline-lg text-headline-lg text-on-surface">Membership</h2>
+                <p class="font-body-lg text-body-lg text-on-surface-variant">
+                    Cork Vegans membership is coming soon. It'll help cover the costs of running our events, and members
+                    will get perks such as discounts on events.
+                </p>
+                <p class="font-body-lg text-body-lg text-on-surface-variant">Membership will help us with things like:</p>
                 <ul class="grid grid-cols-1 sm:grid-cols-2 gap-md">
                     {
-                        donationAims.map((a) => (
+                        membershipAims.map((a) => (
                             <li class="flex items-start gap-sm p-md rounded-lg bg-surface-container-low border border-surface-variant">
                                 <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">{a.icon}</span>
                                 <span class="font-body-md text-body-md text-on-surface">{a.text}</span>
@@ -71,60 +69,28 @@ const roles = [
                 </ul>
             </div>
 
-            <ul class="grid grid-cols-1 md:grid-cols-2 gap-lg">
-                <li class="relative flex flex-col gap-md p-lg rounded-lg bg-surface border border-surface-variant shadow-sm" {...animalSpot("ledge", "donate", { size: 32, max: 2 })}>
-                    <h3 class="font-headline-md text-headline-md text-on-surface">Give once</h3>
-                    <p class="font-body-md text-body-md text-on-surface-variant flex-1">Make a single donation of any amount.</p>
-                    {isHttps(oneOffUrl) ? (
-                        <a href={oneOffUrl} data-donate="once" class="self-start cv-btn cv-btn-md cv-btn-primary">
-                            Donate<span class="sr-only">{continuesTo}</span>
-                            <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
-                        </a>
-                    ) : (
-                        <p data-donate-unavailable="once" class="self-start cv-btn cv-btn-md cv-btn-placeholder">
-                            Coming soon
+            {
+                // With payments off the form isn't rendered, so no page loads its script or Stripe.js.
+                features.payments ? (
+                    <DonateForm />
+                ) : (
+                    <div data-membership-soon class="relative flex flex-col items-start gap-md bg-surface border border-surface-variant rounded-lg p-lg md:p-xl shadow-sm" {...animalSpot("ledge", "membership", { size: 32, max: 2 })}>
+                        <h3 class="font-headline-md text-headline-md text-on-surface">Membership is on the way</h3>
+                        <p class="font-body-md text-body-md text-on-surface-variant">
+                            We're still working out the details. Follow us on{" "}
+                            <a class="font-label-bold text-primary underline underline-offset-2" href={links.facebook} target="_blank" rel="noopener noreferrer">
+                                Facebook<span class="sr-only"> (opens in a new tab)</span>
+                            </a>{" "}
+                            or{" "}
+                            <a class="font-label-bold text-primary underline underline-offset-2" href={links.instagram} target="_blank" rel="noopener noreferrer">
+                                Instagram<span class="sr-only"> (opens in a new tab)</span>
+                            </a>{" "}
+                            and we'll let you know as soon as it opens.
                         </p>
-                    )}
-                </li>
-                <li class="relative flex flex-col gap-md p-lg rounded-lg bg-surface border border-surface-variant shadow-sm" {...animalSpot("ledge", "donate", { size: 32, max: 2 })}>
-                    <h3 class="font-headline-md text-headline-md text-on-surface">Give monthly</h3>
-                    <p class="font-body-md text-body-md text-on-surface-variant flex-1">Set up a regular monthly donation. Change or cancel any time.</p>
-                    {monthly.length > 0 ? (
-                        <>
-                            <div role="group" aria-label="Choose a monthly amount" class="flex flex-wrap gap-sm">
-                                {monthly.map((m) => (
-                                    <a href={m.url} data-donate="monthly" class="cv-btn cv-btn-md cv-btn-primary px-lg">
-                                        {m.label}<span class="sr-only">{continuesTo}</span>
-                                    </a>
-                                ))}
-                            </div>
-                            {isHttps(manageUrl) && (
-                                <p class="text-label-sm text-on-surface-variant">
-                                    Already giving monthly?{" "}
-                                    <a href={manageUrl} data-donate-manage class="font-label-bold text-primary underline underline-offset-2">
-                                        Manage or cancel your donation<span class="sr-only">{continuesTo}</span>
-                                    </a>
-                                </p>
-                            )}
-                        </>
-                    ) : (
-                        <p data-donate-unavailable="monthly" class="self-start cv-btn cv-btn-md cv-btn-placeholder">
-                            Coming soon
-                        </p>
-                    )}
-                </li>
-            </ul>
-
-            <p class="flex items-start gap-sm text-body-md text-on-surface-variant">
-                <span class="material-symbols-outlined text-primary" aria-hidden="true">lock</span>
-                <span>
-                    {
-                        anyConfigured
-                            ? `Payments are handled securely by ${provider || "our payment provider"} on their own website. Cork Vegans never sees or stores your card details.`
-                            : "Online donations are coming soon. Payments will be handled securely by our payment provider on their own website. Cork Vegans will never see or store your card details."
-                    }
-                </span>
-            </p>
+                        <p class="cv-btn cv-btn-md cv-btn-placeholder">Coming soon</p>
+                    </div>
+                )
+            }
         </div>
     </section>
 

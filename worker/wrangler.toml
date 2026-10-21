@@ -1,0 +1,16 @@
+# Standalone donations Worker. Deploy from this folder: npx wrangler deploy
+# Endpoint: https://corkvegans-donate.<your-subdomain>.workers.dev/donate/session
+# Setup and secrets: docs/ADMIN-GUIDE.md, "Donations".
+name = "corkvegans-donate"
+main = "index.js"
+compatibility_date = "2026-10-01"
+
+# /donate/session answers 404 unless this is "true". Payments are off, so it
+# stays unset; to switch on: npx wrangler secret put PAYMENTS_ENABLED (enter true).
+
+# Per-IP limit on Checkout Session creation (card-testing protection).
+# If you merge donate.js into another Worker, copy this block into its config.
+[[ratelimits]]
+name = "DONATE_RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 5, period = 60 }

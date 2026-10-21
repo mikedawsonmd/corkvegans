@@ -1,0 +1,204 @@
+---
+/**
+ * Donation form: pick monthly or once and an amount, then Stripe Embedded
+ * Checkout opens in a modal (src/scripts/donate-form.ts). Only rendered when
+ * features.payments is on in src/config/site.ts. Until Stripe is configured
+ * there, a plain link to the hosted payment page (if any) is shown instead.
+ */
+import { donations } from "../config/site";
+import { DONATION_MAX, DONATION_MIN, FREQUENCIES, PRESETS } from "../lib/donations";
+import { animalSpot } from "../lib/animals";
+
+const publishableKey = donations.publishableKey.trim();
+const endpoint = donations.sessionEndpoint.trim();
+const configured = /^pk_(live|test)_\w+$/.test(publishableKey) && /^https?:\/\//.test(endpoint);
+const fallbackUrl = donations.oneOffUrl.trim();
+const manageUrl = donations.manageUrl.trim();
+const continuesTo = ` (continues to ${donations.providerName || "our payment provider"})`;
+
+// Radio buttons drawn as buttons (see .cv-choice in global.css).
+const choice = "cv-btn cv-btn-md cv-btn-secondary w-full px-md cursor-pointer";
+const legend = "font-label-bold text-label-bold text-on-surface mb-sm";
+const textLink = "font-label-bold text-primary underline underline-offset-2";
+---
+
+<div class="relative bg-surface border border-surface-variant rounded-lg p-lg md:p-xl shadow-sm" {...animalSpot("ledge", "donate", { size: 32, max: 2 })}>
+    {
+        configured ? (
+            <div
+                data-donate-root
+                data-publishable-key={publishableKey}
+                data-endpoint={endpoint}
+                data-turnstile-sitekey={donations.turnstileSiteKey.trim() || undefined}
+                class="flex flex-col gap-lg"
+            >
+                <form data-donate-form novalidate aria-labelledby="donate-form-title" class="flex flex-col gap-lg">
+                    <h3 id="donate-form-title" class="font-headline-md text-headline-md text-on-surface">
+                        Make a donation
+                    </h3>
+
+                    <fieldset>
+                        <legend class={legend}>How often?</legend>
+                        <div class="grid grid-cols-2 gap-sm">
+                            {FREQUENCIES.map((f) => (
+                                <label>
+                                    <input type="radio" name="frequency" value={f.value} checked={f.value === "monthly"} class="cv-choice sr-only" />
+                                    <span class={choice}>{f.label}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </fieldset>
+
+                    {FREQUENCIES.map((f) => (
+                        <fieldset data-amounts={f.value} hidden={f.value !== "monthly"} disabled={f.value !== "monthly"}>
+                            <legend class={legend}>{f.value === "monthly" ? "Monthly amount" : "One-off amount"}</legend>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-sm">
+                                {PRESETS[f.value].map((amount, i) => (
+                                    <label>
+                                        <input type="radio" name={`amount-${f.value}`} value={amount} checked={i === 1} class="cv-choice sr-only" />
+                                        <span class={choice}>
+                                            €{amount}
+                                            <span class="sr-only">{f.value === "monthly" ? " a month" : ""}</span>
+                                        </span>
+                                    </label>
+                                ))}
+                                <label>
+                                    <input type="radio" name={`amount-${f.value}`} value="other" class="cv-choice sr-only" aria-controls="df-other-wrap" />
+                                    <span class={choice}>Other</span>
+                                </label>
+                            </div>
+                        </fieldset>
+                    ))}
+
+                    <div id="df-other-wrap" data-other-wrap hidden>
+                        <label for="df-other" class="font-label-bold text-label-bold text-on-surface">Other amount</label>
+                        <div class="relative mt-xs max-w-[12rem]">
+                            <span class="pointer-events-none absolute inset-y-0 left-md flex items-center text-body-md text-on-surface-variant" aria-hidden="true">€</span>
+                            <input
+                                id="df-other"
+                                type="text"
+                                inputmode="numeric"
+                                autocomplete="off"
+                                maxlength="4"
+                                aria-describedby="df-other-hint df-amount-error"
+                                class="block w-full rounded-lg border-outline bg-surface-container-lowest py-sm pl-xl pr-md text-body-md text-on-surface focus:border-primary focus:ring-primary aria-[invalid=true]:border-error"
+                            />
+                        </div>
+                        <p id="df-other-hint" class="mt-xs text-label-sm text-on-surface-variant">
+                            Whole euros, from €{DONATION_MIN} to €{DONATION_MAX}.
+                        </p>
+                    </div>
+                    <p id="df-amount-error" data-amount-error role="alert" class="text-label-bold text-error empty:hidden"></p>
+
+                    <div data-turnstile class="empty:hidden"></div>
+
+                    <div data-donate-error role="alert" class="rounded-lg border-2 border-error bg-error-container px-lg py-md text-on-error-container" hidden>
+                        <p class="font-label-bold text-label-bold" data-donate-error-message>
+                            Sorry, the donation form couldn't load just now.
+                        </p>
+                        <p class="text-body-md mt-xs">
+                            {fallbackUrl ? (
+                                <>
+                                    Please try again in a minute, or{" "}
+                                    <a href={fallbackUrl} data-donate-fallback class="font-label-bold underline">
+                                        donate directly on Stripe<span class="sr-only">{continuesTo}</span>
+                                    </a>.
+                                </>
+                            ) : (
+                                "Please try again in a minute."
+                            )}
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-md">
+                        <button type="submit" data-continue class="cv-btn cv-btn-md cv-btn-primary">
+                            Continue
+                            <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                        </button>
+                        <p data-donate-status role="status" class="text-body-md text-on-surface-variant"></p>
+                    </div>
+                </form>
+
+                <dialog data-donate-dialog aria-labelledby="donate-dialog-title" class="cv-dialog">
+                    <div class="cv-dialog-panel">
+                        <div class="z-10 flex items-center justify-between max-sm:sticky max-sm:top-0 gap-md border-b border-surface-variant bg-surface px-lg py-sm sm:rounded-t-lg">
+                            <h2 id="donate-dialog-title" data-dialog-title tabindex="-1" class="font-headline-md text-headline-md text-on-surface focus:outline-none">
+                                Donate
+                            </h2>
+                            <button type="button" data-dialog-close aria-label="Close" class="cv-btn cv-btn-sm cv-btn-secondary w-11 shrink-0 px-0">
+                                <span class="material-symbols-outlined" aria-hidden="true">close</span>
+                            </button>
+                        </div>
+                        <div>
+                            <!-- bg matches the Stripe Checkout branding colour, so the padding reads as part of the checkout -->
+                            <div data-checkout class="bg-primary-container sm:rounded-b-lg pb-[calc(theme(spacing.xl)+env(safe-area-inset-bottom))]"></div>
+                            <div data-donate-success tabindex="-1" class="flex flex-col items-start gap-md px-lg pt-lg pb-[calc(theme(spacing.xl)+env(safe-area-inset-bottom))] focus:outline-none" hidden>
+                                <h3 class="font-headline-md text-headline-md text-on-surface">Thank you!</h3>
+                                <p class="font-body-md text-body-md text-on-surface-variant">
+                                    Your donation helps keep Cork Vegans events and activities going. A receipt is on its way to you by email.
+                                </p>
+                                {manageUrl && (
+                                    <p data-success-monthly class="font-body-md text-body-md text-on-surface-variant" hidden>
+                                        You can change or cancel your monthly donation any time:{" "}
+                                        <a href={manageUrl} class={textLink}>
+                                            manage your donation<span class="sr-only">{continuesTo}</span>
+                                        </a>.
+                                    </p>
+                                )}
+                                <button type="button" data-dialog-done class="cv-btn cv-btn-md cv-btn-primary">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </dialog>
+
+                {manageUrl && (
+                    <p data-manage-line class="text-label-sm text-on-surface-variant">
+                        Already giving monthly?{" "}
+                        <a href={manageUrl} data-donate-manage class={textLink}>
+                            Manage or cancel your donation<span class="sr-only">{continuesTo}</span>
+                        </a>
+                    </p>
+                )}
+
+                <noscript>
+                    <p class="text-body-md text-on-surface">
+                        The donation form needs JavaScript.
+                        {fallbackUrl && (
+                            <>
+                                {" "}You can <a href={fallbackUrl} class={textLink}>donate directly on Stripe</a> instead.
+                            </>
+                        )}
+                    </p>
+                </noscript>
+            </div>
+        ) : (
+            <div class="flex flex-col items-start gap-md">
+                <h3 class="font-headline-md text-headline-md text-on-surface">Make a donation</h3>
+                {fallbackUrl ? (
+                    <>
+                        <p class="font-body-md text-body-md text-on-surface-variant">Give any amount, securely through Stripe.</p>
+                        <a href={fallbackUrl} data-donate-fallback class="cv-btn cv-btn-md cv-btn-primary">
+                            Donate<span class="sr-only">{continuesTo}</span>
+                            <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                        </a>
+                    </>
+                ) : (
+                    <p class="font-body-md text-body-md text-on-surface-variant">Online payments aren't available just now.</p>
+                )}
+                {manageUrl && (
+                    <p class="text-label-sm text-on-surface-variant">
+                        Already giving monthly?{" "}
+                        <a href={manageUrl} data-donate-manage class={textLink}>
+                            Manage or cancel your donation<span class="sr-only">{continuesTo}</span>
+                        </a>
+                    </p>
+                )}
+            </div>
+        )
+    }
+</div>
+
+<script>
+    import { initDonateForm } from "../scripts/donate-form.ts";
+    document.querySelectorAll<HTMLElement>("[data-donate-root]").forEach(initDonateForm);
+</script>

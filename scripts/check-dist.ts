@@ -11,13 +11,17 @@
  */
 
 import { appendFileSync, existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { join, relative } from "node:path";
+import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
-import { contactForm, donations, site, volunteerForm } from "../src/config/site.ts";
+import { loadEnv } from "vite";
 import { collectStories, parseStoryFile, slugify } from "../src/lib/stories.ts";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
+// Read the same .env files as the Astro build (shell variables still win),
+// so the checks compare the output with the config it was built from.
+for (const [name, value] of Object.entries(loadEnv("production", root, "PUBLIC_"))) process.env[name] ??= value;
+const { contactForm, donations, features, site, volunteerForm } = await import("../src/config/site.ts");
 const outDir = join(root, process.argv[2] ?? "dist");
 const useFixtures = process.env.CV_FIXTURES === "1";
 const storyDirs = useFixtures ? ["tests/fixtures/stories"] : ["src/content/stories"];
@@ -54,7 +58,7 @@ if (!existsSync(outDir)) {
 }
 
 // ── 1. Expected routes ───────────────────────────────────────────────────
-for (const route of ["index.html", "events/index.html", "stories/index.html", "stories/feed.xml", "resources/index.html", "support/index.html", "support/thanks/index.html", "about/index.html", "404.html", "sitemap.xml", "robots.txt", "events.json", "CNAME"]) {
+for (const route of ["index.html", "events/index.html", "stories/index.html", "stories/feed.xml", "resources/index.html", "support/index.html", "about/index.html", "404.html", "sitemap.xml", "robots.txt", "events.json", "CNAME"]) {
     if (!existsSync(join(outDir, route))) fail(`Missing expected file: ${route}`);
 }
 
@@ -152,12 +156,13 @@ for (const file of storyFiles) {
     if (sitemap.includes(`/stories/${slug}/`)) fail(`Unpublished story is in the sitemap: ${file}`);
 }
 
-// ── 5. Support page reflects the real donation / form configuration ──────
+// ── 5. Support page reflects the real payments / form configuration ──────
 const supportFile = join(outDir, "support/index.html");
 if (existsSync(supportFile)) {
     const html = readFileSync(supportFile, "utf8");
     const formTag = /<form[^>]*data-volunteer-form[^>]*>/.exec(html)?.[0] ?? "";
-    if (!html.includes('id="donate"') || !html.includes('id="volunteer"')) fail("support page: missing #donate or #volunteer section");
+    if (!html.includes('id="membership"') || !html.includes('id="volunteer"')) fail("support page: missing #membership or #volunteer section");
+    if (!html.includes('id="donate"')) fail("support page: missing the #donate alias that keeps old links working");
     if (volunteerForm.endpoint) {
         if (attr(formTag, "action") !== volunteerForm.endpoint) fail("support page: form does not post to the configured endpoint");
     } else {
@@ -166,25 +171,50 @@ if (existsSync(supportFile)) {
         if (!/<fieldset[^>]*\sdisabled/.test(html)) fail("support page: unconfigured form should be disabled");
     }
     const linkFor = (marker: string) => [...html.matchAll(new RegExp(`<a[^>]*${marker}[^>]*>`, "g"))].map((m) => attr(m[0], "href"));
-    const expected = { once: donations.oneOffUrl ? [donations.oneOffUrl] : [], monthly: donations.monthly.map((m) => m.url).filter(Boolean) };
-    for (const [id, urls] of Object.entries(expected)) {
-        const hrefs = linkFor(`data-donate="${id}"`);
-        if (urls.length) {
-            if (hrefs.join(" ") !== urls.join(" ")) fail(`support page: ${id} donation links should be ${urls.join(", ")}`);
-        } else if (hrefs.length || !html.includes(`data-donate-unavailable="${id}"`)) {
-            fail(`support page: ${id} donation should show "Coming soon" when no link is configured`);
+    const root = /<div[^>]*data-donate-root[^>]*>/.exec(html)?.[0] ?? "";
+    if (!features.payments) {
+        if (root || html.includes("data-donate-fallback") || html.includes("data-donate-manage")) fail("support page: payment form or links shown although features.payments is off");
+        if (!html.includes("data-membership-soon")) fail('support page: "Membership coming soon" card missing');
+    } else if (donations.publishableKey && donations.sessionEndpoint) {
+        if (!root) fail("support page: payment form missing although Stripe is configured");
+        else {
+            if (attr(root, "data-publishable-key") !== donations.publishableKey) fail("support page: payment form has the wrong publishable key");
+            if (attr(root, "data-endpoint") !== donations.sessionEndpoint) fail("support page: payment form posts to the wrong endpoint");
         }
+        if (/<input[^>]*autocomplete="cc-/.test(html)) fail("support page: card fields must only appear inside Stripe's frame");
+    } else if (root) {
+        fail("support page: payment form shown but Stripe isn't configured");
     }
-    if (expected.monthly.length && donations.manageUrl && linkFor("data-donate-manage")[0] !== donations.manageUrl) {
-        fail(`support page: "Manage or cancel" link should point to ${donations.manageUrl}`);
+    if (features.payments) {
+        const fallbacks = linkFor("data-donate-fallback");
+        if (fallbacks.some((href) => href !== donations.oneOffUrl)) fail(`support page: payment fallback should link to ${donations.oneOffUrl}`);
+        if (linkFor("data-donate-manage").some((href) => href !== donations.manageUrl)) fail(`support page: "Manage" link should point to ${donations.manageUrl}`);
     }
 }
 
-// ── 5b. Donation thank-you page stays out of search results ──────────────
-const thanksFile = join(outDir, "support/thanks/index.html");
-if (existsSync(thanksFile)) {
-    if (!/<meta name="robots" content="noindex"/.test(readFileSync(thanksFile, "utf8"))) fail("support/thanks: should be noindex");
-    if (sitemap.includes("/support/thanks/")) fail("support/thanks: should not be in the sitemap");
+// ── 5b. With payments off, nothing a visitor loads talks to Stripe or the Worker
+// Astro still emits the payment form's script as an unused file; what matters
+// is every page plus every script those pages load, followed through imports.
+if (!features.payments) {
+    const loaded = new Set<string>(files.filter((f) => /\.(html|xml|json)$/.test(f)));
+    const queue = [...loaded].filter((f) => f.endsWith(".html")).flatMap((f) =>
+        [...readFileSync(f, "utf8").matchAll(/<script[^>]*\ssrc="(\/[^"]+)"/g)].map((m) => resolvePath(m[1])),
+    );
+    while (queue.length) {
+        const file = queue.pop();
+        if (!file || loaded.has(file)) continue;
+        loaded.add(file);
+        for (const m of readFileSync(file, "utf8").matchAll(/(?:from|import)\s*\(?\s*["'](\.{1,2}\/[^"']+\.js)["']/g)) queue.push(join(dirname(file), m[1]));
+    }
+    for (const file of loaded) {
+        const text = readFileSync(file, "utf8");
+        for (const [what, pattern] of [
+            ["Stripe", /stripe\.com/i],
+            ["the payments Worker", /\/donate\/session/],
+        ] as const) {
+            if (pattern.test(text)) fail(`${relative(outDir, file)}: references ${what} although features.payments is off`);
+        }
+    }
 }
 
 // ── 5c. Social and email crops are exactly the right size ────────────────

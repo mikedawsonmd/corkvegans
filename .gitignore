@@ -9,3 +9,7 @@ dist-fixtures/
 
 # macOS folder metadata
 .DS_Store
+
+# Cloudflare Worker local secrets and state
+.dev.vars
+.wrangler/

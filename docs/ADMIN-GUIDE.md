@@ -115,38 +115,101 @@ website, and the post-build check fails the deploy if it ever does.
 
 To remove Eventbrite, delete the secret. The site falls back to Meetup only.
 
-### 2.6 Donations (**set up**)
+### 2.6 Membership and payments (**switched off**)
 
-Donations use **Stripe Payment Links** in the Cork Vegans Stripe account:
-a one-off link (donor chooses the amount), three monthly links (€5, €10
-and €20) and the Stripe customer portal, where monthly donors change or
-cancel their donation. The links live in `src/config/site.ts`:
+The Stripe account has closed, so online payments are off. The Support
+page's first section is **Membership** (`#membership`; old `#donate` links
+still land there) and shows "Coming soon". Membership details aren't
+decided yet; update the section in `src/pages/support/index.astro` once
+they are.
 
-```ts
-export const donations = fixtures ? { … } : {
-    providerName: "Stripe",
-    oneOffUrl: "https://donate.stripe.com/…",
-    monthly: [
-        { label: "€5 a month", url: "https://buy.stripe.com/…" },
-        …
-    ],
-    manageUrl: "https://billing.stripe.com/p/login/…",
-};
+The payment code is kept for membership, behind one switch:
+`features.payments` in `src/config/site.ts` (currently `false`). While it's
+off, the form and checkout modal aren't rendered, no page loads Stripe.js
+or calls the Worker, and the post-build check fails the deploy if any page
+does. The Worker's `/donate/session` route also answers 404 unless its
+`PAYMENTS_ENABLED` variable is `"true"`.
+
+To switch payments back on (with a payment provider account): set
+`features.payments` to `true`, fill in the `donations` settings, set the
+Worker's `PAYMENTS_ENABLED` to `true` and follow the setup below. The form's
+wording is still about donations, so it will need rewording for membership.
+
+**How the payment form works (when switched on).** Visitors pick monthly or
+once and an amount (presets or "Other", €2 to €500). Pressing **Continue**
+asks a small Cloudflare Worker to create a Stripe Checkout Session, then
+Stripe's secure checkout opens in a modal on the same page. Card details go
+straight to Stripe, never to corkvegans.ie. Without keys configured, the
+page shows a plain button to the hosted payment page in `oneOffUrl`, if
+one is set.
+
+**Where things live**
+
+| What | Where |
+| --- | --- |
+| Form, amounts and limits | `src/components/DonateForm.astro`, `src/lib/donations.ts` |
+| On/off switch | `features.payments` in `src/config/site.ts` |
+| Publishable key, Worker URL, Turnstile site key, fallback and portal links | `donations` in `src/config/site.ts` |
+| Worker (creates Checkout Sessions) | `worker/donate.js` (logic), `worker/index.js` (entry point), `worker/wrangler.toml` |
+| Secret key | Worker secret `STRIPE_SECRET_KEY` (never in this repo) |
+
+The Worker's limits (€2 to €500) must match `src/lib/donations.ts`. A unit
+test fails if they drift apart.
+
+**One-time setup**
+
+1. **Restricted key.** In Stripe, go to Developers → API keys → Create
+   restricted key. Give it **Checkout Sessions: Write** and leave
+   everything else as None. Do this in test mode first, then again in
+   live mode. If a test donation fails and `npx wrangler tail` shows
+   "Stripe responded 403", also give it **Products: Write** and
+   **Prices: Write** (the form creates its prices on the fly).
+2. **Deploy the Worker.** From the `worker/` folder:
+   `npx wrangler login`, then `npx wrangler secret put STRIPE_SECRET_KEY`
+   (paste the `rk_…` key when asked), `npx wrangler secret put
+   PAYMENTS_ENABLED` (enter `true`), then `npx wrangler deploy`. Note the
+   URL it prints; the endpoint is that URL plus `/donate/session`.
+   (If you'd rather add it to an existing Worker, copy `donate.js` next to
+   it, import `handleDonate` from it, call that at the top of the Worker's
+   `fetch` handler and copy the `[[ratelimits]]` block into its config.)
+3. **Point the site at it.** In `src/config/site.ts`, put the publishable
+   key (`pk_live_…`) and the Worker endpoint in `donations`, replacing the
+   empty strings after `||`. Both are public by design.
+4. Set `features.payments` to `true` and commit to `main`. The form
+   appears after the deploy.
+
+**Testing with test keys before going live:** run the Worker locally with a
+test key (put `STRIPE_SECRET_KEY=rk_test_…` and `PAYMENTS_ENABLED=true` on
+separate lines in `worker/.dev.vars`, then `npx wrangler dev` in
+`worker/`), and the site against it (with `features.payments` on):
+
+```sh
+PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_… \
+PUBLIC_DONATE_ENDPOINT=http://localhost:8787/donate/session npm run dev
 ```
 
-To add, remove or change a monthly amount, edit the `monthly` list and
-commit to `main`. The buttons update after the deploy. Empty a URL (or the
-whole `monthly` list) to show that option as "Coming soon".
+You can put those two `PUBLIC_…` lines in `.env.local` instead (ignored
+by git). Restart `npm run dev` after changing it.
 
-In Stripe, set each payment link's **confirmation page** to redirect to
-`https://corkvegans.ie/support/thanks/`. That page is hidden from search
-results.
+Pay with card `4242 4242 4242 4242`, any future date and any CVC. Check
+the payment (or subscription) in the Stripe Dashboard in test mode.
+`worker/.dev.vars` is ignored by git; never commit it.
 
-Card details are only ever entered on Stripe's own site.
+**Abuse protection.** The Worker only accepts requests from corkvegans.ie
+(and localhost while testing), checks every amount itself, and allows 5
+checkout sessions per visitor IP per minute. Cloudflare Turnstile is
+optional: create a widget in Cloudflare (Turnstile → Add widget, domain
+`corkvegans.ie`), run `npx wrangler secret put TURNSTILE_SECRET_KEY` and set
+`turnstileSiteKey` in `src/config/site.ts`. Set both or neither, otherwise
+every donation is rejected.
 
-**Support page wording.** The "Donations help us with things like…" list
-and the intro text in `src/pages/support/index.astro` are a starting
-point. Organisers should confirm they're accurate before relying on them.
+**Receipts and monthly donors.** Turn on Settings → Customer emails →
+Successful payments in Stripe so donors get a receipt. Monthly donors
+manage or cancel through the Stripe customer portal (`manageUrl`).
+
+**Support page wording.** The "Membership will help us with things
+like…" list and the intro text in `src/pages/support/index.astro` are a
+starting point. Organisers should confirm they're accurate before relying on them.
 The page deliberately makes no claim about charity status or tax relief.
 Only add those if they've been verified.
 
