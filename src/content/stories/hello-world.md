@@ -1,22 +1,27 @@
 ---
+draft: false
 title: Welcome to the Cork Vegans website
-description: Our website has had a refresh! Take a tour of what’s new, from live event listings to volunteering, and meet the illustrator behind the new look.
+description: Our website has had a refresh! Take a tour of what’s new, from live
+  event listings to volunteering, and meet the illustrator behind the new look.
 category: News
 author: Cork Vegans
 publishedAt: 2026-10-18
 featuredImage: /src/assets/stories/frame-3.jpg
 featuredImageAlt: "Emma's wonderful animal illustrations "
 imageFocus: whole
-draft: false
 social:
-  - summary: |-
+  - summary: >-
       Our website has had a refresh! 🌱 
 
-      Live events, a new Stories section, resources and volunteering, plus beautiful illustrations by the wonderful  Emma Boruchowicz.
-    igCaption: |-
+
+      Live events, a new Stories section, resources and volunteering, plus
+      beautiful illustrations by the wonderful  Emma Boruchowicz.
+    igCaption: >-
       Our website has had a refresh! 🌱 
 
-      Live events, a new Stories section, resources and volunteering, plus beautiful illustrations by the wonderful  Emma Boruchowicz.
+
+      Live events, a new Stories section, resources and volunteering, plus
+      beautiful illustrations by the wonderful  Emma Boruchowicz.
     image: /src/assets/stories/screenshot-2026-10-18-at-160345.png
 ---
 Hello and welcome to the very first post on our Stories page!
@@ -37,7 +42,7 @@ First things first: a huge thank you to **Emma Boruchowicz**, who created the il
 
 **Volunteer with us.** There’s now a simple form on our Support page if you’d like to get involved. Whether it’s helping organise events, welcoming newcomers on the day, taking photos, writing, social media or outreach, no experience needed. Just tell us what you’re interested in and we’ll be in touch.
 
-**Donations, coming soon.** We’re setting up one-off and monthly donations to help us run more events, including in paid venues. More on that shortly.
+**Membership, coming soon.** We’re setting up memberships to help us run more events, including in paid venues. Members will get perks like priority event access and discounts on paid events! More on that shortly.
 
 **Easier to use everywhere.** The site has been rebuilt to work well on phones and to be more accessible for everyone.
 
