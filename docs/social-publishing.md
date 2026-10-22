@@ -58,42 +58,88 @@ it asks, follow its prompts.
 | `instagram_content_publish` | To publish to Instagram |
 | `business_management` | Only if the Page is owned by a Meta Business account |
 
-### 1.4 Get a long-lived Page access token and the IDs
+### 1.4 Get a Page access token from a system user
 
-1. Open the **Graph API Explorer**
-   (https://developers.facebook.com/tools/explorer/). Pick your app, click
-   **Generate Access Token**, and approve the permissions above. Make sure
-   you tick the Cork Vegans Page and Instagram account when asked.
-2. Exchange that short-lived token for a **long-lived user token** (about 60
-   days). In the Explorer, or in a browser, call:
-   ```
-   https://graph.facebook.com/v26.0/oauth/access_token?grant_type=fb_exchange_token&client_id=APP_ID&client_secret=APP_SECRET&fb_exchange_token=SHORT_LIVED_TOKEN
-   ```
-   The **App ID** and **App secret** are under the app's **Settings → Basic**.
-   Copy `access_token` from the response.
-3. Use the long-lived user token to list your Pages:
-   ```
-   https://graph.facebook.com/v26.0/me/accounts?access_token=LONG_LIVED_USER_TOKEN
-   ```
-   Find Cork Vegans in the list. Its `id` is the **Page ID**, and its
-   `access_token` is the **Page access token**. A Page token made this way
-   **doesn't expire**.
-4. Find the Instagram account's ID:
-   ```
-   https://graph.facebook.com/v26.0/PAGE_ID?fields=instagram_business_account&access_token=PAGE_ACCESS_TOKEN
-   ```
-   The `id` inside `instagram_business_account` is the **Instagram user ID**.
-   It's a long number, not the @handle.
-5. Optional: paste the Page token into the **Access Token Debugger**
-   (https://developers.facebook.com/tools/debug/accesstoken/) to check its
-   permissions and that **Expires** says **Never**.
+The website posts with a token belonging to a **system user**: a robot
+account in the Cork Vegans Meta Business portfolio, not a person. Its token
+never expires and isn't affected by anyone's password changes, security
+checks or logins. (A token made from a personal Facebook account stops
+working whenever any of those happen, and Meta also expires its data access
+every 90 days.)
 
-Treat the tokens and the App secret like passwords. Don't paste them into
-chat, email or the repository; they only go into GitHub (section 2).
+The current setup, made on 22 October 2026:
 
-**If posting stops working** with an error about the token (e.g. after
-someone changes their Facebook password, loses their role on the Page, or
-removes the app), repeat step 1.4 and update the secret.
+| | |
+| --- | --- |
+| Business portfolio | Cork Vegans (ID 156729148686489) |
+| System user | **WebsitePublisher** (Employee) |
+| Its assets | Cork Vegans Page and the corkvegans Instagram account (Content, Community activity, Insights); **Cork Vegans Publisher** app (full access) |
+
+**To set it up again, or make a new token:**
+
+1. Go to **https://business.facebook.com/settings** → **Users → System
+   users**. You need full control of the portfolio. To create a new system
+   user, click **Add** and choose the **Employee** role. Meta rejects some
+   names without saying why; one word with no spaces, like
+   `WebsitePublisher`, works.
+2. Click the system user → **Assign assets**:
+   - **Pages** → Cork Vegans → Content, Community activity, Insights
+   - **Instagram accounts** → corkvegans → the same (Instagram asks you to
+     log in separately)
+   - **Apps** → Cork Vegans Publisher → full access
+
+   If the Instagram account or the app isn't listed, add it to the portfolio
+   first under **Accounts → Instagram accounts** or **Accounts → Apps →
+   Connect an app ID** (`1640539060772695`).
+3. Click **Generate token**. Choose the Cork Vegans Publisher app, set
+   **Token expiration** to **Never**, and tick the permissions from 1.3
+   (`business_management` isn't needed). Copy the token: Meta shows it only
+   once.
+4. That's a *user* token, but Facebook only accepts Page posts made with a
+   *Page* token. Open the **Graph API Explorer**
+   (https://developers.facebook.com/tools/explorer/), paste the token into
+   the **Access Token** box, run `me/accounts`, and copy the `access_token`
+   from the Cork Vegans entry. That's the **Page access token**.
+5. Check it in the **Access Token Debugger**
+   (https://developers.facebook.com/tools/debug/accesstoken/):
+   - **Type:** Page, and **Page ID:** Cork Vegans
+   - **App-Scoped User ID:** WebsitePublisher, not a person
+   - **Expires** and **Data Access Expires:** Never
+
+Treat tokens like passwords. Don't paste them into chat, email or the
+repository; they only go into GitHub (section 2).
+
+**First-time setup only:** you'll also need the IDs. The **Page ID** is shown
+in the debugger. For the **Instagram user ID**, run
+`PAGE_ID?fields=instagram_business_account` in the Explorer with the Page
+token; it's the `id` inside `instagram_business_account` (a long number, not
+the @handle). When renewing, the IDs don't change, so only update
+`META_PAGE_ACCESS_TOKEN`.
+
+### 1.5 When posting stops working
+
+The "Post stories to social media" run fails, and the error mentions the
+token or permissions, for example *"Any of the pages_read_engagement, …
+permission(s) must be granted before impersonating a user's page"*.
+
+A system user token is only cancelled if the system user is deleted or loses
+its assets, or the app is removed from the portfolio. Check those in
+Business settings first. (Before 22 October 2026 the token came from a
+personal account, and a Facebook security check cancelled it.)
+
+To fix it:
+
+1. Make a new Page token (1.4, steps 3–5), after re-assigning any missing
+   assets (step 2).
+2. Update `META_PAGE_ACCESS_TOKEN` in GitHub (section 2: click the pencil
+   next to the secret).
+3. Go to **Actions → Post stories to social media → Run workflow**, untick
+   **Dry run**, and run it. Stories that failed get posted. Stories already
+   posted are skipped.
+
+If the Explorer only shows "Sorry, something went wrong", log out of
+Facebook and back in, complete any security checks it asks for, and try
+again in a private window.
 
 ---
 
