@@ -24,9 +24,10 @@ const searchText = [story.title, story.description, story.author, story.category
     data-title={story.title}
     data-text={searchText}
 >
+    <!-- White to stand off the pink sections; pink inside a white section. -->
     <article
         {...(animalSpot ? spot("ledge", "stories", { size: 32, max: 2, hop: true }) : {})}
-        class="group relative h-full flex flex-col bg-surface border border-surface-variant rounded-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 focus-within:shadow-xl"
+        class="group relative h-full flex flex-col bg-surface-container-lowest [.bg-surface-container-lowest_&]:bg-surface border border-surface-variant rounded-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 focus-within:shadow-xl"
     >
         <div class="overflow-hidden rounded-t-[23px]">
             <StoryImage
