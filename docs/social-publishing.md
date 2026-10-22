@@ -141,6 +141,18 @@ If the Explorer only shows "Sorry, something went wrong", log out of
 Facebook and back in, complete any security checks it asks for, and try
 again in a private window.
 
+**The weekly token check.** Every Monday morning, **Actions → Check social
+media token** checks the token without posting anything. It checks that the
+token can read the Page and the Instagram account, that it's a Page token
+with the permissions from 1.3, and that it isn't expiring within 30 days.
+If anything's wrong, the run fails and GitHub emails you, usually before a
+story is affected. The run's summary says what's wrong; fix it as above, then
+re-run the check (**Run workflow**) to confirm.
+
+GitHub pauses scheduled checks in a repository with no commits for 60 days.
+Any story added in Pages CMS counts as a commit. If the check is paused,
+Actions shows a banner with a button to turn it back on.
+
 ---
 
 ## 2. GitHub secrets
@@ -273,6 +285,7 @@ stories.
 | Crops (sharp) | `src/lib/social-images.ts`, `src/pages/stories/[slug]/*.jpg.ts` |
 | RSS feed | `src/lib/feed.ts`, `src/pages/stories/feed.xml.ts` |
 | Posting | `scripts/post-social.ts`, `.github/workflows/social.yml` |
+| Weekly token check | `scripts/check-social-token.ts`, `.github/workflows/social-token-check.yml` |
 | Record of posts | `data/social-posted.json` |
 
 The Meta Graph API version is set once, in `scripts/post-social.ts`

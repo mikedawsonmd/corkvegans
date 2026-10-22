@@ -102,7 +102,7 @@ export function tokenHint(code: number | undefined): string {
     return "";
 }
 
-type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
+export type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
 
 /** Calls the Graph API. The token goes in the request body or query, never in logs. */
 export async function graph(
