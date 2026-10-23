@@ -22,6 +22,8 @@ export interface EventbriteEvent {
     start?: { utc?: string | null; timezone?: string | null } | null;
     end?: { utc?: string | null; timezone?: string | null } | null;
     status?: string | null;
+    /** false for private events (Eventbrite's "Private" / unlisted setting). */
+    listed?: boolean | null;
     online_event?: boolean | null;
     is_free?: boolean | null;
     logo?: { url?: string | null; original?: { url?: string | null } | null } | null;
@@ -55,6 +57,8 @@ export function normaliseEventbriteEvent(ev: EventbriteEvent, groupName: string)
     const start = toIso(ev.start?.utc);
     const url = safeHttpsUrl(ev.url, EVENTBRITE_HOSTS);
     if (!status || !title || !start || !url || !ev.id) return null;
+    // Private events (tests, invitation-only) stay off the site.
+    if (ev.listed === false) return null;
 
     const end = toIso(ev.end?.utc);
     const imageUrl = safeHttpsUrl(ev.logo?.original?.url ?? ev.logo?.url, IMAGE_HOSTS);

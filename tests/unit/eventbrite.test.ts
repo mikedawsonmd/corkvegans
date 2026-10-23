@@ -44,6 +44,11 @@ describe("Eventbrite normalisation", () => {
         }
     });
 
+    it("leaves out private events", () => {
+        expect(normaliseEventbriteEvent({ ...base, listed: false }, "Cork Vegans")).toBeNull();
+        expect(normaliseEventbriteEvent({ ...base, listed: true }, "Cork Vegans")).not.toBeNull();
+    });
+
     it("handles missing images and venues, and online events", () => {
         const ev = normaliseEventbriteEvent({ ...base, logo: null, venue: null, online_event: true, is_free: true }, "Cork Vegans")!;
         expect(ev.image).toBeNull();
