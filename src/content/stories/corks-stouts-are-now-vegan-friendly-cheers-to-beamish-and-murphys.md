@@ -1,6 +1,6 @@
 ---
 draft: false
-title: "Cork’s Stouts Are Now Vegan Friendly: Cheers to Beamish and Murphy’s"
+title: "Cork’s stouts are now vegan friendly: cheers to Beamish and Murphy’s"
 description: Beamish and Murphy’s, Cork’s two famous stouts, are now vegan
   friendly after Heineken Ireland confirmed it no longer uses isinglass. Time to
   raise a glass. 🍺
