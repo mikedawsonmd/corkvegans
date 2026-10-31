@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { contactForm, donations, links, site, volunteerForm } from "../../src/config/site.ts";
+import { contactEmail, contactForm, links, membership, site, volunteerForm } from "../../src/config/site.ts";
 
 describe("site configuration", () => {
     it("uses the apex domain as canonical, matching CNAME", () => {
@@ -13,13 +13,17 @@ describe("site configuration", () => {
         for (const url of Object.values(links)) expect(url).toMatch(/^https:\/\//);
     });
 
-    it("has donation links that are either empty or https", () => {
-        for (const url of [donations.oneOffUrl, donations.manageUrl]) expect(url === "" || url.startsWith("https://")).toBe(true);
+    it("has a membership portal link that's either empty or https", () => {
+        expect(membership.portalUrl === "" || membership.portalUrl.startsWith("https://")).toBe(true);
     });
 
     it("only ever exposes a Stripe publishable key, never a secret one", () => {
-        expect(donations.publishableKey === "" || /^pk_(live|test)_\w+$/.test(donations.publishableKey)).toBe(true);
-        expect(donations.sessionEndpoint === "" || /^https:\/\/.+\/donate\/session$/.test(donations.sessionEndpoint)).toBe(true);
+        expect(membership.publishableKey === "" || /^pk_(live|test)_\w+$/.test(membership.publishableKey)).toBe(true);
+        expect(membership.endpoint === "" || /^https:\/\/[^/]+$/.test(membership.endpoint)).toBe(true);
+    });
+
+    it("has a contact email for members", () => {
+        expect(contactEmail).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
     });
 
     it("has form endpoints that are empty or Formspree form URLs", () => {

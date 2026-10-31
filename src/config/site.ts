@@ -8,7 +8,7 @@
 
 /**
  * Test builds only (CV_FIXTURES=1, used by the automated browser tests):
- * fake form and donation endpoints so those flows can be exercised.
+ * fake form and membership endpoints so those flows can be exercised.
  * Never set in production.
  */
 const fixtures = typeof process !== "undefined" && process.env?.CV_FIXTURES === "1";
@@ -96,55 +96,60 @@ export const headerCta = { href: "/support/", label: "Support us" };
 /**
  * Feature switches.
  *
- * payments: the on-page Stripe donation form and checkout modal
- * (src/components/DonateForm.astro, worker/donate.js). Off since the Stripe
- * account closed; the code is kept for membership. While it's off the
- * Support page shows "Membership coming soon", Stripe.js is never loaded and
- * the Worker is never called. Turning it on also needs the `donations`
- * settings below and the Worker's PAYMENTS_ENABLED variable.
+ * payments: the membership join form and its checkout modal
+ * (src/components/MembershipForm.astro, worker/membership.js). While it's off
+ * the Support page shows "Membership is on the way", Stripe.js is never
+ * loaded and the Worker is never called. Turning it on also needs the
+ * `membership` settings below and the Worker's PAYMENTS_ENABLED variable.
+ * Test builds (CV_FIXTURES=1) switch it on so the browser tests cover the form.
  */
 export const features = {
-    payments: false,
+    payments: fixtures,
 };
 
 /**
- * Build-time setting, e.g. to try the payment form with Stripe test keys.
+ * Build-time setting, e.g. to try the join form with Stripe test keys.
  * Astro exposes .env/.env.local values on import.meta.env (the dev server
  * doesn't copy them to process.env); plain Node scripts only have process.env.
  */
 const env = (name: string): string =>
     String(import.meta.env?.[name] ?? "").trim() || (typeof process !== "undefined" && process.env?.[name]?.trim()) || "";
 
+/** Where members write to us: refunds, privacy requests, questions. */
+export const contactEmail = "crkvgns@gmail.com";
+
 /**
- * Payment form settings, used only when features.payments is on. The form
- * uses Stripe Embedded Checkout; the Worker in worker/donate.js creates each
- * Checkout Session, and card details never reach corkvegans.ie.
+ * Membership settings, used only when features.payments is on. The join form
+ * uses Stripe Embedded Checkout; the Worker in worker/membership.js creates
+ * each Checkout Session, and card details never reach corkvegans.ie.
  *
- * Everything here is public. Override the first three for a single build
- * with PUBLIC_STRIPE_PUBLISHABLE_KEY, PUBLIC_DONATE_ENDPOINT and
- * PUBLIC_TURNSTILE_SITE_KEY (see docs/ADMIN-GUIDE.md, "Membership and payments").
+ * Everything here is public. Override the first four for a single build
+ * with PUBLIC_STRIPE_PUBLISHABLE_KEY, PUBLIC_MEMBERSHIP_ENDPOINT,
+ * PUBLIC_TURNSTILE_SITE_KEY and PUBLIC_STRIPE_PORTAL_URL (see
+ * docs/ADMIN-GUIDE.md, "Membership").
  */
-export const donations = fixtures
+export const membership = fixtures
     ? {
-          providerName: "Test Provider",
           publishableKey: "pk_test_fixture",
-          sessionEndpoint: "https://donate.example/donate/session",
+          endpoint: "https://membership.example",
           turnstileSiteKey: "",
-          oneOffUrl: "https://donate.example/once",
-          manageUrl: "https://donate.example/manage",
+          portalUrl: "https://billing.example/login",
+          discountEur: 5,
+          eventbriteCodeParam: "discount",
       }
     : {
-          providerName: "Stripe",
           /** Stripe publishable key: pk_live_… (or pk_test_… while testing). Never a secret key. */
           publishableKey: env("PUBLIC_STRIPE_PUBLISHABLE_KEY") || "",
-          /** The Worker's endpoint, ending /donate/session. */
-          sessionEndpoint: env("PUBLIC_DONATE_ENDPOINT") || "",
+          /** The Worker's address, e.g. https://corkvegans-membership.<subdomain>.workers.dev (no path). */
+          endpoint: env("PUBLIC_MEMBERSHIP_ENDPOINT") || "",
           /** Cloudflare Turnstile site key. Leave empty unless the Worker has TURNSTILE_SECRET_KEY. */
           turnstileSiteKey: env("PUBLIC_TURNSTILE_SITE_KEY") || "",
-          /** Hosted payment page, the fallback if the form can't load. Empty: no fallback link. */
-          oneOffUrl: "",
-          /** Customer portal for recurring payments. Empty: no "manage" link. */
-          manageUrl: "",
+          /** Stripe customer portal login link (Settings → Billing → Customer portal). Empty: no "manage" link. */
+          portalUrl: env("PUBLIC_STRIPE_PORTAL_URL") || "",
+          /** Euros off a member ticket. Keep in step with the Worker's MEMBER_DISCOUNT_EUR. */
+          discountEur: 5,
+          /** The query parameter that makes Eventbrite apply a code from an event link. */
+          eventbriteCodeParam: "discount",
       };
 
 /**

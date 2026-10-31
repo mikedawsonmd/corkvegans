@@ -24,7 +24,7 @@ Editors only need [CONTENT-EDITOR-GUIDE.md](CONTENT-EDITOR-GUIDE.md).
 - **Content:** stories are Markdown files in `src/content/stories/`, and
   their images are in `src/assets/stories/`.
 - **Settings:** in `src/config/site.ts`: navigation, social links (footer
-  icons), the Resources page links, donation URLs and the form endpoint.
+  icons), the Resources page links, membership settings and the form endpoints.
 
 | Path | What it is |
 | --- | --- |
@@ -115,103 +115,193 @@ website, and the post-build check fails the deploy if it ever does.
 
 To remove Eventbrite, delete the secret. The site falls back to Meetup only.
 
-### 2.6 Membership and payments (**switched off**)
+### 2.6 Membership (**switched off** until set up)
 
-The Stripe account has closed, so online payments are off. The Support
-page's first section is **Membership** (`#membership`; old `#donate` links
-still land there) and shows "Coming soon". Membership details aren't
-decided yet; update the section in `src/pages/support/index.astro` once
-they are.
+Cork Vegans membership is "contribute what you can": monthly (€5, €10, €15
+or another amount from €2 to €500) or yearly (€50, €100 or another amount
+from €50 to €500). Every member gets the same benefits: €5 off one ticket
+per paid event, early booking, and member events. The terms are on
+`/membership-terms/`; keep them in step with the Support page.
 
-The payment code is kept for membership, behind one switch:
-`features.payments` in `src/config/site.ts` (currently `false`). While it's
-off, the form and checkout modal aren't rendered, no page loads Stripe.js
-or calls the Worker, and the post-build check fails the deploy if any page
-does. The Worker's `/donate/session` route also answers 404 unless its
-`PAYMENTS_ENABLED` variable is `"true"`.
+**How it works**
 
-To switch payments back on (with a payment provider account): set
-`features.payments` to `true`, fill in the `donations` settings, set the
-Worker's `PAYMENTS_ENABLED` to `true` and follow the setup below. The form's
-wording is still about donations, so it will need rewording for membership.
+1. On the Support page (`#membership`) the visitor picks an amount, enters
+   their name and email, agrees to the terms and presses **Join**.
+2. The membership Worker (`worker/`, on Cloudflare) checks everything and
+   creates a Stripe Checkout session. Stripe's checkout opens in a modal;
+   card details go straight to Stripe, never to corkvegans.ie.
+3. When the payment goes through, Stripe sends `checkout.session.completed`
+   to the Worker's webhook. The Worker makes the member's code (like
+   `CV-7K3P9Q`), creates it on Eventbrite as an access code with €5 off on
+   the **Members** ticket group, saves the code on the Stripe subscription,
+   and sends the welcome email through Brevo.
+4. Meanwhile the modal says "Welcome to Cork Vegans!" and shows the code as
+   soon as it exists, with a Copy button. The code is remembered in the
+   browser, so Eventbrite links on our events list apply it automatically.
+   The welcome email's events link does the same on any device.
+5. Each renewal (`invoice.paid`) moves the code's end date to the new period
+   end plus 3 days. Cancelling keeps the code until the paid period ends.
+   When the membership ends (`customer.subscription.deleted`) the code is
+   deleted, or ended now if it's been used (Eventbrite can't delete used
+   codes).
+6. "Lost your code?" on the Support page re-sends the welcome email to any
+   live membership under that email, and always shows the same message.
 
-**How the payment form works (when switched on).** Visitors pick monthly or
-once and an amount (presets or "Other", €2 to €500). Pressing **Continue**
-asks a small Cloudflare Worker to create a Stripe Checkout Session, then
-Stripe's secure checkout opens in a modal on the same page. Card details go
-straight to Stripe, never to corkvegans.ie. Without keys configured, the
-page shows a plain button to the hosted payment page in `oneOffUrl`, if
-one is set.
+Every webhook step is safe to repeat (Stripe retries failures): the code and
+Eventbrite discount ID are saved on the subscription, and the code is worked
+out from the subscription ID, so a member never gets two codes.
 
 **Where things live**
 
 | What | Where |
 | --- | --- |
-| Form, amounts and limits | `src/components/DonateForm.astro`, `src/lib/donations.ts` |
+| Join form, amounts and limits | `src/components/MembershipForm.astro`, `src/scripts/membership-form.ts`, `src/lib/membership.ts` |
 | On/off switch | `features.payments` in `src/config/site.ts` |
-| Publishable key, Worker URL, Turnstile site key, fallback and portal links | `donations` in `src/config/site.ts` |
-| Worker (creates Checkout Sessions) | `worker/donate.js` (logic), `worker/index.js` (entry point), `worker/wrangler.toml` |
-| Secret key | Worker secret `STRIPE_SECRET_KEY` (never in this repo) |
+| Publishable key, Worker address, Turnstile site key, portal link, €5 | `membership` in `src/config/site.ts` |
+| Worker routes and checkout | `worker/membership.js` (entry point `worker/index.js`, config `worker/wrangler.toml`) |
+| Webhook, codes, Eventbrite, email | `worker/stripe-webhook.js`, `worker/members.js`, `worker/eventbrite.js`, `worker/welcome-email.js` |
+| Stripe product and prices | `scripts/stripe-membership-catalogue.ts` |
+| Terms and privacy pages | `src/pages/membership-terms/`, `src/pages/privacy/` |
 
-The Worker's limits (€2 to €500) must match `src/lib/donations.ts`. A unit
-test fails if they drift apart.
+The amounts in `src/lib/membership.ts` and `worker/membership.js` must
+match; a unit test fails if they drift apart. If you change the €5, change
+`MEMBER_DISCOUNT_EUR` in `worker/wrangler.toml` and `discountEur` in
+`src/config/site.ts` together.
 
-**One-time setup**
+**Setup checklist.** Do it all in Stripe test mode first, then repeat the
+Stripe steps in live mode.
 
-1. **Restricted key.** In Stripe, go to Developers → API keys → Create
-   restricted key. Give it **Checkout Sessions: Write** and leave
-   everything else as None. Do this in test mode first, then again in
-   live mode. If a test donation fails and `npx wrangler tail` shows
-   "Stripe responded 403", also give it **Products: Write** and
-   **Prices: Write** (the form creates its prices on the fly).
-2. **Deploy the Worker.** From the `worker/` folder:
-   `npx wrangler login`, then `npx wrangler secret put STRIPE_SECRET_KEY`
-   (paste the `rk_…` key when asked), `npx wrangler secret put
-   PAYMENTS_ENABLED` (enter `true`), then `npx wrangler deploy`. Note the
-   URL it prints; the endpoint is that URL plus `/donate/session`.
-   (If you'd rather add it to an existing Worker, copy `donate.js` next to
-   it, import `handleDonate` from it, call that at the top of the Worker's
-   `fetch` handler and copy the `[[ratelimits]]` block into its config.)
-3. **Point the site at it.** In `src/config/site.ts`, put the publishable
-   key (`pk_live_…`) and the Worker endpoint in `donations`, replacing the
-   empty strings after `||`. Both are public by design.
-4. Set `features.payments` to `true` and commit to `main`. The form
-   appears after the deploy.
+1. **Product and prices.** Run the catalogue script with a secret key that
+   has Products: Write and Prices: Write (type it only in that command):
+   ```sh
+   STRIPE_SECRET_KEY=sk_test_… node scripts/stripe-membership-catalogue.ts
+   ```
+   It creates one product per preset amount (**Cork Vegans membership: €5 a
+   month** and so on), each with one price whose lookup key is
+   `membership_monthly_5`, `_10`, `_15`, `membership_yearly_50` or `_100`,
+   plus **Cork Vegans membership** (ID `cv_membership_custom`) for amounts
+   members choose themselves. Running it again changes nothing. Each preset
+   needs its own product because the customer portal only allows one
+   monthly and one yearly price per product.
+2. **Restricted key for the Worker.** Developers → API keys → Create
+   restricted key: Checkout Sessions: Write, Customers: Write,
+   Subscriptions: Write, Prices: Write, Products: Read. Everything else None.
+3. **Customer portal.** Settings → Billing → Customer portal: allow
+   cancelling (at the end of the billing period). Under subscriptions,
+   allow switching plans and add only the three **monthly** products
+   (**Cork Vegans membership: €5 / €10 / €15 a month**); choose **No charges
+   or credits**, and **Wait until end of billing period** for downgrades.
+   Leave the yearly products out: Stripe moves a yearly member to a monthly
+   product at once, charging the first month that day and dropping the
+   rest of the paid year (tested October 2026). Yearly members and those
+   who chose their own amount change by cancelling and rejoining, or by
+   emailing us; the terms and welcome email say so.
+   Copy the portal's **login link** (https://billing.stripe.com/p/login/…).
+4. **Webhook.** Developers → Webhooks → Add endpoint:
+   `https://corkvegans-membership.<your-subdomain>.workers.dev/stripe/webhook`,
+   API version `2026-09-30.endive` (the Worker reads fields in that
+   version's shape), events `checkout.session.completed`, `invoice.paid`,
+   `customer.subscription.updated`, `customer.subscription.deleted`. Copy
+   its signing secret (`whsec_…`).
+5. **Eventbrite.**
+   - Create a ticket group called **Members** (Organization settings, or
+     when you first add a member ticket). Find its ID with
+     `GET https://www.eventbriteapi.com/v3/organizations/<org id>/ticket_groups/`.
+   - Make the Worker its own private token. Eventbrite tokens can do
+     anything their account can, so ideally create it from a team member
+     whose role only allows managing events and promo codes.
+   - **For each paid event:** besides the public ticket, add a **Member
+     ticket** at the same price, set to **hidden**, with a maximum of **1 per
+     order**, with "Member" in its name (e.g. **Member ticket**). Every
+     deploy (each push, and every 6 hours) puts hidden tickets named like
+     that into the Members group; to do it straight away, run Actions →
+     "Deploy site" → "Run workflow". Start its sales before
+     the public ticket's: that's the early booking window. Members' codes
+     reveal it and take €5 off; at €5 or less it's free.
+   - **Member events:** give the event only a hidden Member ticket.
+   - In GitHub, add the variable `EVENTBRITE_MEMBERS_TICKET_GROUP_ID` (the
+     group's ID) under Settings → Secrets and variables → Actions →
+     Variables; without it the deploy skips the member-ticket step.
+   - **Confirmed in October 2026:** the API accepts an access code with
+     `amount_off` on the Members group, stores `end_date` as sent (Irish
+     time), finds codes with the `multi_events` scope, and moves the end date
+     on update. Checked on a private test event the same month: a link ending
+     `?discount=<code>` reveals the hidden Member ticket with the €5 off, and
+     a ticket discounted to €0 checks out without card details.
+   - Eventbrite's editor doesn't show ticket groups, hence the deploy step
+     (`scripts/sync-member-tickets.ts`). It reads the group, adds any
+     missing member tickets and sends the whole list back with
+     `POST /v3/ticket_groups/<group id>/`. Names with "non-member" are
+     ignored, and so are tickets that aren't hidden.
+   - Private events never appear on the site's events page.
+6. **Brevo.** Senders, domains & dedicated IPs → Domains: add
+   corkvegans.ie with the branded subdomain members.corkvegans.ie, and add
+   the DNS records it shows at GoDaddy (Brevo code, two DKIM CNAMEs and three
+   branding CNAMEs: `members`, `r.members`, `img.members`). Don't add Brevo's
+   DMARC record: corkvegans.ie already has one, and a second breaks both.
+   Then authenticate it. Add the sender address you'll use in `EMAIL_FROM`
+   (members@corkvegans.ie, done October 2026; it needs no mailbox, as
+   replies go to `EMAIL_REPLY_TO`). In the transactional Tracking settings,
+   set anonymous tracking to **Yes**. Brevo can't switch click tracking off on
+   this plan, so links in the email go through r.members.corkvegans.ie; the
+   privacy page says so. Then SMTP & API → API keys → generate a key
+   (`xkeysib-…`): no expiration, **Restricted**, Transactional email
+   **All**, everything else None. Leave IP blocking (Security → Authorized
+   IPs) off: Cloudflare's sending addresses change. Brevo deletes a key
+   after 90 days without use, so the Worker's weekly cron makes one
+   read-only call to keep it alive (`wrangler.toml` `[triggers]`).
+7. **Deploy the Worker.** From `worker/`: `npx wrangler login`, then
+   `npx wrangler secret put NAME` for each of:
+   `PAYMENTS_ENABLED` (`true`), `STRIPE_SECRET_KEY` (the `rk_…` key),
+   `STRIPE_WEBHOOK_SECRET`, `MEMBER_CODE_SECRET` (any long random string;
+   never change it), `EVENTBRITE_TOKEN`, `EVENTBRITE_ORGANIZATION_ID`,
+   `EVENTBRITE_MEMBERS_TICKET_GROUP_ID`, `BREVO_API_KEY`, `EMAIL_FROM`
+   (e.g. `Cork Vegans <members@corkvegans.ie>`) and `STRIPE_PORTAL_URL`.
+   Optional: `TURNSTILE_SECRET_KEY`. Then `npx wrangler deploy`. The previous payments
+   Worker (the one this replaces) can then be deleted in Cloudflare.
+8. **Point the site at it.** In `src/config/site.ts` → `membership`, put the
+   publishable key (`pk_live_…`), the Worker address (no path) and the
+   portal login link in place of the empty strings, set
+   `features.payments` to `true`, and commit to `main`.
 
-**Testing with test keys before going live:** run the Worker locally with a
-test key (put `STRIPE_SECRET_KEY=rk_test_…` and `PAYMENTS_ENABLED=true` on
-separate lines in `worker/.dev.vars`, then `npx wrangler dev` in
-`worker/`), and the site against it (with `features.payments` on):
+**Testing end to end (test mode).**
 
-```sh
-PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_… \
-PUBLIC_DONATE_ENDPOINT=http://localhost:8787/donate/session npm run dev
-```
-
-You can put those two `PUBLIC_…` lines in `.env.local` instead (ignored
-by git). Restart `npm run dev` after changing it.
-
-Pay with card `4242 4242 4242 4242`, any future date and any CVC. Check
-the payment (or subscription) in the Stripe Dashboard in test mode.
-`worker/.dev.vars` is ignored by git; never commit it.
+1. In `worker/.dev.vars` (ignored by git), put the same names as step 7
+   with test values: `PAYMENTS_ENABLED=true`, the `rk_test_…` key, and so
+   on. Leave `STRIPE_WEBHOOK_SECRET` for step 3.
+2. In `.env.local`: `PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_…`,
+   `PUBLIC_MEMBERSHIP_ENDPOINT=http://localhost:8787` and
+   `PUBLIC_STRIPE_PORTAL_URL=` the test portal login link. Switch
+   `features.payments` on locally (don't commit that).
+3. Forward Stripe's events to your machine with the
+   [Stripe CLI](https://docs.stripe.com/stripe-cli):
+   ```sh
+   stripe login
+   stripe listen --forward-to localhost:8787/stripe/webhook
+   ```
+   It prints a signing secret (`whsec_…`): put it in `worker/.dev.vars` as
+   `STRIPE_WEBHOOK_SECRET`.
+4. Run `npx wrangler dev` in `worker/` and `npm run dev` in the project,
+   open http://localhost:4321/support/#membership, and join with card
+   `4242 4242 4242 4242`, any future date and any CVC. `stripe listen`
+   should show the events answered with 200; the modal shows the code, the
+   email arrives, and the code appears under Eventbrite's promo codes.
+   Eventbrite has no test mode, so use a private test event.
+5. Renewal: `stripe subscriptions update sub_… -d billing_cycle_anchor=now
+   -d proration_behavior=none` makes an immediate invoice; the code's end
+   date moves. Cancelling: `stripe subscriptions cancel sub_…` deletes the
+   code. `npx wrangler tail` shows the deployed Worker's logs.
 
 **Abuse protection.** The Worker only accepts requests from corkvegans.ie
-(and localhost while testing), checks every amount itself, and allows 5
-checkout sessions per visitor IP per minute. Cloudflare Turnstile is
-optional: create a widget in Cloudflare (Turnstile → Add widget, domain
-`corkvegans.ie`), run `npx wrangler secret put TURNSTILE_SECRET_KEY` and set
+(and localhost while testing), checks every field itself, and rate limits
+per IP: 5 checkouts, 3 "Lost your code?" requests and 30 code checks a
+minute. Cloudflare Turnstile is optional: create a widget for
+`corkvegans.ie`, set the Worker's `TURNSTILE_SECRET_KEY` and
 `turnstileSiteKey` in `src/config/site.ts`. Set both or neither, otherwise
-every donation is rejected.
+every join is rejected.
 
-**Receipts and monthly donors.** Turn on Settings → Customer emails →
-Successful payments in Stripe so donors get a receipt. Monthly donors
-manage or cancel through the Stripe customer portal (`manageUrl`).
-
-**Support page wording.** The "Membership will help us with things
-like…" list and the intro text in `src/pages/support/index.astro` are a
-starting point. Organisers should confirm they're accurate before relying on them.
-The page deliberately makes no claim about charity status or tax relief.
-Only add those if they've been verified.
+**Receipts.** Turn on Settings → Customer emails → Successful payments in
+Stripe so members get a receipt for each payment.
 
 ### 2.7 Volunteer form (**set up**)
 
@@ -340,7 +430,7 @@ shrinks on phones (under 768px wide); on larger screens it stays full height.
   address.
 - **What editors can do:** create, edit and delete stories and story
   images. They can't change `.pages.yml`, manage collaborators, site
-  settings, donation links or code. There are no finer-grained roles: every
+  settings, membership settings or code. There are no finer-grained roles: every
   editor can edit every story.
 - **Who changed what:** every save is a commit with the editor's name
   (`settings.commit.identity: user`). See GitHub → repository → Commits, or
@@ -449,7 +539,7 @@ net, so only invite people you trust.
 ```bash
 npm ci
 npm run dev            # http://localhost:4321 with real content
-npm run dev:fixtures   # with example stories and test form/donation links
+npm run dev:fixtures   # with example stories and test form and membership endpoints
 npm run sync:events    # refresh src/data/events.json
 npm run build          # production build + checks → dist/
 npm test               # unit tests
@@ -469,7 +559,9 @@ All services are free today. Expected recurring cost: **€0/month**.
 | Meetup iCal | Free; depends on Meetup keeping the public feed. |
 | Eventbrite API | Free with an organiser account; subject to API rate limits (the site makes a few calls every 6 hours). |
 | Formspree | Free tier has a monthly submission cap (50/month at the time of writing). Check before relying on it. |
-| Donation provider | Usually free to set up; the provider charges per-transaction fees. |
+| Stripe | Free to set up; Stripe charges a fee per payment. |
+| Brevo | Free plan has a daily email cap (a few hundred). Plenty for welcome emails. |
+| Cloudflare Workers | Free tier allows 100,000 requests a day. |
 
 Re-check these terms once a year.
 

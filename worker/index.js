@@ -1,11 +1,17 @@
 /**
- * Standalone donations Worker: only /donate/session exists. The logic lives in
- * donate.js; the Workers runtime only allows handlers as exports here.
+ * Standalone membership Worker. The logic lives in membership.js; the
+ * Workers runtime only allows handlers as exports here.
  */
-import { handleDonate } from "./donate.js";
+import { handleMembership } from "./membership.js";
+import { keepBrevoKeyAlive } from "./welcome-email.js";
 
 export default {
-    async fetch(request, env) {
-        return (await handleDonate(request, env)) ?? new Response("Not found", { status: 404 });
+    async fetch(request, env, ctx) {
+        return (await handleMembership(request, env, ctx)) ?? new Response("Not found", { status: 404 });
+    },
+
+    /** Weekly (wrangler.toml [triggers]): keeps the Brevo API key from expiring. */
+    async scheduled(_controller, env, ctx) {
+        ctx.waitUntil(keepBrevoKeyAlive(env));
     },
 };

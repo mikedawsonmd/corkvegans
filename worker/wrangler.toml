@@ -1,16 +1,37 @@
-# Standalone donations Worker. Deploy from this folder: npx wrangler deploy
-# Endpoint: https://corkvegans-donate.<your-subdomain>.workers.dev/donate/session
-# Setup and secrets: docs/ADMIN-GUIDE.md, "Donations".
-name = "corkvegans-donate"
+# Membership Worker. Deploy from this folder: npx wrangler deploy
+# Endpoint: https://corkvegans-membership.<your-subdomain>.workers.dev
+# Setup, secrets and variables: docs/ADMIN-GUIDE.md, "Membership".
+name = "corkvegans-membership"
 main = "index.js"
 compatibility_date = "2026-10-01"
 
-# /donate/session answers 404 unless this is "true". Payments are off, so it
-# stays unset; to switch on: npx wrangler secret put PAYMENTS_ENABLED (enter true).
+# The /membership/ routes answer 404 unless PAYMENTS_ENABLED is "true". Set it
+# (and the other secrets) with: npx wrangler secret put PAYMENTS_ENABLED
 
-# Per-IP limit on Checkout Session creation (card-testing protection).
-# If you merge donate.js into another Worker, copy this block into its config.
+# Mondays 06:17 UTC: one read-only Brevo call, because Brevo deletes an API
+# key after 90 days without use (welcome-email.js, keepBrevoKeyAlive).
+[triggers]
+crons = ["17 6 * * 1"]
+
+[vars]
+MEMBER_DISCOUNT_EUR = "5"
+MEMBER_CODE_GRACE_DAYS = "3"
+EVENTBRITE_TIME_ZONE = "Europe/Dublin"
+EMAIL_REPLY_TO = "crkvgns@gmail.com"
+
+# Per-IP limits. If you merge membership.js into another Worker, copy these
+# blocks into its config.
 [[ratelimits]]
-name = "DONATE_RATE_LIMITER"
+name = "MEMBERSHIP_RATE_LIMITER" # checkout sessions (card-testing protection)
 namespace_id = "1001"
 simple = { limit = 5, period = 60 }
+
+[[ratelimits]]
+name = "CODE_RATE_LIMITER" # the thank-you screen fetching the new code
+namespace_id = "1002"
+simple = { limit = 30, period = 60 }
+
+[[ratelimits]]
+name = "LOOKUP_RATE_LIMITER" # "Lost your code?"
+namespace_id = "1003"
+simple = { limit = 3, period = 60 }

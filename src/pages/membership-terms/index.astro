@@ -1,0 +1,81 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import { contactEmail, links, membership } from "../../config/site";
+import { LIMITS, PRESETS } from "../../lib/membership";
+
+const description = "The terms of Cork Vegans membership: what members get, how payments, renewals and cancelling work, and refunds.";
+const discount = membership.discountEur;
+const euros = (amounts: number[]) => amounts.map((a) => `€${a}`).join(", ");
+---
+
+<BaseLayout title="Membership terms" description={description}>
+    <PageHeader eyebrow="Membership" title="Membership terms" accent="#417660" eyebrowColor="#275d49" />
+    <section class="pt-lg pb-xl bg-surface" aria-label="Membership terms">
+        <div class="px-margin-mobile">
+            <div class="cv-prose">
+                <p>
+                    These terms cover Cork Vegans membership. By joining, you agree to them. If anything here isn't clear, email us at{" "}
+                    <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
+                </p>
+
+                <h2>What members get</h2>
+                <ul>
+                    <li>
+                        €{discount} off one ticket per member for each paid Cork Vegans event, subject to availability. If a ticket costs
+                        €{discount} or less, it's free with your code.
+                    </li>
+                    <li>Advance booking for paid events: member tickets go on sale before general release.</li>
+                    <li>Exclusive member events.</li>
+                </ul>
+                <p>
+                    You get a personal member code when you join. Use it when you book on Eventbrite. It's for you only, so please
+                    don't share it. Each member can use it for one ticket per event.
+                </p>
+                <p>Free events stay free and open to everyone.</p>
+
+                <h2>Contribute what you can</h2>
+                <p>
+                    You choose how much to pay: {euros(PRESETS.monthly)} a month, {euros(PRESETS.yearly)} a year, or your own amount
+                    (€{LIMITS.monthly.min} to €{LIMITS.monthly.max} a month, or €{LIMITS.yearly.min} to €{LIMITS.yearly.max} a year).
+                    Every member gets the same benefits, whatever they pay.
+                </p>
+
+                <h2>Renewal</h2>
+                <p>
+                    Membership is monthly or yearly, and it renews automatically at the end of each period until you cancel. Payments
+                    are taken by Stripe, our payment provider.
+                </p>
+
+                <h2>Cancelling</h2>
+                <p>
+                    You can cancel any time in your membership portal. Your benefits continue until the end of the period you've paid
+                    for, and you won't be charged again. The link to your portal is in your welcome email.
+                </p>
+
+                <h2>Changing your amount</h2>
+                <p>
+                    If you pay monthly at one of our set amounts (€5, €10 or €15), you can switch between them in your membership portal,
+                    and the new amount starts from your next payment. To change a yearly membership or an amount you chose yourself, cancel
+                    in your portal and join again at the new amount when your current membership ends, or email us at{" "}
+                    <a href={`mailto:${contactEmail}`}>{contactEmail}</a> and we'll help.
+                </p>
+
+                <h2>Membership refunds</h2>
+                <p>
+                    If you change your mind within 14 days of joining and haven't used any member benefits, email us at{" "}
+                    <a href={`mailto:${contactEmail}`}>{contactEmail}</a> and we'll refund you in full.
+                </p>
+
+                <h2>Event tickets</h2>
+                <p>
+                    Refunds for event tickets are covered by each event's refund policy on{" "}
+                    <a href={links.eventbrite} target="_blank" rel="noopener noreferrer">Eventbrite<span class="sr-only"> (opens in a new tab)</span></a>.
+                </p>
+
+                <h2>Your details</h2>
+                <p>Our <a href="/privacy/">privacy notice</a> explains what we collect for membership and why.</p>
+            </div>
+        </div>
+    </section>
+</BaseLayout>

@@ -11,6 +11,7 @@
     "dev": "astro dev",
     "dev:fixtures": "CV_FIXTURES=1 astro dev",
     "sync:events": "node scripts/sync-events.ts",
+    "sync:member-tickets": "node scripts/sync-member-tickets.ts",
     "build": "astro build && node scripts/check-dist.ts dist",
     "build:fixtures": "CV_FIXTURES=1 astro build --outDir dist-fixtures && CV_FIXTURES=1 node scripts/check-dist.ts dist-fixtures",
     "preview": "astro preview",

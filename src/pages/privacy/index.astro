@@ -1,0 +1,75 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import { contactEmail } from "../../config/site";
+
+const description = "How Cork Vegans uses your details: membership, our forms and this website. Plain and simple.";
+const email = `mailto:${contactEmail}`;
+---
+
+<BaseLayout title="Privacy" description={description}>
+    <PageHeader eyebrow="Privacy" title="Privacy notice" accent="#417660" eyebrowColor="#275d49" />
+    <section class="pt-lg pb-xl bg-surface" aria-label="Privacy notice">
+        <div class="px-margin-mobile">
+            <div class="cv-prose">
+                <p>
+                    Cork Vegans is a volunteer-run community group in Cork. This notice explains what we collect, why, and who helps us
+                    handle it. Questions or requests: <a href={email}>{contactEmail}</a>.
+                </p>
+
+                <h2>Membership</h2>
+                <p>When you join, we collect:</p>
+                <ul>
+                    <li>your first and last name and your email address;</li>
+                    <li>how much you pay, and whether it's monthly or yearly;</li>
+                    <li>how you heard about us, if you tell us;</li>
+                    <li>whether you'd like us to keep you posted about events by email;</li>
+                    <li>your member code and whether your membership is active.</li>
+                </ul>
+                <p>We use these to:</p>
+                <ul>
+                    <li>run your membership and take your payments;</li>
+                    <li>send you your member code, and again if you ask for it;</li>
+                    <li>give you your member discount and early booking on Eventbrite;</li>
+                    <li>email you about events, only if you ticked that box. You can ask us to stop at any time.</li>
+                </ul>
+                <p>We never see your card details. You enter them with Stripe, not on our website.</p>
+
+                <h2>Who helps us</h2>
+                <ul>
+                    <li><strong>Stripe</strong> takes your payments and keeps your membership record.</li>
+                    <li>
+                        <strong>Brevo</strong> sends your welcome email and member code. Brevo counts how many of these emails are
+                        opened and which links are clicked, but not who opened them.
+                    </li>
+                    <li><strong>Eventbrite</strong> holds your member code so it works when you book. When you book, Eventbrite also has your booking details.</li>
+                    <li><strong>Cloudflare</strong> runs the service behind the join form, and may check you're not a bot.</li>
+                    <li><strong>Formspree</strong> delivers messages from our contact and volunteer forms.</li>
+                </ul>
+                <p>Some of these companies are based outside the EU. They process your details for us under their own data protection terms.</p>
+
+                <h2>On this website</h2>
+                <p>
+                    We don't use advertising or tracking cookies. Our fonts come from Google Fonts, so Google sees your IP address when
+                    your browser loads them. If you join or open the link in your welcome email, your member code is saved in your
+                    browser on that device, so links to Eventbrite on our events page can apply it for you. Clearing this site's data in
+                    your browser removes it.
+                </p>
+
+                <h2>How long we keep it</h2>
+                <p>
+                    We keep your membership details while you're a member. After that, we keep only what we need for our accounts and
+                    delete the rest.
+                </p>
+
+                <h2>Your rights</h2>
+                <p>
+                    You can ask to see the details we hold about you, to correct them, or to delete them. Email us at{" "}
+                    <a href={email}>{contactEmail}</a> and we'll reply within a month. If you're not happy with how we've handled your
+                    details, you can complain to the{" "}
+                    <a href="https://www.dataprotection.ie/" target="_blank" rel="noopener noreferrer">Data Protection Commission<span class="sr-only"> (opens in a new tab)</span></a>.
+                </p>
+            </div>
+        </div>
+    </section>
+</BaseLayout>

@@ -2,7 +2,8 @@
 #
 # Runs when:
 #   - anything is pushed to main (including every Pages CMS save),
-#   - every 6 hours, to refresh Meetup / Eventbrite events,
+#   - every 6 hours, to refresh Meetup / Eventbrite events (and put new
+#     member tickets in the Eventbrite Members ticket group),
 #   - manually: Actions → "Deploy site" → "Run workflow".
 #
 # Requires Settings → Pages → Source = "GitHub Actions".
@@ -46,6 +47,13 @@ jobs:
           EVENTBRITE_TOKEN: ${{ secrets.EVENTBRITE_TOKEN }}
           EVENTBRITE_ORGANIZATION_ID: ${{ vars.EVENTBRITE_ORGANIZATION_ID }}
           EVENTS_PREVIOUS_URL: https://corkvegans.ie/events.json
+
+      - name: Put member tickets in the Members ticket group (never fails the build)
+        run: npm run sync:member-tickets
+        env:
+          EVENTBRITE_TOKEN: ${{ secrets.EVENTBRITE_TOKEN }}
+          EVENTBRITE_ORGANIZATION_ID: ${{ vars.EVENTBRITE_ORGANIZATION_ID }}
+          EVENTBRITE_MEMBERS_TICKET_GROUP_ID: ${{ vars.EVENTBRITE_MEMBERS_TICKET_GROUP_ID }}
 
       - name: Unit tests
         run: npm test

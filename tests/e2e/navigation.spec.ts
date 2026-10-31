@@ -185,7 +185,7 @@ test.describe("navigation", () => {
     test("footer has site links, then social links at the very bottom", async ({ page }) => {
         await page.goto("/about/");
         const footer = page.locator("footer");
-        await expect(footer.getByRole("navigation", { name: "Footer" }).getByRole("link")).toHaveText(["Events", "Stories", "Resources", "About", "Contact", "Support us"]);
+        await expect(footer.getByRole("navigation", { name: "Footer" }).getByRole("link")).toHaveText(["Events", "Stories", "Resources", "About", "Contact", "Support us", "Membership terms", "Privacy"]);
         const socials = footer.getByRole("list", { name: "Cork Vegans on social media" }).getByRole("link");
         await expect(socials).toHaveCount(4);
         for (const [name, href] of [

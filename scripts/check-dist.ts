@@ -21,7 +21,7 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 // Read the same .env files as the Astro build (shell variables still win),
 // so the checks compare the output with the config it was built from.
 for (const [name, value] of Object.entries(loadEnv("production", root, "PUBLIC_"))) process.env[name] ??= value;
-const { contactForm, donations, features, site, volunteerForm } = await import("../src/config/site.ts");
+const { contactForm, features, membership, site, volunteerForm } = await import("../src/config/site.ts");
 const outDir = join(root, process.argv[2] ?? "dist");
 const useFixtures = process.env.CV_FIXTURES === "1";
 const storyDirs = useFixtures ? ["tests/fixtures/stories"] : ["src/content/stories"];
@@ -58,7 +58,7 @@ if (!existsSync(outDir)) {
 }
 
 // ── 1. Expected routes ───────────────────────────────────────────────────
-for (const route of ["index.html", "events/index.html", "stories/index.html", "stories/feed.xml", "resources/index.html", "support/index.html", "about/index.html", "404.html", "sitemap.xml", "robots.txt", "events.json", "CNAME"]) {
+for (const route of ["index.html", "events/index.html", "stories/index.html", "stories/feed.xml", "resources/index.html", "support/index.html", "about/index.html", "membership-terms/index.html", "privacy/index.html", "404.html", "sitemap.xml", "robots.txt", "events.json", "CNAME"]) {
     if (!existsSync(join(outDir, route))) fail(`Missing expected file: ${route}`);
 }
 
@@ -162,7 +162,6 @@ if (existsSync(supportFile)) {
     const html = readFileSync(supportFile, "utf8");
     const formTag = /<form[^>]*data-volunteer-form[^>]*>/.exec(html)?.[0] ?? "";
     if (!html.includes('id="membership"') || !html.includes('id="volunteer"')) fail("support page: missing #membership or #volunteer section");
-    if (!html.includes('id="donate"')) fail("support page: missing the #donate alias that keeps old links working");
     if (volunteerForm.endpoint) {
         if (attr(formTag, "action") !== volunteerForm.endpoint) fail("support page: form does not post to the configured endpoint");
     } else {
@@ -171,29 +170,29 @@ if (existsSync(supportFile)) {
         if (!/<fieldset[^>]*\sdisabled/.test(html)) fail("support page: unconfigured form should be disabled");
     }
     const linkFor = (marker: string) => [...html.matchAll(new RegExp(`<a[^>]*${marker}[^>]*>`, "g"))].map((m) => attr(m[0], "href"));
-    const root = /<div[^>]*data-donate-root[^>]*>/.exec(html)?.[0] ?? "";
+    const root = /<div[^>]*data-membership-root[^>]*>/.exec(html)?.[0] ?? "";
+    const endpoint = membership.endpoint.replace(/\/+$/, "");
     if (!features.payments) {
-        if (root || html.includes("data-donate-fallback") || html.includes("data-donate-manage")) fail("support page: payment form or links shown although features.payments is off");
-        if (!html.includes("data-membership-soon")) fail('support page: "Membership coming soon" card missing');
-    } else if (donations.publishableKey && donations.sessionEndpoint) {
-        if (!root) fail("support page: payment form missing although Stripe is configured");
+        if (root || html.includes("data-membership-manage")) fail("support page: membership form or links shown although features.payments is off");
+        if (!html.includes("data-membership-soon")) fail('support page: "Membership is on the way" card missing');
+    } else if (membership.publishableKey && endpoint) {
+        if (!root) fail("support page: membership form missing although Stripe is configured");
         else {
-            if (attr(root, "data-publishable-key") !== donations.publishableKey) fail("support page: payment form has the wrong publishable key");
-            if (attr(root, "data-endpoint") !== donations.sessionEndpoint) fail("support page: payment form posts to the wrong endpoint");
+            if (attr(root, "data-publishable-key") !== membership.publishableKey) fail("support page: membership form has the wrong publishable key");
+            if (attr(root, "data-endpoint") !== endpoint) fail("support page: membership form posts to the wrong endpoint");
         }
         if (/<input[^>]*autocomplete="cc-/.test(html)) fail("support page: card fields must only appear inside Stripe's frame");
+        if (!html.includes('href="/membership-terms/"')) fail("support page: the join form must link to the membership terms");
     } else if (root) {
-        fail("support page: payment form shown but Stripe isn't configured");
+        fail("support page: membership form shown but Stripe isn't configured");
     }
-    if (features.payments) {
-        const fallbacks = linkFor("data-donate-fallback");
-        if (fallbacks.some((href) => href !== donations.oneOffUrl)) fail(`support page: payment fallback should link to ${donations.oneOffUrl}`);
-        if (linkFor("data-donate-manage").some((href) => href !== donations.manageUrl)) fail(`support page: "Manage" link should point to ${donations.manageUrl}`);
+    if (features.payments && linkFor("data-membership-manage").some((href) => href !== membership.portalUrl)) {
+        fail(`support page: "Manage" link should point to ${membership.portalUrl}`);
     }
 }
 
 // ── 5b. With payments off, nothing a visitor loads talks to Stripe or the Worker
-// Astro still emits the payment form's script as an unused file; what matters
+// Astro still emits the membership form's script as an unused file; what matters
 // is every page plus every script those pages load, followed through imports.
 if (!features.payments) {
     const loaded = new Set<string>(files.filter((f) => /\.(html|xml|json)$/.test(f)));
@@ -210,11 +209,16 @@ if (!features.payments) {
         const text = readFileSync(file, "utf8");
         for (const [what, pattern] of [
             ["Stripe", /stripe\.com/i],
-            ["the payments Worker", /\/donate\/session/],
+            ["the membership Worker", /\/membership\/(session|code|resend)/],
         ] as const) {
             if (pattern.test(text)) fail(`${relative(outDir, file)}: references ${what} although features.payments is off`);
         }
     }
+}
+
+// ── 5b2. Membership only: no page or file mentions donations ───────────────
+for (const file of files.filter((f) => /\.(html|xml|json|js|css|txt)$/.test(f))) {
+    if (/donat/i.test(readFileSync(file, "utf8"))) fail(`${relative(outDir, file)}: mentions donations (the site offers paid membership only)`);
 }
 
 // ── 5c. Social and email crops are exactly the right size ────────────────

@@ -149,7 +149,7 @@ html {
         @apply border-primary bg-primary text-on-primary hover:border-surface-tint hover:bg-surface-tint;
     }
 
-    /* Radio buttons drawn as buttons, e.g. the donation amounts: a visually
+    /* Radio buttons drawn as buttons, e.g. the membership amounts: a visually
        hidden <input class="cv-choice sr-only"> followed by a secondary button
        that turns primary when checked and shows the radio's focus ring. */
     .cv-choice:checked + .cv-btn-secondary {
@@ -172,7 +172,7 @@ html {
 
 /* ── Modal dialog ──────────────────────────────────────────────────────────
    A native <dialog class="cv-dialog"> opened with showModal(), wrapping a
-   <div class="cv-dialog-panel">, e.g. the donation checkout. The dialog is a
+   <div class="cv-dialog-panel">, e.g. the membership checkout. The dialog is a
    transparent full-screen layer that scrolls like a page; the panel grows to
    fit its content, so there's no scrollbar inside the card. Mobile: the panel
    is a full-screen sheet that slides up. From sm: a centred card up to 560px
@@ -527,4 +527,27 @@ html {
 
 .cv-swim {
     animation: cv-swim 5s ease-in-out infinite;
+}
+
+/* Long-form text pages (membership terms, privacy): headings, paragraphs
+   and lists spaced for reading. */
+.cv-prose {
+    @apply max-w-3xl mx-auto font-body-md text-body-md text-on-surface;
+}
+
+.cv-prose h2 {
+    @apply font-headline-md text-headline-md text-on-surface mt-xl mb-sm;
+}
+
+.cv-prose p,
+.cv-prose ul {
+    @apply mb-md;
+}
+
+.cv-prose ul {
+    @apply list-disc pl-lg flex flex-col gap-xs;
+}
+
+.cv-prose a {
+    @apply font-label-bold text-primary underline underline-offset-2;
 }

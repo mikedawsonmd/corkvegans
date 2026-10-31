@@ -2,14 +2,17 @@
 /** Concise homepage pointer to the Support us page. */
 import SectionHeading from "./SectionHeading.astro";
 import { animalSpot } from "../lib/animals";
+import { features, membership } from "../config/site";
+
+const perks = `€${membership.discountEur} off our paid events, early booking and member events`;
 
 const cards = [
     {
         href: "/support/#membership",
         icon: "card_membership",
         title: "Membership",
-        text: "Membership coming soon. Become a member to help keep our events going.",
-        cta: "Find out more",
+        text: features.payments ? `Become a member: ${perks}. Contribute what you can.` : `Membership is coming soon: ${perks}.`,
+        cta: features.payments ? "Join" : "Find out more",
     },
     {
         href: "/support/#volunteer",

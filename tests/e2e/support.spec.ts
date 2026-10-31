@@ -3,11 +3,7 @@ import { features } from "../../src/config/site.ts";
 
 const ENDPOINT = "https://formspree.io/f/testfixture";
 
-test("membership: coming soon, with no payment form, Stripe or Worker calls", async ({ page }) => {
-    const external: string[] = [];
-    page.on("request", (r) => {
-        if (/stripe\.com|\/donate\/session/.test(r.url())) external.push(r.url());
-    });
+test("membership: benefits, terms link and no donation wording", async ({ page }) => {
     await page.goto("/support/");
 
     const nav = page.getByRole("navigation", { name: "On this page" });
@@ -16,44 +12,73 @@ test("membership: coming soon, with no payment form, Stripe or Worker calls", as
 
     const section = page.locator("#membership");
     await expect(section.getByRole("heading", { level: 2, name: "Membership" })).toBeVisible();
-    await expect(section).toContainText("Cork Vegans membership is coming soon");
-    await expect(section).toContainText("Membership will help us with things like:");
-    await expect(section.getByRole("listitem")).toHaveCount(4);
-
-    if (!features.payments) {
-        await expect(section.getByText("Coming soon", { exact: true })).toBeVisible();
-        await expect(page.locator("[data-donate-root], [data-donate-dialog], [data-donate-fallback], [data-donate-manage]")).toHaveCount(0);
-        await expect(page.getByText(/Stripe|donat/i)).toHaveCount(0);
-        await page.waitForLoadState("networkidle");
-        expect(external).toEqual([]);
-    }
+    await expect(section).toContainText("every member gets the same benefits, whatever they pay");
+    await expect(section.locator("ul").first().getByRole("listitem")).toHaveCount(4);
+    await expect(section).toContainText("€5 off one ticket for each paid Cork Vegans event (subject to availability)");
+    await expect(section).toContainText("Free events stay free and open to everyone.");
+    await expect(section.getByRole("link", { name: "membership terms" }).first()).toHaveAttribute("href", "/membership-terms/");
+    await expect(page.getByText(/donat/i)).toHaveCount(0);
+    await expect(page.locator("#donate")).toHaveCount(0);
 });
 
-test("membership: old #donate links still land on the section", async ({ page }) => {
-    await page.goto("/support/#donate");
-    await expect(page.locator("#membership-heading")).toBeInViewport();
+test("membership: coming soon, with no join form, Stripe or Worker calls", async ({ page }) => {
+    test.skip(features.payments, "features.payments is on");
+    const external: string[] = [];
+    page.on("request", (r) => {
+        if (/stripe\.com|\/membership\//.test(r.url())) external.push(r.url());
+    });
+    await page.goto("/support/");
+    await expect(page.locator("#membership").getByText("Coming soon", { exact: true })).toBeVisible();
+    await expect(page.locator("[data-membership-root], [data-membership-dialog], [data-membership-manage]")).toHaveCount(0);
+    await page.waitForLoadState("networkidle");
+    expect(external).toEqual([]);
 });
 
 test("home page points to membership", async ({ page }) => {
     await page.goto("/");
-    const card = page.getByRole("link", { name: /^Membership/ });
+    const card = page.getByRole("link", { name: /^Membership (Become|Membership is)/ });
     await expect(card).toHaveAttribute("href", "/support/#membership");
-    await expect(card).toContainText("Membership coming soon. Become a member to help keep our events going.");
+    await expect(card).toContainText("€5 off our paid events, early booking and member events");
     await card.click();
     await expect(page.locator("#membership-heading")).toBeInViewport();
 });
 
-test("the old donation thank-you page is gone", async ({ page }) => {
+test("the old thank-you page is gone", async ({ page }) => {
     const res = await page.goto("/support/thanks/");
     expect(res?.status()).toBe(404);
 });
 
-// The payment form is kept for membership but switched off (features.payments
-// in src/config/site.ts). These run again as soon as it's switched back on.
-test.describe("payment form", () => {
+test("membership terms and privacy pages", async ({ page }) => {
+    await page.goto("/membership-terms/");
+    await expect(page.getByRole("heading", { level: 1, name: "Membership terms" })).toBeVisible();
+    for (const heading of ["What members get", "Contribute what you can", "Renewal", "Cancelling", "Changing your amount", "Membership refunds", "Event tickets"]) {
+        await expect(page.getByRole("heading", { level: 2, name: heading })).toBeVisible();
+    }
+    await expect(page.getByText("You can cancel any time in your membership portal. Your benefits continue until the end of the period you've paid for, and you won't be charged again.")).toBeVisible();
+    await expect(page.getByText("If you change your mind within 14 days of joining and haven't used any member benefits")).toBeVisible();
+    await expect(page.getByRole("link", { name: "crkvgns@gmail.com" }).first()).toHaveAttribute("href", "mailto:crkvgns@gmail.com");
+
+    await page.locator("footer").getByRole("link", { name: "Privacy" }).click();
+    await expect(page).toHaveURL(/\/privacy\/$/);
+    for (const name of ["Stripe", "Brevo", "Eventbrite"]) await expect(page.locator("main, body").getByText(name, { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Your rights" })).toBeVisible();
+});
+
+test("events page remembers a member code from the welcome email link", async ({ page }) => {
+    await page.goto("/events/?member=CV-7K3P9Q");
+    await expect(page).toHaveURL(/\/events\/$/);
+    expect(await page.evaluate(() => localStorage.getItem("cv-member-code"))).toBe("CV-7K3P9Q");
+    // Only Eventbrite links get the code; others are left alone.
+    for (const href of await page.locator("[data-event-list] a[href]").evaluateAll((links) => links.map((a) => (a as HTMLAnchorElement).href))) {
+        if (!/eventbrite\.(ie|com|co\.uk)\/e\//.test(href)) expect(href).not.toContain("CV-7K3P9Q");
+    }
+});
+
+// The join form is on in test builds (CV_FIXTURES=1), against a fake Worker and Stripe.
+test.describe("join form", () => {
     test.skip(!features.payments, "features.payments is off");
 
-    const SESSION_ENDPOINT = "https://donate.example/donate/session";
+    const WORKER = "https://membership.example";
 
     // Stands in for Stripe.js: "mounts" a fake checkout with a button that
     // completes it, so the whole flow runs without contacting Stripe.
@@ -74,160 +99,212 @@ test.describe("payment form", () => {
         });
     `;
 
-    async function mockStripe(page: Page, worker: (body: Record<string, unknown>) => { status: number; json: unknown } = () => ({ status: 200, json: { clientSecret: "cs_test_fake" } })) {
-        const requests: Record<string, unknown>[] = [];
+    type Reply = { status: number; json: unknown };
+    async function mockWorker(
+        page: Page,
+        { session = () => ({ status: 200, json: { clientSecret: "cs_test_fake_secret_x" } }), code = () => ({ status: 200, json: { status: "ready", code: "CV-7K3P9Q" } }), resend = () => ({ status: 200, json: { ok: true } }) }: {
+            session?: (body: Record<string, unknown>) => Reply;
+            code?: (n: number) => Reply;
+            resend?: (body: Record<string, unknown>) => Reply;
+        } = {},
+    ) {
+        const requests: { path: string; body: Record<string, unknown> }[] = [];
+        let codeCalls = 0;
         await page.route("https://js.stripe.com/**", (route) => route.fulfill({ contentType: "text/javascript", body: FAKE_STRIPE_JS }));
-        await page.route(SESSION_ENDPOINT, (route) => {
+        await page.route(`${WORKER}/**`, (route) => {
+            const path = new URL(route.request().url()).pathname;
             const body = route.request().postDataJSON();
-            requests.push(body);
-            const { status, json } = worker(body);
+            requests.push({ path, body });
+            const { status, json } = path === "/membership/session" ? session(body) : path === "/membership/code" ? code(++codeCalls) : resend(body);
             return route.fulfill({ status, json, headers: { "Access-Control-Allow-Origin": "*" } });
         });
         return requests;
     }
 
-    test("donation form: monthly by default, with once amounts and limits", async ({ page }) => {
-        await mockStripe(page);
+    async function fillDetails(page: Page) {
+        await page.getByLabel("First name").fill("Aoife");
+        await page.getByLabel("Last name").fill("Murphy");
+        await page.locator("[data-membership-form]").getByLabel("Email", { exact: true }).fill("aoife@example.ie");
+        await page.getByLabel("How did you hear about us?").fill("A friend");
+        await page.getByLabel(/I agree to the/).check();
+    }
+
+    test("monthly by default, yearly amounts, and friendly limits for Other", async ({ page }) => {
+        await mockWorker(page);
         await page.goto("/support/#membership");
-        await expect(page.locator("#donate")).toBeInViewport();
 
         const often = page.getByRole("group", { name: "How often?" });
         await expect(often.getByRole("radio", { name: "Monthly" })).toBeChecked();
         const monthly = page.getByRole("group", { name: "Monthly amount" });
-        await expect(monthly.getByRole("radio")).toHaveCount(4);
+        for (const name of ["€5 a month", "€10 a month", "€15 a month", "Other"]) await expect(monthly.getByRole("radio", { name, exact: true })).toBeAttached();
         await expect(monthly.getByRole("radio", { name: "€10 a month" })).toBeChecked();
+        await expect(page.getByText("Same benefits whatever you choose. Pick what works for you.")).toBeVisible();
 
-        await often.getByText("Once").click();
-        await expect(page.getByRole("group", { name: "Monthly amount" })).toBeHidden();
-        const once = page.getByRole("group", { name: "One-off amount" });
-        for (const name of ["€10", "€20", "€50", "Other"]) await expect(once.getByRole("radio", { name, exact: true })).toBeAttached();
-        await expect(once.getByRole("radio", { name: "€20", exact: true })).toBeChecked();
+        await often.getByText("Yearly").click();
+        await expect(monthly).toBeHidden();
+        const yearly = page.getByRole("group", { name: "Yearly amount" });
+        await expect(yearly.getByRole("radio")).toHaveCount(3);
+        await expect(yearly.getByRole("radio", { name: "€50 a year" })).toBeChecked();
+        await expect(yearly.getByRole("radio", { name: "€100 a year" })).toBeAttached();
 
-        await once.getByText("Other").click();
-        const other = page.getByLabel("Other amount");
-        await other.fill("1");
-        await page.getByRole("button", { name: "Continue" }).click();
-        await expect(page.getByRole("alert").filter({ hasText: "smallest donation" })).toBeVisible();
+        await fillDetails(page);
+        await yearly.getByText("Other").click();
+        const other = page.getByLabel("Your amount");
+        await expect(page.getByText("Whole euros, from €50 to €500 a year.")).toBeVisible();
+        await other.fill("40");
+        await page.getByRole("button", { name: "Join" }).click();
+        await expect(page.getByRole("alert").filter({ hasText: "smallest yearly amount is €50 a year" })).toBeVisible();
         await expect(other).toHaveAttribute("aria-invalid", "true");
         await expect(other).toBeFocused();
 
         await other.fill("501");
-        await page.getByRole("button", { name: "Continue" }).click();
-        await expect(page.getByText("The most you can give online is €500")).toBeVisible();
+        await page.getByRole("button", { name: "Join" }).click();
+        await expect(page.getByText("The most we can take online is €500 a year")).toBeVisible();
         await other.fill("12.50");
-        await page.getByRole("button", { name: "Continue" }).click();
+        await page.getByRole("button", { name: "Join" }).click();
         await expect(page.getByText("whole number of euros")).toBeVisible();
 
-        await expect(page.getByRole("link", { name: /Manage or cancel your donation/ })).toHaveAttribute("href", "https://donate.example/manage");
-        await expect(page.locator("#donate input[autocomplete^='cc-']")).toHaveCount(0); // no card fields on our page
+        await expect(page.locator("#membership input[autocomplete^='cc-']")).toHaveCount(0); // no card fields on our page
     });
 
-    test("donation form: opens checkout in a modal; closing it destroys the session", async ({ page, isMobile }) => {
-        const requests = await mockStripe(page);
+    test("asks for the details and the terms before opening checkout", async ({ page }) => {
+        const requests = await mockWorker(page);
+        await page.goto("/support/#membership");
+        await page.getByRole("button", { name: "Join" }).click();
+
+        await expect(page.locator("#mf-first-name-error")).toHaveText("Enter your first name.");
+        await expect(page.locator("#mf-last-name-error")).toHaveText("Enter your last name.");
+        await expect(page.locator("#mf-email-error")).toHaveText("Enter your email address.");
+        await expect(page.locator("#mf-terms-error")).toHaveText("Tick the box to agree to the membership terms.");
+        await expect(page.getByLabel("First name")).toBeFocused();
+        await page.locator("[data-membership-form]").getByLabel("Email", { exact: true }).fill("not-an-email");
+        await page.getByRole("button", { name: "Join" }).click();
+        await expect(page.locator("#mf-email-error")).toContainText("right format");
+        expect(requests).toEqual([]);
+
+        await expect(page.getByRole("link", { name: /membership terms/ }).first()).toHaveAttribute("href", "/membership-terms/");
+        await expect(page.getByLabel("Keep me posted about Cork Vegans events by email")).not.toBeChecked();
+    });
+
+    test("opens checkout in a modal with the amount, and closing it destroys the session", async ({ page, isMobile }) => {
+        const requests = await mockWorker(page);
         await page.goto("/support/#membership");
         const destroyed = () => page.evaluate(() => (window as unknown as { __destroyed?: number }).__destroyed ?? 0);
 
-        await page.getByRole("group", { name: "Monthly amount" }).getByText("€20").click();
-        await page.getByRole("button", { name: "Continue" }).click();
+        await page.getByRole("group", { name: "Monthly amount" }).getByText("€15").click();
+        await fillDetails(page);
+        await page.getByLabel("Keep me posted about Cork Vegans events by email").check();
+        await page.getByRole("button", { name: "Join" }).click();
 
-        const dialog = page.getByRole("dialog", { name: "Donate €20 a month" });
+        const dialog = page.getByRole("dialog", { name: "Join for €15 a month" });
         await expect(dialog).toBeVisible();
-        await expect(dialog.getByRole("heading", { name: "Donate €20 a month" })).toBeFocused();
-        await expect(dialog.locator("[data-fake-checkout]")).toHaveText("Fake checkout pk_test_fixture cs_test_fake");
-        await expect(page.locator("[data-donate-form]")).toBeVisible(); // the card behind is unchanged
-        const scrollBefore = await page.evaluate(() => -parseInt(document.body.style.top, 10)); // page is locked here
-        expect(scrollBefore).toBeGreaterThan(0);
-        expect(requests).toEqual([{ frequency: "monthly", amount: 20 }]);
+        await expect(dialog.getByRole("heading", { name: "Join for €15 a month" })).toBeFocused();
+        await expect(dialog.locator("[data-fake-checkout]")).toHaveText("Fake checkout pk_test_fixture cs_test_fake_secret_x");
+        expect(requests).toEqual([
+            {
+                path: "/membership/session",
+                body: { frequency: "monthly", amount: 15, firstName: "Aoife", lastName: "Murphy", email: "aoife@example.ie", heardAbout: "A friend", updates: true, terms: true },
+            },
+        ]);
         if (isMobile) {
-            const box = (await dialog.boundingBox())!;
-            expect(box.width).toBe(page.viewportSize()!.width); // full-screen sheet
+            expect((await dialog.boundingBox())!.width).toBe(page.viewportSize()!.width); // full-screen sheet
         } else {
             expect((await dialog.locator(".cv-dialog-panel").boundingBox())!.width).toBeLessThanOrEqual(560);
         }
 
-        // X closes, destroys the checkout, returns focus and restores the scroll position.
         await dialog.getByRole("button", { name: "Close" }).click();
         await expect(dialog).toBeHidden();
-        await expect(page.getByRole("button", { name: "Continue" })).toBeFocused();
+        await expect(page.getByRole("button", { name: "Join" })).toBeFocused();
         expect(await destroyed()).toBe(1);
-        expect(await page.evaluate(() => window.scrollY)).toBe(scrollBefore);
-        await expect(page.locator("[data-fake-checkout]")).toHaveCount(0);
 
-        // Escape closes too, and the next open creates a fresh session.
-        await page.getByRole("button", { name: "Continue" }).click();
+        await page.getByRole("button", { name: "Join" }).click();
         await expect(page.getByRole("dialog")).toBeVisible();
         await page.keyboard.press("Escape");
         await expect(page.getByRole("dialog")).toBeHidden();
         expect(await destroyed()).toBe(2);
         expect(requests).toHaveLength(2);
-
-        // So does clicking the dimmed backdrop (desktop only: on mobile the sheet fills the screen).
-        if (!isMobile) {
-            await page.getByRole("button", { name: "Continue" }).click();
-            await expect(page.getByRole("dialog")).toBeVisible();
-            await page.mouse.click(5, 5);
-            await expect(page.getByRole("dialog")).toBeHidden();
-            expect(await destroyed()).toBe(3);
-        }
     });
 
-    test("donation form: shows thanks in the modal, then resets the form", async ({ page, isMobile }) => {
-        const requests = await mockStripe(page);
+    test("welcomes the new member with their code, copy button and how to use it", async ({ page, context, isMobile }) => {
+        await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+        await mockWorker(page, { code: (n) => (n < 2 ? { status: 200, json: { status: "pending" } } : { status: 200, json: { status: "ready", code: "CV-7K3P9Q" } }) });
         await page.goto("/support/#membership");
+        await fillDetails(page);
+        await page.getByRole("button", { name: "Join" }).click();
+        await page.getByRole("dialog").getByRole("button", { name: "Pay now" }).click();
 
-        await page.getByRole("group", { name: "How often?" }).getByText("Once").click();
-        await page.getByRole("group", { name: "One-off amount" }).getByText("Other").click();
-        await page.getByLabel("Other amount").fill("€35");
-        await page.getByRole("button", { name: "Continue" }).click();
-        expect(requests.at(-1)).toEqual({ frequency: "once", amount: 35 });
-
-        const dialog = page.getByRole("dialog", { name: "Donate €35" });
-        await dialog.getByRole("button", { name: "Pay now" }).click();
-        const thanks = dialog.locator("[data-donate-success]");
-        await expect(thanks).toBeFocused();
-        await expect(thanks.getByRole("heading", { name: "Thank you!" })).toBeVisible();
-        await expect(thanks).toContainText("receipt is on its way to you by email");
-        await expect(thanks.getByRole("link", { name: /manage your donation/ })).toBeHidden(); // one-off gift
-        await expect(dialog.locator("[data-fake-checkout]")).toHaveCount(0);
+        const welcome = page.locator("[data-membership-success]");
+        await expect(welcome).toBeFocused();
+        await expect(welcome.getByRole("heading", { name: "Welcome to Cork Vegans!" })).toBeVisible();
+        await expect(welcome.locator("[data-member-code]")).toHaveText("CV-7K3P9Q");
+        await expect(welcome).toContainText("€5 off one ticket for each paid Cork Vegans event");
+        await expect(welcome).toContainText("unlocks member tickets before general release");
+        await expect(welcome.getByRole("link", { name: "Book with your member discount" })).toHaveAttribute("href", "/events/");
+        expect(await page.evaluate(() => localStorage.getItem("cv-member-code"))).toBe("CV-7K3P9Q");
 
         if (!isMobile) {
-            await page.mouse.click(5, 5); // the backdrop mustn't wipe the thank-you
-            await expect(thanks).toBeVisible();
+            await welcome.getByRole("button", { name: "Copy code" }).click();
+            await expect(welcome.getByRole("status").filter({ hasText: "Copied" })).toBeVisible();
+            expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("CV-7K3P9Q");
+            await page.mouse.click(5, 5); // the backdrop mustn't wipe the welcome
+            await expect(welcome).toBeVisible();
         }
 
-        await thanks.getByRole("button", { name: "Close" }).click();
-        await expect(dialog).toBeHidden();
-        await expect(page.getByRole("button", { name: "Continue" })).toBeFocused();
-        await expect(page.getByRole("group", { name: "How often?" }).getByRole("radio", { name: "Monthly" })).toBeChecked();
+        await welcome.getByRole("button", { name: "Close" }).click();
+        await expect(page.getByRole("dialog")).toBeHidden();
+        await expect(page.getByLabel("First name")).toHaveValue("");
         await expect(page.getByRole("group", { name: "Monthly amount" }).getByRole("radio", { name: "€10 a month" })).toBeChecked();
-        await expect(page.getByLabel("Other amount")).toBeHidden();
     });
 
-    test("donation form: monthly donors get the manage link after paying", async ({ page }) => {
-        await mockStripe(page);
+    test("says the code is on its way by email if it isn't ready", async ({ page }) => {
+        await mockWorker(page, { code: () => ({ status: 404, json: { error: "not_found" } }) });
         await page.goto("/support/#membership");
-        await page.getByRole("button", { name: "Continue" }).click();
-        await page.getByRole("button", { name: "Pay now" }).click();
-        await expect(page.getByRole("dialog").locator("[data-donate-success]").getByRole("link", { name: /manage your donation/ })).toHaveAttribute("href", "https://donate.example/manage");
+        await fillDetails(page);
+        await page.getByRole("button", { name: "Join" }).click();
+        await page.getByRole("dialog").getByRole("button", { name: "Pay now" }).click();
+        await expect(page.locator("[data-code-later]")).toContainText("on its way to you by email");
+        await expect(page.locator("[data-code-ready]")).toBeHidden();
     });
 
-    test("donation form: offers the Stripe page if the Worker fails", async ({ page }) => {
+    test("shows the fallback error if the Worker fails", async ({ page }) => {
         let status = 502;
-        await mockStripe(page, () => ({ status, json: { error: "checkout_unavailable" } }));
+        await mockWorker(page, { session: () => ({ status, json: { error: "checkout_unavailable" } }) });
         await page.goto("/support/#membership");
-        await page.getByRole("button", { name: "Continue" }).click();
+        await fillDetails(page);
+        await page.getByRole("button", { name: "Join" }).click();
 
-        const error = page.locator("[data-donate-error]");
+        const error = page.locator("[data-membership-error]");
         await expect(error).toBeVisible();
         await expect(error).toContainText("couldn't load just now");
-        await expect(error.getByRole("link", { name: /donate directly on Stripe/ })).toHaveAttribute("href", "https://donate.example/once");
-        await expect(page.locator("[data-donate-form]")).toBeVisible();
+        await expect(error.getByRole("link", { name: "crkvgns@gmail.com" })).toHaveAttribute("href", "mailto:crkvgns@gmail.com");
         await expect(page.getByRole("dialog")).toBeHidden(); // errors stay in the card
-        await expect(page.getByRole("button", { name: "Continue" })).toBeEnabled();
+        await expect(page.getByRole("button", { name: "Join" })).toBeEnabled();
 
         status = 429;
-        await page.getByRole("button", { name: "Continue" }).click();
+        await page.getByRole("button", { name: "Join" }).click();
         await expect(error).toContainText("tried a few times in a row");
+    });
+
+    test("Lost your code? gives the same answer for any email", async ({ page }) => {
+        const requests = await mockWorker(page);
+        await page.goto("/support/#membership");
+        const lookup = page.locator("[data-lookup-form]");
+        await expect(lookup.getByRole("heading", { name: "Lost your code?" })).toBeVisible();
+
+        await lookup.getByRole("button", { name: "Send my code" }).click();
+        await expect(lookup.locator("#mf-lookup-email-error")).toHaveText("Enter your email address.");
+        expect(requests).toEqual([]);
+
+        await lookup.getByLabel("Email").fill("someone@example.ie");
+        await lookup.getByRole("button", { name: "Send my code" }).click();
+        await expect(lookup.getByRole("status")).toHaveText("If there's an active membership for that email, we've sent the code. It can take a few minutes to arrive.");
+        expect(requests).toEqual([{ path: "/membership/resend", body: { email: "someone@example.ie" } }]);
+    });
+
+    test("links members to the portal", async ({ page }) => {
+        await mockWorker(page);
+        await page.goto("/support/#membership");
+        await expect(page.getByRole("link", { name: /Manage or cancel your membership/ })).toHaveAttribute("href", "https://billing.example/login");
     });
 });
 
@@ -238,7 +315,7 @@ test("volunteer anchor and form labels", async ({ page }) => {
     await expect(page.getByLabel("Email *")).toBeVisible();
     await expect(page.getByLabel("Message (optional)")).toBeVisible();
     await expect(page.getByRole("group", { name: /Areas you're interested in/ }).getByRole("checkbox")).toHaveCount(7);
-    await expect(page.getByText("How we use your details")).toBeVisible();
+    await expect(page.getByText("How we use your details", { exact: true })).toBeVisible();
 });
 
 test("shows accessible errors and does not submit an incomplete form", async ({ page }) => {

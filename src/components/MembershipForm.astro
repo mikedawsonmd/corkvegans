@@ -1,0 +1,266 @@
+---
+/**
+ * Membership join form: monthly or yearly, an amount, the member's details,
+ * then Stripe Embedded Checkout in a modal (src/scripts/membership-form.ts).
+ * After payment the modal shows the member's code. Also has the "Lost your
+ * code?" form. Only rendered when features.payments is on in
+ * src/config/site.ts; until Stripe is configured there it says joining online
+ * isn't available yet.
+ */
+import { contactEmail, membership } from "../config/site";
+import { DEFAULT_AMOUNT, FREQUENCIES, PRESETS, amountHint } from "../lib/membership";
+import { animalSpot } from "../lib/animals";
+
+const publishableKey = membership.publishableKey.trim();
+const endpoint = membership.endpoint.trim().replace(/\/+$/, "");
+const configured = /^pk_(live|test)_\w+$/.test(publishableKey) && /^https?:\/\/[^/]+$/.test(endpoint);
+const portalUrl = membership.portalUrl.trim();
+const discount = membership.discountEur;
+
+// Radio buttons drawn as buttons (see .cv-choice in global.css).
+const choice = "cv-btn cv-btn-md cv-btn-secondary w-full px-md cursor-pointer";
+const legend = "font-label-bold text-label-bold text-on-surface mb-sm";
+const label = "font-label-bold text-label-bold text-on-surface";
+const input =
+    "mt-xs block w-full rounded-lg border-outline bg-surface-container-lowest px-md py-sm text-body-md text-on-surface focus:border-primary focus:ring-primary aria-[invalid=true]:border-error";
+const errorText = "mt-xs text-label-bold text-error";
+const checkbox = "mt-[2px] h-5 w-5 shrink-0 rounded-[4px] border-outline text-primary focus:ring-primary";
+const textLink = "font-label-bold text-primary underline underline-offset-2";
+const optional = "font-body-md text-on-surface-variant";
+---
+
+<div class="relative bg-surface border border-surface-variant rounded-lg p-lg md:p-xl shadow-sm" {...animalSpot("ledge", "membership", { size: 32, max: 2 })}>
+    {
+        configured ? (
+            <div
+                data-membership-root
+                data-publishable-key={publishableKey}
+                data-endpoint={endpoint}
+                data-turnstile-sitekey={membership.turnstileSiteKey.trim() || undefined}
+                class="flex flex-col gap-lg"
+            >
+                <form data-membership-form novalidate aria-labelledby="membership-form-title" class="flex flex-col gap-lg">
+                    <h3 id="membership-form-title" class="font-headline-md text-headline-md text-on-surface">
+                        Become a member
+                    </h3>
+
+                    <fieldset>
+                        <legend class={legend}>How often?</legend>
+                        <div class="grid grid-cols-2 gap-sm">
+                            {FREQUENCIES.map((f) => (
+                                <label>
+                                    <input type="radio" name="frequency" value={f.value} checked={f.value === "monthly"} class="cv-choice sr-only" />
+                                    <span class={choice}>{f.label}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </fieldset>
+
+                    <div class="flex flex-col gap-sm">
+                        {FREQUENCIES.map((f) => (
+                            <fieldset data-amounts={f.value} hidden={f.value !== "monthly"} disabled={f.value !== "monthly"}>
+                                <legend class={legend}>{f.value === "monthly" ? "Monthly amount" : "Yearly amount"}</legend>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-sm">
+                                    {PRESETS[f.value].map((amount) => (
+                                        <label>
+                                            <input type="radio" name={`amount-${f.value}`} value={amount} checked={amount === DEFAULT_AMOUNT[f.value]} class="cv-choice sr-only" />
+                                            <span class={choice}>
+                                                €{amount}
+                                                <span class="sr-only">{f.value === "monthly" ? " a month" : " a year"}</span>
+                                            </span>
+                                        </label>
+                                    ))}
+                                    <label>
+                                        <input type="radio" name={`amount-${f.value}`} value="other" class="cv-choice sr-only" aria-controls="mf-other-wrap" />
+                                        <span class={choice}>Other</span>
+                                    </label>
+                                </div>
+                            </fieldset>
+                        ))}
+                        <p class="text-label-sm text-on-surface-variant">Same benefits whatever you choose. Pick what works for you.</p>
+                    </div>
+
+                    <div id="mf-other-wrap" data-other-wrap hidden>
+                        <label for="mf-other" class={label}>Your amount</label>
+                        <div class="relative mt-xs max-w-[12rem]">
+                            <span class="pointer-events-none absolute inset-y-0 left-md flex items-center text-body-md text-on-surface-variant" aria-hidden="true">€</span>
+                            <input
+                                id="mf-other"
+                                type="text"
+                                inputmode="numeric"
+                                autocomplete="off"
+                                maxlength="4"
+                                aria-describedby="mf-other-hint mf-amount-error"
+                                class="block w-full rounded-lg border-outline bg-surface-container-lowest py-sm pl-xl pr-md text-body-md text-on-surface focus:border-primary focus:ring-primary aria-[invalid=true]:border-error"
+                            />
+                        </div>
+                        <p id="mf-other-hint" class="mt-xs text-label-sm text-on-surface-variant">{amountHint("monthly")}</p>
+                    </div>
+                    <p id="mf-amount-error" data-amount-error role="alert" class="text-label-bold text-error empty:hidden"></p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-lg">
+                        <div>
+                            <label for="mf-first-name" class={label}>First name</label>
+                            <input id="mf-first-name" name="firstName" type="text" autocomplete="given-name" required maxlength="60" aria-describedby="mf-first-name-error" class={input} />
+                            <p id="mf-first-name-error" class={errorText} hidden></p>
+                        </div>
+                        <div>
+                            <label for="mf-last-name" class={label}>Last name</label>
+                            <input id="mf-last-name" name="lastName" type="text" autocomplete="family-name" required maxlength="60" aria-describedby="mf-last-name-error" class={input} />
+                            <p id="mf-last-name-error" class={errorText} hidden></p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="mf-email" class={label}>Email</label>
+                        <input id="mf-email" name="email" type="email" autocomplete="email" required maxlength="254" aria-describedby="mf-email-hint mf-email-error" class={input} />
+                        <p id="mf-email-hint" class="mt-xs text-label-sm text-on-surface-variant">We'll send your member code here.</p>
+                        <p id="mf-email-error" class={errorText} hidden></p>
+                    </div>
+
+                    <div>
+                        <label for="mf-heard-about" class={label}>How did you hear about us? <span class={optional}>(optional)</span></label>
+                        <input id="mf-heard-about" name="heardAbout" type="text" autocomplete="off" maxlength="200" class={input} />
+                    </div>
+
+                    <div class="flex flex-col gap-md">
+                        <div class="flex items-start gap-sm">
+                            <input id="mf-updates" name="updates" type="checkbox" class={checkbox} />
+                            <label for="mf-updates" class="text-body-md text-on-surface">Keep me posted about Cork Vegans events by email</label>
+                        </div>
+                        <div>
+                            <div class="flex items-start gap-sm">
+                                <input id="mf-terms" name="terms" type="checkbox" required aria-describedby="mf-terms-error" class={checkbox} />
+                                <label for="mf-terms" class="text-body-md text-on-surface">
+                                    I agree to the{" "}
+                                    <a href="/membership-terms/" target="_blank" class={textLink}>
+                                        membership terms<span class="sr-only"> (opens in a new tab)</span>
+                                    </a>
+                                </label>
+                            </div>
+                            <p id="mf-terms-error" class={errorText} hidden></p>
+                        </div>
+                    </div>
+
+                    <div data-turnstile class="empty:hidden"></div>
+
+                    <div data-membership-error role="alert" class="rounded-lg border-2 border-error bg-error-container px-lg py-md text-on-error-container" hidden>
+                        <p class="font-label-bold text-label-bold" data-membership-error-message>
+                            Sorry, the membership form couldn't load just now.
+                        </p>
+                        <p class="text-body-md mt-xs">
+                            Please try again in a minute. If it still doesn't work, email us at{" "}
+                            <a href={`mailto:${contactEmail}`} class="font-label-bold underline">{contactEmail}</a>.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-md">
+                        <button type="submit" data-join class="cv-btn cv-btn-md cv-btn-primary">
+                            Join
+                            <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                        </button>
+                        <p data-membership-status role="status" class="text-body-md text-on-surface-variant"></p>
+                    </div>
+
+                    <p class="text-label-sm text-on-surface-variant">
+                        Payments are handled securely by Stripe. See how we use your details in our{" "}
+                        <a href="/privacy/" class={textLink}>privacy notice</a>.
+                    </p>
+                </form>
+
+                <dialog data-membership-dialog aria-labelledby="membership-dialog-title" class="cv-dialog">
+                    <div class="cv-dialog-panel">
+                        <div class="z-10 flex items-center justify-between max-sm:sticky max-sm:top-0 gap-md border-b border-surface-variant bg-surface px-lg py-sm sm:rounded-t-lg">
+                            <h2 id="membership-dialog-title" data-dialog-title tabindex="-1" class="font-headline-md text-headline-md text-on-surface focus:outline-none">
+                                Join
+                            </h2>
+                            <button type="button" data-dialog-close aria-label="Close" class="cv-btn cv-btn-sm cv-btn-secondary w-11 shrink-0 px-0">
+                                <span class="material-symbols-outlined" aria-hidden="true">close</span>
+                            </button>
+                        </div>
+                        <div>
+                            <!-- bg matches the Stripe Checkout branding colour, so the padding reads as part of the checkout -->
+                            <div data-checkout class="bg-primary-container sm:rounded-b-lg pb-[calc(theme(spacing.xl)+env(safe-area-inset-bottom))]"></div>
+                            <div data-membership-success tabindex="-1" class="flex flex-col items-start gap-md px-lg pt-lg pb-[calc(theme(spacing.xl)+env(safe-area-inset-bottom))] focus:outline-none" hidden>
+                                <h3 class="font-headline-md text-headline-md text-on-surface">Welcome to Cork Vegans!</h3>
+
+                                <div class="w-full rounded-lg bg-primary-fixed px-lg py-md text-center text-on-primary-fixed" aria-live="polite">
+                                    <p data-code-loading class="text-body-md">Setting up your member code…</p>
+                                    <div data-code-ready class="flex flex-col items-center gap-sm" hidden>
+                                        <p class="text-label-bold">Your member code</p>
+                                        <p data-member-code class="font-mono text-[2rem] leading-tight font-bold tracking-[0.15em]"></p>
+                                        <div class="flex items-center gap-sm">
+                                            <button type="button" data-copy-code class="cv-btn cv-btn-sm cv-btn-secondary">
+                                                <span class="material-symbols-outlined" aria-hidden="true">content_copy</span>Copy code
+                                            </button>
+                                            <span data-copy-status role="status" class="text-label-sm"></span>
+                                        </div>
+                                    </div>
+                                    <p data-code-later class="text-body-md" hidden>
+                                        Your member code is on its way to you by email. It can take a few minutes to arrive.
+                                    </p>
+                                </div>
+
+                                <div class="flex flex-col gap-xs">
+                                    <h4 class="font-label-bold text-label-bold text-on-surface">How to use your code</h4>
+                                    <ul class="list-disc pl-lg font-body-md text-body-md text-on-surface-variant flex flex-col gap-xs">
+                                        <li>€{discount} off one ticket for each paid Cork Vegans event. Enter your code at checkout on Eventbrite.</li>
+                                        <li>It also unlocks member tickets before general release, so you can book early.</li>
+                                        <li>Book from our events page and your code is added for you.</li>
+                                    </ul>
+                                </div>
+                                <a href="/events/" class="cv-btn cv-btn-md cv-btn-primary">
+                                    Book with your member discount
+                                    <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                                </a>
+                                <p class="font-body-md text-body-md text-on-surface-variant">
+                                    We've also emailed you your code{portalUrl ? " and a link to manage your membership" : ""}.
+                                </p>
+                                <button type="button" data-dialog-done class="cv-btn cv-btn-md cv-btn-secondary">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </dialog>
+
+                <form data-lookup-form novalidate aria-labelledby="mf-lookup-title" class="flex flex-col gap-sm border-t border-surface-variant pt-lg">
+                    <h3 id="mf-lookup-title" class="font-label-bold text-label-bold text-on-surface">Lost your code?</h3>
+                    <p class="text-label-sm text-on-surface-variant">Enter the email you joined with and we'll send it again.</p>
+                    <div class="flex flex-wrap items-start gap-sm">
+                        <div class="grow min-w-[14rem]">
+                            <label for="mf-lookup-email" class="sr-only">Email</label>
+                            <input id="mf-lookup-email" name="email" type="email" autocomplete="email" maxlength="254" aria-describedby="mf-lookup-email-error" class={input.replace("mt-xs ", "")} />
+                            <p id="mf-lookup-email-error" class={errorText} hidden></p>
+                        </div>
+                        <button type="submit" class="cv-btn cv-btn-md cv-btn-secondary">Send my code</button>
+                    </div>
+                    <p data-lookup-result role="status" class="text-body-md text-on-surface empty:hidden"></p>
+                </form>
+
+                {portalUrl && (
+                    <p data-membership-manage class="text-label-sm text-on-surface-variant">
+                        Already a member?{" "}
+                        <a href={portalUrl} class={textLink}>
+                            Manage or cancel your membership<span class="sr-only"> (continues to Stripe)</span>
+                        </a>
+                    </p>
+                )}
+
+                <noscript>
+                    <p class="text-body-md text-on-surface">
+                        Joining online needs JavaScript. You can also email us at <a href={`mailto:${contactEmail}`} class={textLink}>{contactEmail}</a>.
+                    </p>
+                </noscript>
+            </div>
+        ) : (
+            <div class="flex flex-col items-start gap-md">
+                <h3 class="font-headline-md text-headline-md text-on-surface">Become a member</h3>
+                <p class="font-body-md text-body-md text-on-surface-variant">Joining online isn't available just now. Please check back soon.</p>
+            </div>
+        )
+    }
+</div>
+
+<script>
+    import { initMembershipForm } from "../scripts/membership-form.ts";
+    document.querySelectorAll<HTMLElement>("[data-membership-root]").forEach(initMembershipForm);
+</script>

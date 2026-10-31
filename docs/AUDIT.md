@@ -18,7 +18,7 @@ expansion.
 | Meetup integration | Browser fetches `https://red-wave-4e83.mikedawsonmd.workers.dev/events` (a Cloudflare Worker whose source is **not** in this repository). It returns `{ events: [{title, date, time, dateISO, month, day, venue, url, image}], fetchedAt }`. Cards are built with string concatenation and an HTML escaper. `dateISO` is labelled UTC (`…Z`) but appears to hold Irish local time — correct in winter, but likely one hour out during Irish Summer Time. |
 | Meetup public feed | `https://www.meetup.com/corkvegans/events/ical/` is an official, public iCalendar feed (no credentials) with `TZID=Europe/Dublin` start/end times, status, description and URL. It has no venue or image data for current events. |
 | Eventbrite | Organiser page `https://www.eventbrite.ie/o/cork-vegans-91797524863` (commented-out link only). No integration. |
-| Donations | **No donation provider found** — not in the repo, the live site, the Linktree, or public web results. |
+| Payments | **No payment provider found**: not in the repo, the live site, the Linktree, or public web results. |
 | Forms | None. |
 | CMS | None. |
 | Hosting | GitHub Pages, "deploy from branch" (no workflow files). `CNAME` = `corkvegans.ie`. |
@@ -69,7 +69,7 @@ layout (logo panel + date badge + details + pill CTA).
 /events/              All upcoming events (Meetup + Eventbrite)
 /stories/             Stories & Updates (all stories; category, search and sort filters)
 /stories/[slug]/      Individual story
-/support/             Support us (#donate, #volunteer)
+/support/             Support us (#membership, #volunteer)
 /about/               About Cork Vegans
 /404.html             Not found
 /sitemap.xml, /robots.txt, /events.json (last event snapshot)
@@ -83,7 +83,7 @@ layout (logo panel + date badge + details + pill CTA).
 | Eventbrite | API v3 `GET /v3/organizations/{id}/events/` with a private token, fetched at build time in GitHub Actions | `EVENTBRITE_TOKEN` (GitHub secret), organisation ID |
 | CMS | Pages CMS (hosted, free, open source, Git-backed) | GitHub App install by repo owner |
 | Volunteer form | Formspree (hosted form backend; free tier) — endpoint is configurable | Form endpoint ID (public by design, not a secret) |
-| Donations | Provider unknown — config-driven hosted-checkout links | Owner must supply one-off and monthly links |
+| Payments | Provider unknown: config-driven hosted-checkout links | Owner must supply checkout links |
 
 ## 6. Risks and breaking changes
 
@@ -115,7 +115,7 @@ writing) is expected to be sufficient. All free tiers can change — see
 - Switch GitHub Pages source to GitHub Actions (repo admin).
 - Install the Pages CMS GitHub App on this repository only, and invite editors.
 - Eventbrite private token and organisation ID (if Eventbrite events should appear).
-- Donation provider name plus one-off and monthly checkout links.
+- Payment provider name plus checkout links.
 - A Formspree account (or chosen alternative) and the form endpoint, with the
   notification email set to an organisers' address.
 - Approval of the Support page wording and privacy notice.
