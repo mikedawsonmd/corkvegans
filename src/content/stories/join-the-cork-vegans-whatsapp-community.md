@@ -1,11 +1,11 @@
 ---
-draft: true
+draft: false
 title: Join the Cork Vegans WhatsApp community
 description: Hear about events first, swap tips and meet other vegans around
   Cork. Here’s why you should join our WhatsApp community, and how.
 category: Community
 author: Cork Vegans
-publishedAt: 2026-10-19
+publishedAt: 2026-10-31
 featuredImage: /src/assets/stories/whatsappmain.jpg
 featuredImageAlt: Cork vegans logo next to Whatsapp logo
 imageFocus: centre
