@@ -2,18 +2,22 @@ import { expect, test, type Page } from "@playwright/test";
 import { features } from "../../src/config/site.ts";
 
 const ENDPOINT = "https://formspree.io/f/testfixture";
+const CARD_TOKEN = "sub_1TestMember00.AbCdEfGhIjKlMnOpQrStUv";
 
 test("membership: benefits, terms link and no donation wording", async ({ page }) => {
-    await page.goto("/support/");
+    await page.goto("/membership/");
 
     const nav = page.getByRole("navigation", { name: "On this page" });
-    await expect(nav.getByRole("link", { name: "Membership" })).toHaveAttribute("href", "#membership");
-    await expect(nav.getByRole("link", { name: "Volunteer" })).toHaveAttribute("href", "#volunteer");
+    await expect(nav.getByRole("link", { name: "Join" })).toHaveAttribute("href", "#join");
+    await expect(nav.getByRole("link", { name: "Member discounts" })).toHaveAttribute("href", "#partners");
+    await expect(nav.getByRole("link", { name: "Your card" })).toHaveCount(features.payments ? 1 : 0);
 
-    const section = page.locator("#membership");
-    await expect(section.getByRole("heading", { level: 2, name: "Membership" })).toBeVisible();
+    const section = page.locator("#join");
+    await expect(section.getByRole("heading", { level: 2, name: "What members get" })).toBeVisible();
     await expect(section).toContainText("every member gets the same benefits, whatever they pay");
-    await expect(section.locator("ul").first().getByRole("listitem")).toHaveCount(4);
+    // The test partners make the partner discount a benefit.
+    await expect(section.locator("ul").first().getByRole("listitem")).toHaveCount(5);
+    await expect(section).toContainText("Discounts at our partner businesses");
     await expect(section).toContainText("€5 off one ticket for each paid Cork Vegans event (subject to availability)");
     await expect(section).toContainText("Free events stay free and open to everyone.");
     await expect(section.getByRole("link", { name: "membership terms" }).first()).toHaveAttribute("href", "/membership-terms/");
@@ -27,8 +31,8 @@ test("membership: coming soon, with no join form, Stripe or Worker calls", async
     page.on("request", (r) => {
         if (/stripe\.com|\/membership\//.test(r.url())) external.push(r.url());
     });
-    await page.goto("/support/");
-    await expect(page.locator("#membership").getByText("Coming soon", { exact: true })).toBeVisible();
+    await page.goto("/membership/");
+    await expect(page.locator("#join").getByText("Coming soon", { exact: true })).toBeVisible();
     await expect(page.locator("[data-membership-root], [data-membership-dialog], [data-membership-manage]")).toHaveCount(0);
     await page.waitForLoadState("networkidle");
     expect(external).toEqual([]);
@@ -37,10 +41,21 @@ test("membership: coming soon, with no join form, Stripe or Worker calls", async
 test("home page points to membership", async ({ page }) => {
     await page.goto("/");
     const card = page.getByRole("link", { name: /^Membership (Become|Membership is)/ });
-    await expect(card).toHaveAttribute("href", "/support/#membership");
+    await expect(card).toHaveAttribute("href", "/membership/");
     await expect(card).toContainText("€5 off our paid events, early booking and member events");
     await card.click();
-    await expect(page.locator("#membership-heading")).toBeInViewport();
+    await expect(page.locator("h1")).toHaveText("Cork Vegans membership");
+});
+
+test("the Support page sends people to the Membership page", async ({ page }) => {
+    await page.goto("/support/#membership");
+    const section = page.locator("#membership");
+    await expect(section.getByRole("heading", { level: 2, name: "Membership" })).toBeInViewport();
+    await expect(section).toContainText("€5 off our paid events, early booking and member events");
+    await expect(page.locator("[data-membership-root]")).toHaveCount(0);
+    await expect(page.getByRole("navigation", { name: "On this page" }).getByRole("link", { name: "Membership" })).toHaveAttribute("href", "/membership/");
+    await section.getByRole("link", { name: features.payments ? "Become a member" : "Find out more" }).click();
+    await expect(page).toHaveURL(/\/membership\/$/);
 });
 
 test("the old thank-you page is gone", async ({ page }) => {
@@ -51,7 +66,7 @@ test("the old thank-you page is gone", async ({ page }) => {
 test("membership terms and privacy pages", async ({ page }) => {
     await page.goto("/membership-terms/");
     await expect(page.getByRole("heading", { level: 1, name: "Membership terms" })).toBeVisible();
-    for (const heading of ["What members get", "Contribute what you can", "Renewal", "Cancelling", "Changing your amount", "Membership refunds", "Event tickets"]) {
+    for (const heading of ["What members get", "Your membership card", "Partner discounts", "Contribute what you can", "Renewal", "Cancelling", "Changing your amount", "Membership refunds", "Event tickets"]) {
         await expect(page.getByRole("heading", { level: 2, name: heading })).toBeVisible();
     }
     await expect(page.getByText("You can cancel any time in your membership portal. Your benefits continue until the end of the period you've paid for, and you won't be charged again.")).toBeVisible();
@@ -102,7 +117,7 @@ test.describe("join form", () => {
     type Reply = { status: number; json: unknown };
     async function mockWorker(
         page: Page,
-        { session = () => ({ status: 200, json: { clientSecret: "cs_test_fake_secret_x" } }), code = () => ({ status: 200, json: { status: "ready", code: "CV-7K3P9Q" } }), resend = () => ({ status: 200, json: { ok: true } }) }: {
+        { session = () => ({ status: 200, json: { clientSecret: "cs_test_fake_secret_x" } }), code = () => ({ status: 200, json: { status: "ready", code: "CV-7K3P9Q", cardToken: CARD_TOKEN } }), resend = () => ({ status: 200, json: { ok: true } }) }: {
             session?: (body: Record<string, unknown>) => Reply;
             code?: (n: number) => Reply;
             resend?: (body: Record<string, unknown>) => Reply;
@@ -131,7 +146,7 @@ test.describe("join form", () => {
 
     test("monthly by default, yearly amounts, and friendly limits for Other", async ({ page }) => {
         await mockWorker(page);
-        await page.goto("/support/#membership");
+        await page.goto("/membership/#join");
 
         const often = page.getByRole("group", { name: "How often?" });
         await expect(often.getByRole("radio", { name: "Monthly" })).toBeChecked();
@@ -164,12 +179,12 @@ test.describe("join form", () => {
         await page.getByRole("button", { name: "Join" }).click();
         await expect(page.getByText("whole number of euros")).toBeVisible();
 
-        await expect(page.locator("#membership input[autocomplete^='cc-']")).toHaveCount(0); // no card fields on our page
+        await expect(page.locator("#join input[autocomplete^='cc-']")).toHaveCount(0); // no card fields on our page
     });
 
     test("asks for the details and the terms before opening checkout", async ({ page }) => {
         const requests = await mockWorker(page);
-        await page.goto("/support/#membership");
+        await page.goto("/membership/#join");
         await page.getByRole("button", { name: "Join" }).click();
 
         await expect(page.locator("#mf-first-name-error")).toHaveText("Enter your first name.");
@@ -188,7 +203,7 @@ test.describe("join form", () => {
 
     test("opens checkout in a modal with the amount, and closing it destroys the session", async ({ page, isMobile }) => {
         const requests = await mockWorker(page);
-        await page.goto("/support/#membership");
+        await page.goto("/membership/#join");
         const destroyed = () => page.evaluate(() => (window as unknown as { __destroyed?: number }).__destroyed ?? 0);
 
         await page.getByRole("group", { name: "Monthly amount" }).getByText("€15").click();
@@ -227,8 +242,8 @@ test.describe("join form", () => {
 
     test("welcomes the new member with their code, copy button and how to use it", async ({ page, context, isMobile }) => {
         await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-        await mockWorker(page, { code: (n) => (n < 2 ? { status: 200, json: { status: "pending" } } : { status: 200, json: { status: "ready", code: "CV-7K3P9Q" } }) });
-        await page.goto("/support/#membership");
+        await mockWorker(page, { code: (n) => (n < 2 ? { status: 200, json: { status: "pending" } } : { status: 200, json: { status: "ready", code: "CV-7K3P9Q", cardToken: CARD_TOKEN } }) });
+        await page.goto("/membership/#join");
         await fillDetails(page);
         await page.getByRole("button", { name: "Join" }).click();
         await page.getByRole("dialog").getByRole("button", { name: "Pay now" }).click();
@@ -241,6 +256,8 @@ test.describe("join form", () => {
         await expect(welcome).toContainText("unlocks member tickets before general release");
         await expect(welcome.getByRole("link", { name: "Book with your member discount" })).toHaveAttribute("href", "/events/");
         expect(await page.evaluate(() => localStorage.getItem("cv-member-code"))).toBe("CV-7K3P9Q");
+        await expect(welcome.getByRole("link", { name: "Open your membership card" })).toHaveAttribute("href", `/membership/card/#${CARD_TOKEN}`);
+        expect(await page.evaluate(() => localStorage.getItem("cv-card-token"))).toBe(CARD_TOKEN);
 
         if (!isMobile) {
             await welcome.getByRole("button", { name: "Copy code" }).click();
@@ -258,7 +275,7 @@ test.describe("join form", () => {
 
     test("says the code is on its way by email if it isn't ready", async ({ page }) => {
         await mockWorker(page, { code: () => ({ status: 404, json: { error: "not_found" } }) });
-        await page.goto("/support/#membership");
+        await page.goto("/membership/#join");
         await fillDetails(page);
         await page.getByRole("button", { name: "Join" }).click();
         await page.getByRole("dialog").getByRole("button", { name: "Pay now" }).click();
@@ -269,7 +286,7 @@ test.describe("join form", () => {
     test("shows the fallback error if the Worker fails", async ({ page }) => {
         let status = 502;
         await mockWorker(page, { session: () => ({ status, json: { error: "checkout_unavailable" } }) });
-        await page.goto("/support/#membership");
+        await page.goto("/membership/#join");
         await fillDetails(page);
         await page.getByRole("button", { name: "Join" }).click();
 
@@ -287,7 +304,7 @@ test.describe("join form", () => {
 
     test("Lost your code? gives the same answer for any email", async ({ page }) => {
         const requests = await mockWorker(page);
-        await page.goto("/support/#membership");
+        await page.goto("/membership/#join");
         const lookup = page.locator("[data-lookup-form]");
         await expect(lookup.getByRole("heading", { name: "Lost your code?" })).toBeVisible();
 
@@ -303,7 +320,7 @@ test.describe("join form", () => {
 
     test("links members to the portal", async ({ page }) => {
         await mockWorker(page);
-        await page.goto("/support/#membership");
+        await page.goto("/membership/#join");
         await expect(page.getByRole("link", { name: /Manage or cancel your membership/ })).toHaveAttribute("href", "https://billing.example/login");
     });
 });

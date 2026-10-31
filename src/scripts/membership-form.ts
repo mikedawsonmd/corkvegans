@@ -8,6 +8,7 @@
 
 import { DEFAULT_AMOUNT, amountHint, formatAmount, parseAmount, type Frequency } from "../lib/membership.ts";
 import { saveMemberCode } from "./member-code.ts";
+import { CARD_TOKEN, saveCardToken } from "./member-card.ts";
 import { loadScript, setupTurnstile } from "./turnstile.ts";
 
 const STRIPE_JS = "https://js.stripe.com/endive/stripe.js";
@@ -73,19 +74,21 @@ export async function requestClientSecret(endpoint: string, body: JoinRequest): 
 }
 
 /**
- * The new member's code. The Worker makes it when Stripe confirms the
- * payment, usually within a few seconds, so this checks a few times.
- * Resolves null if it isn't ready in time (it's in the welcome email).
+ * The new member's code and card token. The Worker makes the code when
+ * Stripe confirms the payment, usually within a few seconds, so this checks
+ * a few times. Resolves null if it isn't ready in time (it's in the welcome email).
  */
 export async function waitForMemberCode(
     endpoint: string,
     clientSecret: string,
     { attempts = 10, interval = 2_000, sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms)) } = {},
-): Promise<string | null> {
+): Promise<{ code: string; cardToken: string | null } | null> {
     for (let i = 0; i < attempts; i++) {
         try {
             const { status, data } = await post(`${endpoint}/membership/code`, { clientSecret });
-            if (status === 200 && data?.status === "ready" && typeof data.code === "string") return data.code;
+            if (status === 200 && data?.status === "ready" && typeof data.code === "string") {
+                return { code: data.code, cardToken: typeof data.cardToken === "string" && CARD_TOKEN.test(data.cardToken) ? data.cardToken : null };
+            }
             if (status === 404 || status === 400) return null;
         } catch {
             // Rate limited or offline: keep trying until the attempts run out.
@@ -128,6 +131,7 @@ export function initMembershipForm(root: HTMLElement) {
     const codeText = $("[data-member-code]");
     const copyButton = $<HTMLButtonElement>("[data-copy-code]");
     const copyStatus = $("[data-copy-status]");
+    const cardLink = $<HTMLAnchorElement>("[data-card-link]");
 
     const { publishableKey = "", endpoint = "", turnstileSitekey } = root.dataset;
     const stripeReady = loadScript(STRIPE_JS).then(() => {
@@ -210,12 +214,17 @@ export function initMembershipForm(root: HTMLElement) {
         dialogTitle.focus();
     }
 
-    function showCode(code: string | null) {
+    function showCode(ready: { code: string; cardToken: string | null } | null) {
         codeLoading.hidden = true;
-        if (code) {
-            codeText.textContent = code;
+        if (ready) {
+            codeText.textContent = ready.code;
             codeReady.hidden = false;
-            saveMemberCode(code);
+            saveMemberCode(ready.code);
+            if (ready.cardToken) {
+                saveCardToken(ready.cardToken);
+                cardLink.href = `/membership/card/#${ready.cardToken}`;
+                cardLink.hidden = false;
+            }
         } else {
             codeLater.hidden = false;
         }
@@ -300,6 +309,7 @@ export function initMembershipForm(root: HTMLElement) {
                     codeLoading.hidden = false;
                     codeReady.hidden = true;
                     codeLater.hidden = true;
+                    cardLink.hidden = true;
                     copyStatus.textContent = "";
                     success.hidden = false;
                     success.focus();

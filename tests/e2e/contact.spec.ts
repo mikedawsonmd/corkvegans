@@ -21,7 +21,7 @@ test("the About page has a contact section with topics and a privacy note", asyn
     await page.goto("/about/#contact");
     await expect(page.locator("#contact")).toBeInViewport();
     await expect(page.getByRole("heading", { name: "Get in touch" })).toBeVisible();
-    await expect(page.getByLabel("What's it about?").locator("option")).toHaveCount(8);
+    await expect(page.getByLabel("What's it about?").locator("option")).toHaveCount(9);
     await expect(page.locator("#contact").getByText("How we use your details")).toBeVisible();
     await expect(page.getByRole("link", { name: "volunteer form" })).toHaveAttribute("href", "/support/#volunteer");
 });
@@ -37,6 +37,13 @@ test("links elsewhere on the site open the form with the right topic", async ({ 
     await expect(page.getByRole("link", { name: "Tell us" })).toHaveAttribute("href", "/about/?topic=story#contact");
     await page.goto("/resources/");
     await expect(page.getByRole("link", { name: "Recommend it" })).toHaveAttribute("href", "/about/?topic=recommend#contact");
+
+    await page.goto("/membership/#partners");
+    await page.getByRole("link", { name: "Become a partner" }).click();
+    await expect(page).toHaveURL("/about/?topic=partner#contact");
+    await expect(page.getByLabel("What's it about?")).toHaveValue("partner");
+    await expect(page.getByLabel("What's it about?").locator("option:checked")).toHaveText("Discount partnership");
+    await expect(page.locator("[data-topic-hint]")).toContainText("the discount you'd like to offer Cork Vegans members");
     await expect(page.locator("footer").getByRole("link", { name: "Contact" })).toHaveAttribute("href", "/about/#contact");
 });
 

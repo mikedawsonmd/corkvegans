@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CUSTOM_PRODUCT_ID, LIMITS, PRESETS, RATE_LIMIT, checkoutSessionParams, handleMembership, parseJoin } from "../../worker/membership.js";
 import { fakeServices, subscription, workerEnv } from "./fake-membership-services.ts";
+import { cardTokenFor } from "../../worker/card.js";
 
 const ORIGIN = "https://corkvegans.ie";
 let ipCounter = 0;
@@ -244,17 +245,19 @@ describe("membership Worker: the new member's code", () => {
         return fetchMock;
     }
 
-    it("returns the code once the webhook has made it", async () => {
-        const fetchMock = stubSession({ status: "complete", subscription: { metadata: { member_code: "CV-7K3P9Q" } } });
-        const res = (await handleMembership(post("/membership/code", { clientSecret: secret }), env))!;
-        expect(await res.json()).toEqual({ status: "ready", code: "CV-7K3P9Q" });
+    const codeEnv = { ...env, MEMBER_CODE_SECRET: "member-code-secret" };
+
+    it("returns the code and card token once the webhook has made the code", async () => {
+        const fetchMock = stubSession({ status: "complete", subscription: { id: "sub_1abcdefgh", metadata: { member_code: "CV-7K3P9Q" } } });
+        const res = (await handleMembership(post("/membership/code", { clientSecret: secret }), codeEnv))!;
+        expect(await res.json()).toEqual({ status: "ready", code: "CV-7K3P9Q", cardToken: await cardTokenFor("sub_1abcdefgh", "member-code-secret") });
         expect(String(fetchMock.mock.calls[0][0])).toBe("https://api.stripe.com/v1/checkout/sessions/cs_test_abc?expand%5B%5D=subscription");
     });
 
     it("accepts the long, %-encoded client secrets Stripe really sends", async () => {
         const real = `cs_test_a1B2c3D4e5_secret_fidnandhYHdWcXxpYCc${"%2FvYWJxbGlj".repeat(30)}`;
-        stubSession({ client_secret: real, status: "complete", subscription: { metadata: { member_code: "CV-7K3P9Q" } } });
-        expect(await (await handleMembership(post("/membership/code", { clientSecret: real }), env))!.json()).toEqual({ status: "ready", code: "CV-7K3P9Q" });
+        stubSession({ client_secret: real, status: "complete", subscription: { id: "sub_1abcdefgh", metadata: { member_code: "CV-7K3P9Q" } } });
+        expect(await (await handleMembership(post("/membership/code", { clientSecret: real }), codeEnv))!.json()).toMatchObject({ status: "ready", code: "CV-7K3P9Q" });
     });
 
     it("says pending until then", async () => {
@@ -277,6 +280,86 @@ describe("membership Worker: the new member's code", () => {
         const fetchMock = stubSession({});
         expect((await handleMembership(post("/membership/code", body), env))!.status).toBe(400);
         expect(fetchMock).not.toHaveBeenCalled();
+    });
+});
+
+describe("membership Worker: membership cards", () => {
+    const secret = workerEnv.MEMBER_CODE_SECRET;
+    const services = (subs: ReturnType<typeof subscription>[], fail?: RegExp) => {
+        const s = fakeServices({ subscriptions: subs, fail });
+        vi.stubGlobal("fetch", s.fetchImpl);
+        return s;
+    };
+    const check = async (token: unknown, e: Record<string, unknown> = workerEnv) => {
+        const res = (await handleMembership(post("/membership/card", { token }), e))!;
+        return { status: res.status, body: await res.json(), headers: res.headers };
+    };
+
+    it("signs a token per membership that can't be altered or made up", async () => {
+        const token = await cardTokenFor("sub_1abcdefgh", secret);
+        expect(token).toMatch(/^sub_1abcdefgh\.[A-Za-z0-9_-]{22}$/);
+        expect(await cardTokenFor("sub_1abcdefgh", secret)).toBe(token);
+        expect(await cardTokenFor("sub_2abcdefgh", secret)).not.toBe(token.replace("sub_1", "sub_2"));
+        expect(await cardTokenFor("sub_1abcdefgh", "another-secret")).not.toBe(token);
+    });
+
+    it("says valid with the first name only while the membership is live", async () => {
+        services([subscription({ id: "sub_1abcdefgh" })]);
+        const res = await check(await cardTokenFor("sub_1abcdefgh", secret));
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual({ status: "valid", firstName: "Aoife" });
+        expect(res.headers.get("Cache-Control")).toBe("no-store");
+        expect(JSON.stringify(res.body)).not.toMatch(/Murphy|CV-|example/);
+    });
+
+    it("gives the end date once a membership is cancelled, and says ended after", async () => {
+        const cancelled = { ...subscription({ id: "sub_1abcdefgh" }), cancel_at_period_end: true };
+        services([cancelled as ReturnType<typeof subscription>]);
+        const token = await cardTokenFor("sub_1abcdefgh", secret);
+        // 1_800_000_000 is 15 January 2027, 08:00 UTC.
+        expect((await check(token)).body).toEqual({ status: "valid", firstName: "Aoife", endsOn: "2027-01-15" });
+        services([subscription({ id: "sub_1abcdefgh", status: "canceled" })]);
+        expect((await check(token)).body).toEqual({ status: "ended" });
+    });
+
+    it("answers 404 for altered, made-up or other people's tokens without asking Stripe for fakes", async () => {
+        const s = services([subscription({ id: "sub_1abcdefgh", metadata: { source: "elsewhere" } })]);
+        const token = await cardTokenFor("sub_1abcdefgh", secret);
+        expect((await check(token)).status).toBe(404); // not a corkvegans.ie membership
+        const callsBefore = s.calls.length;
+        const altered = token.slice(0, -1) + (token.endsWith("A") ? "B" : "A");
+        for (const fake of [altered, token.replace("sub_1", "sub_9"), await cardTokenFor("sub_1abcdefgh", "guess"), "sub_1abcdefgh", "CV-7K3P9Q"]) {
+            expect((await check(fake)).status).toBe(404);
+        }
+        expect(s.calls.length).toBe(callsBefore);
+        services([]);
+        expect((await check(await cardTokenFor("sub_1gone12345", secret))).status).toBe(404);
+    });
+
+    it("rejects bad requests, hides Stripe errors and rate limits to 30 a minute per IP", async () => {
+        services([subscription({ id: "sub_1abcdefgh" })]);
+        expect((await check(42)).status).toBe(400);
+        expect((await handleMembership(post("/membership/card", { token: "x", extra: 1 }), workerEnv))!.status).toBe(400);
+        const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+        services([subscription({ id: "sub_1abcdefgh" })], /api\.stripe\.com/);
+        const failed = await check(await cardTokenFor("sub_1abcdefgh", secret));
+        expect(failed).toMatchObject({ status: 502, body: { error: "unavailable" } });
+        expect(String(errors.mock.calls)).not.toMatch(/sub_1abcdefgh|aoife/);
+        const ip = "198.51.100.77";
+        const statuses = [];
+        for (let i = 0; i < 31; i++) statuses.push((await handleMembership(post("/membership/card", { token: "x" }, { ip }), workerEnv))!.status);
+        expect(statuses.slice(0, 30).every((st) => st === 404)).toBe(true);
+        expect(statuses[30]).toBe(429);
+    });
+
+    it("puts the card link in the welcome email, with the token after #", async () => {
+        const member = subscription({ metadata: { ...subscription().metadata, member_code: "CV-7K3P9Q", eventbrite_discount_id: "d1", welcome_email_sent_at: "2026-01-01T00:00:00Z" } });
+        const s = fakeServices({ subscriptions: [member] });
+        vi.stubGlobal("fetch", s.fetchImpl);
+        await handleMembership(post("/membership/resend", { email: "aoife@example.ie" }), workerEnv);
+        const link = `https://corkvegans.ie/membership/card/#${await cardTokenFor("sub_1", secret)}`;
+        expect(s.emails[0].text).toContain(link);
+        expect(s.emails[0].html).toContain(`href="${link}"`);
     });
 });
 

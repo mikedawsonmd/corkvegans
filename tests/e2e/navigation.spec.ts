@@ -6,6 +6,7 @@ const pages = [
     { path: "/stories/", h1: "Stories & Updates" },
     { path: "/stories/example-community-picnic/", h1: "Example: A sunny community picnic" },
     { path: "/support/", h1: "Support Cork Vegans" },
+    { path: "/membership/", h1: "Cork Vegans membership" },
     { path: "/resources/", h1: "Useful links" },
     { path: "/about/", h1: "About Cork Vegans" },
 ];
@@ -49,7 +50,7 @@ test.describe("navigation", () => {
         test.skip(isMobile, "desktop navigation");
         await page.goto("/");
         const nav = page.getByRole("navigation", { name: "Main" });
-        for (const [label, path] of [["Events", "/events/"], ["Stories", "/stories/"], ["Resources", "/resources/"], ["About", "/about/"]]) {
+        for (const [label, path] of [["Events", "/events/"], ["Stories", "/stories/"], ["Membership", "/membership/"], ["Resources", "/resources/"], ["About", "/about/"]]) {
             await nav.getByRole("link", { name: label }).click();
             await expect(page).toHaveURL(path);
             await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: label })).toHaveAttribute("aria-current", "page");
@@ -150,7 +151,7 @@ test.describe("navigation", () => {
         await expect(button).toHaveAttribute("aria-expanded", "true");
         const menu = page.locator("#mobileMenu");
         await expect(menu).toBeVisible();
-        await expect(menu.getByRole("link")).toHaveCount(4);
+        await expect(menu.getByRole("link")).toHaveCount(5);
 
         await page.keyboard.press("Escape");
         await expect(menu).toBeHidden();
@@ -185,7 +186,7 @@ test.describe("navigation", () => {
     test("footer has site links, then social links at the very bottom", async ({ page }) => {
         await page.goto("/about/");
         const footer = page.locator("footer");
-        await expect(footer.getByRole("navigation", { name: "Footer" }).getByRole("link")).toHaveText(["Events", "Stories", "Resources", "About", "Contact", "Support us", "Membership terms", "Privacy"]);
+        await expect(footer.getByRole("navigation", { name: "Footer" }).getByRole("link")).toHaveText(["Events", "Stories", "Membership", "Resources", "About", "Contact", "Support us", "Membership terms", "Privacy"]);
         const socials = footer.getByRole("list", { name: "Cork Vegans on social media" }).getByRole("link");
         await expect(socials).toHaveCount(4);
         for (const [name, href] of [

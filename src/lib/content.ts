@@ -1,11 +1,12 @@
 /**
- * Astro-side access to stories: loads the Markdown files and the media
- * folder through Vite, and logs content problems once per build.
+ * Astro-side access to stories and partners: loads the content files and media
+ * folders through Vite, and logs content problems once per build.
  */
 
 import { resolve } from "node:path";
 import type { ImageMetadata } from "astro";
 import { collectStories, storyImageKey, type Story } from "./stories.ts";
+import { collectPartners, partnerLogoKey, type Partner } from "./partners.ts";
 
 type Files = Record<string, string>;
 type Images = Record<string, ImageMetadata>;
@@ -61,4 +62,38 @@ export function getStoryImage(path: string | null): ImageMetadata | null {
         return null;
     }
     return image;
+}
+
+// ── Partner businesses ───────────────────────────────────────────────────
+
+const realPartnerFiles: Files = import.meta.glob<string>("/src/content/partners/*.{yml,yaml}", { query: "?raw", import: "default", eager: true });
+const fixturePartnerFiles: Files = import.meta.glob<string>("/tests/fixtures/partners/*.{yml,yaml}", { query: "?raw", import: "default", eager: true });
+const realPartnerLogos: Images = import.meta.glob<ImageMetadata>("/src/assets/partners/**/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP}", { import: "default", eager: true });
+const fixturePartnerLogos: Images = Object.fromEntries(
+    Object.entries(import.meta.glob<ImageMetadata>("/tests/fixtures/assets/partners/**/*.{jpg,jpeg,png,webp}", { import: "default", eager: true })).map(
+        ([key, image]) => [key.replace("/tests/fixtures/assets/partners/", "/src/assets/partners/"), image],
+    ),
+);
+
+let partnerCache: Partner[] | null = null;
+
+export function getPartners(): Partner[] {
+    if (partnerCache) return partnerCache;
+    const { partners, problems } = collectPartners(useFixtures ? fixturePartnerFiles : realPartnerFiles);
+    const inCi = process.env.GITHUB_ACTIONS === "true";
+    for (const p of problems) {
+        const msg = `Partner "${p.file}" was skipped: ${p.message}`;
+        console.warn(inCi ? `::warning title=Partner skipped::${msg}` : `WARNING: ${msg}`);
+    }
+    partnerCache = partners;
+    return partners;
+}
+
+/** A partner's logo as an optimisable image, or null (no logo, or not found). */
+export function getPartnerLogo(path: string | null): ImageMetadata | null {
+    const key = partnerLogoKey(path);
+    if (!key) return null;
+    const image = (useFixtures ? fixturePartnerLogos : realPartnerLogos)[key];
+    if (!image) console.warn(`WARNING: Partner logo not found: ${path}`);
+    return image ?? null;
 }

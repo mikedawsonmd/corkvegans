@@ -551,3 +551,25 @@ html {
 .cv-prose a {
     @apply font-label-bold text-primary underline underline-offset-2;
 }
+
+/* ── Membership card ──────────────────────────────────────────────────────
+   The pulsing dot beside the card's clock: with the ticking seconds, it shows
+   at a glance that the card is live and not a screenshot. */
+.cv-live-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: #b6efd4;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .cv-live-dot {
+        animation: cv-live-pulse 1.6s ease-in-out infinite;
+    }
+}
+
+@keyframes cv-live-pulse {
+    50% {
+        opacity: 0.25;
+    }
+}

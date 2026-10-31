@@ -1,0 +1,24 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import MemberCard from "../../../components/MemberCard.astro";
+import { features } from "../../../config/site";
+---
+
+<BaseLayout title="Membership card" description="Your Cork Vegans membership card." noindex>
+    <section class="pt-xl pb-xl bg-surface">
+        <div class="max-w-7xl mx-auto px-margin-mobile flex flex-col items-center gap-lg">
+            <h1 class="sr-only">Your membership card</h1>
+            {
+                features.payments ? (
+                    <MemberCard />
+                ) : (
+                    <div data-membership-soon class="max-w-md flex flex-col items-start gap-sm rounded-lg border border-surface-variant bg-surface-container-low p-lg">
+                        <h2 class="font-headline-md text-headline-md text-on-surface">Membership cards are on the way</h2>
+                        <p class="text-body-md text-on-surface-variant">Members will get a card here once membership opens.</p>
+                        <a href="/membership/" class="cv-btn cv-btn-md cv-btn-secondary">About membership</a>
+                    </div>
+                )
+            }
+        </div>
+    </section>
+</BaseLayout>

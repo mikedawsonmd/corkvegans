@@ -10,6 +10,7 @@
  * MEMBER_DISCOUNT_EUR (default 5), MEMBER_CODE_GRACE_DAYS (default 3).
  */
 
+import { cardTokenFor } from "./card.js";
 import { createMemberDiscount, removeMemberDiscount, setMemberDiscountEnd } from "./eventbrite.js";
 import { stripe } from "./http.js";
 import { membershipPrice, sendEmail, welcomeEmail } from "./welcome-email.js";
@@ -18,7 +19,7 @@ export const SOURCE = "corkvegans.ie";
 /** No 0/O, 1/I/L or other look-alikes. */
 export const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 export const CODE_PATTERN = /^CV-[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/;
-const LIVE = new Set(["active", "trialing", "past_due"]);
+export const LIVE = new Set(["active", "trialing", "past_due"]);
 /** "Lost your code?" won't re-send to the same membership more often than this. */
 export const RESEND_INTERVAL_MS = 10 * 60_000;
 
@@ -53,6 +54,7 @@ async function sendWelcome(env, subscription, to) {
         price: membershipPrice(subscription),
         discountEur: discountEur(env),
         portalUrl: env.STRIPE_PORTAL_URL,
+        cardToken: await cardTokenFor(subscription.id, env.MEMBER_CODE_SECRET),
     });
     await sendEmail(env, to, content);
 }

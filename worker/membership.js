@@ -1,9 +1,11 @@
 /**
  * Cork Vegans membership Worker. Routes:
  *   POST /membership/session  creates a Stripe Embedded Checkout session for
- *                             the join form on corkvegans.ie/support/
- *   POST /membership/code     the new member's code, for the thank-you screen
+ *                             the join form on corkvegans.ie/membership/
+ *   POST /membership/code     the new member's code and card token, for the
+ *                             thank-you screen
  *   POST /membership/resend   "Lost your code?": re-sends the welcome email
+ *   POST /membership/card     whether a membership card is valid (card.js)
  *   POST /stripe/webhook      Stripe events (stripe-webhook.js)
  *   /donate/session           retired: 410 Gone
  *
@@ -20,11 +22,12 @@
  *   TURNSTILE_SECRET_KEY   (secret, optional) turns on the Turnstile check
  *   MEMBER_CODE_SECRET, MEMBER_DISCOUNT_EUR, MEMBER_CODE_GRACE_DAYS: members.js
  *   EVENTBRITE_*: eventbrite.js. BREVO_API_KEY, EMAIL_*, STRIPE_PORTAL_URL: welcome-email.js
- *   MEMBERSHIP_RATE_LIMITER, CODE_RATE_LIMITER, LOOKUP_RATE_LIMITER
+ *   MEMBERSHIP_RATE_LIMITER, CODE_RATE_LIMITER, LOOKUP_RATE_LIMITER, CARD_RATE_LIMITER
  *                          (rate limit bindings, optional) see wrangler.toml
  */
 
 import { cors, json, passesTurnstile, preflight, rateLimit, readJson, safeMessage, stripe } from "./http.js";
+import { cardStatus, cardTokenFor } from "./card.js";
 import { CODE_PATTERN, SOURCE, resendMemberCodes } from "./members.js";
 import { handleStripeWebhook } from "./stripe-webhook.js";
 
@@ -41,6 +44,7 @@ export const RATE_LIMIT = 5;
 const joinLimit = rateLimit("MEMBERSHIP_RATE_LIMITER", RATE_LIMIT);
 const codeLimit = rateLimit("CODE_RATE_LIMITER", 30); // the thank-you screen checks every few seconds
 const lookupLimit = rateLimit("LOOKUP_RATE_LIMITER", 3);
+const cardLimit = rateLimit("CARD_RATE_LIMITER", 30); // cards and businesses' checks
 
 /** The thank-you screen may fetch the code for this long after checkout opened. */
 const CODE_WINDOW_SECONDS = 24 * 3600;
@@ -59,7 +63,7 @@ export async function handleMembership(request, env, ctx) {
     if (path === "/donate/session") return json({ error: "gone" }, 410);
     if (path === "/stripe/webhook") return env.STRIPE_WEBHOOK_SECRET ? handleStripeWebhook(request, env) : new Response("Not found", { status: 404 });
 
-    const route = { "/membership/session": join, "/membership/code": code, "/membership/resend": resend }[path];
+    const route = { "/membership/session": join, "/membership/code": code, "/membership/resend": resend, "/membership/card": card }[path];
     if (!route) return null;
     // Switched off unless explicitly enabled (as on the site).
     if (env.PAYMENTS_ENABLED !== "true") return new Response("Not found", { status: 404 });
@@ -180,8 +184,8 @@ async function join(request, env, { ip, headers }) {
 
 /**
  * Only the browser that went through checkout has the session's client
- * secret, so it's the proof of who's asking. Answers { status: "ready", code }
- * once the webhook has made the code, { status: "pending" } until then.
+ * secret, so it's the proof of who's asking. Answers { status: "ready", code,
+ * cardToken } once the webhook has made the code, { status: "pending" } until then.
  */
 async function code(request, env, { ip, headers }) {
     if (!(await codeLimit(env, ip))) return json({ error: "rate_limited" }, 429, { ...headers, "Retry-After": "60" });
@@ -196,7 +200,8 @@ async function code(request, env, { ip, headers }) {
         }
         const memberCode = session.status === "complete" ? session.subscription?.metadata?.member_code : undefined;
         const ready = typeof memberCode === "string" && CODE_PATTERN.test(memberCode);
-        return json(ready ? { status: "ready", code: memberCode } : { status: "pending" }, 200, { ...headers, "Cache-Control": "no-store" });
+        const answer = ready ? { status: "ready", code: memberCode, cardToken: await cardTokenFor(session.subscription.id, env.MEMBER_CODE_SECRET) } : { status: "pending" };
+        return json(answer, 200, { ...headers, "Cache-Control": "no-store" });
     } catch (err) {
         console.error(`membership: could not look up a new member's code (${safeMessage(err)})`);
         return json({ error: "unavailable" }, 502, headers);
@@ -224,4 +229,20 @@ async function resend(request, env, { ip, headers, ctx }) {
     if (ctx?.waitUntil) ctx.waitUntil(work);
     else await work;
     return json({ ok: true }, 200, headers);
+}
+
+// ── POST /membership/card ─────────────────────────────────────────────────
+
+/** { status: "valid" | "ended", … } for a genuine card token (card.js), 404 otherwise. */
+async function card(request, env, { ip, headers }) {
+    if (!(await cardLimit(env, ip))) return json({ error: "rate_limited" }, 429, { ...headers, "Retry-After": "60" });
+    const body = await readJson(request, 512);
+    if (!body || typeof body.token !== "string" || Object.keys(body).length !== 1) return json({ error: "invalid_request" }, 400, headers);
+    try {
+        const status = await cardStatus(env, body.token);
+        return status ? json(status, 200, { ...headers, "Cache-Control": "no-store" }) : json({ error: "not_found" }, 404, headers);
+    } catch (err) {
+        console.error(`membership: could not check a membership card (${safeMessage(err)})`);
+        return json({ error: "unavailable" }, 502, headers);
+    }
 }

@@ -29,7 +29,8 @@ const email = `mailto:${contactEmail}`;
                 <p>We use these to:</p>
                 <ul>
                     <li>run your membership and take your payments;</li>
-                    <li>send you your member code, and again if you ask for it;</li>
+                    <li>send you your member code and membership card, and again if you ask for them;</li>
+                    <li>tell a business that scans your membership card whether your membership is current;</li>
                     <li>give you your member discount and early booking on Eventbrite;</li>
                     <li>email you about events, only if you ticked that box. You can ask us to stop at any time.</li>
                 </ul>
@@ -43,7 +44,7 @@ const email = `mailto:${contactEmail}`;
                         opened and which links are clicked, but not who opened them.
                     </li>
                     <li><strong>Eventbrite</strong> holds your member code so it works when you book. When you book, Eventbrite also has your booking details.</li>
-                    <li><strong>Cloudflare</strong> runs the service behind the join form, and may check you're not a bot.</li>
+                    <li><strong>Cloudflare</strong> runs the service behind the join form and membership cards, and may check you're not a bot.</li>
                     <li><strong>Formspree</strong> delivers messages from our contact and volunteer forms.</li>
                 </ul>
                 <p>Some of these companies are based outside the EU. They process your details for us under their own data protection terms.</p>
@@ -52,8 +53,14 @@ const email = `mailto:${contactEmail}`;
                 <p>
                     We don't use advertising or tracking cookies. Our fonts come from Google Fonts, so Google sees your IP address when
                     your browser loads them. If you join or open the link in your welcome email, your member code is saved in your
-                    browser on that device, so links to Eventbrite on our events page can apply it for you. Clearing this site's data in
-                    your browser removes it.
+                    browser on that device, so links to Eventbrite on our events page can apply it for you. Your membership card works the
+                    same way: when you open it, its link is saved on that device so it opens again. Clearing this site's data in your
+                    browser removes them.
+                </p>
+                <p>
+                    When a business scans your membership card, they see your first name and whether your membership is current (and its end
+                    date, if you've cancelled). They don't see your surname, email address or member code, and the check saves nothing on
+                    their phone.
                 </p>
 
                 <h2>How long we keep it</h2>

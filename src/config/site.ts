@@ -42,6 +42,7 @@ export const links = {
 export const nav = [
     { href: "/events/", label: "Events" },
     { href: "/stories/", label: "Stories" },
+    { href: "/membership/", label: "Membership" },
     { href: "/resources/", label: "Resources" },
     { href: "/about/", label: "About" },
 ];

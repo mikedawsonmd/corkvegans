@@ -25,11 +25,14 @@ export function membershipPrice(subscription) {
 }
 
 /**
- * @param {{ firstName?: string, code: string, price: ReturnType<typeof membershipPrice>, discountEur: number, portalUrl?: string }} details
+ * @param {{ firstName?: string, code: string, price: ReturnType<typeof membershipPrice>, discountEur: number, portalUrl?: string, cardToken?: string }} details
  * @returns {{ subject: string, text: string, html: string }}
  */
-export function welcomeEmail({ firstName, code, price, discountEur, portalUrl }) {
+export function welcomeEmail({ firstName, code, price, discountEur, portalUrl, cardToken }) {
     const hello = firstName ? `Hi ${firstName},` : "Hi there,";
+    // In the #fragment, so the token never reaches a server log.
+    const cardLink = cardToken ? `${SITE_URL}/membership/card/#${cardToken}` : "";
+    const cardText = "Your membership card: open it on your phone to show you're a member, for example at our partner businesses.";
     const eventsLink = `${SITE_URL}/events/?member=${encodeURIComponent(code)}`;
     const termsLink = `${SITE_URL}/membership-terms/`;
     const paying = price ? `You're paying €${Number.isInteger(price.amount) ? price.amount : price.amount.toFixed(2)} ${PER[price.interval]}. Every member gets the same benefits, whatever they pay.` : "";
@@ -58,6 +61,7 @@ export function welcomeEmail({ firstName, code, price, discountEur, portalUrl })
         `Book from our events page and your code is added for you: ${eventsLink}`,
         `All our events on Eventbrite: ${EVENTBRITE_URL}`,
         "",
+        ...(cardLink ? [`${cardText} ${cardLink}`, ""] : []),
         "Your membership",
         ...(paying ? [paying] : []),
         ...(portalUrl ? [`Manage or cancel your membership: ${portalUrl}`, changing] : []),
@@ -86,6 +90,9 @@ ${p("Welcome to Cork Vegans, and thank you for joining!")}
 <ul style="margin:0 0 16px;padding-left:20px">${uses.map((u) => `<li style="margin:0 0 8px">${escape(u)}</li>`).join("")}</ul>
 ${p(`${link(eventsLink, "Book with your member discount")}: your code is added for you on our events page.`)}
 ${p(`All our events are also on ${link(EVENTBRITE_URL, "Eventbrite")}.`)}
+${cardLink ? `<h2 style="margin:0 0 8px;font-size:18px">Your membership card</h2>
+${p("Open it on your phone to show you're a member, for example at our partner businesses. It shows this month and a QR code they can scan to check it. Tip: add it to your home screen.")}
+${p(link(cardLink, "Open your membership card"))}` : ""}
 <h2 style="margin:0 0 8px;font-size:18px">Your membership</h2>
 ${paying ? p(escape(paying)) : ""}
 ${portalUrl ? p(`${link(portalUrl, "Manage or cancel your membership")}. ${escape(changing)}`) : ""}

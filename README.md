@@ -16,7 +16,9 @@ Eventbrite, when configured) every few hours.
 | `/stories/` | Stories & Updates (paginated at `/stories/page/2/` …) |
 | `/stories/<slug>/` | Individual story, with social preview metadata and share buttons |
 | `/resources/` | Useful links: WhatsApp community, Cork vegan food map |
-| `/support/` | Membership (`#membership`) and volunteer (`#volunteer`) |
+| `/support/` | Membership summary (`#membership`) and volunteer (`#volunteer`) |
+| `/membership/` | Join (`#join`), partner discounts (`#partners`) and the membership card (`#card`) |
+| `/membership/card/`, `/membership/check/` | A member's digital card, and the page a business opens from its QR code (not indexed) |
 | `/membership-terms/` | Membership terms |
 | `/privacy/` | Privacy notice |
 | `/about/` | About Cork Vegans |

@@ -120,12 +120,14 @@ To remove Eventbrite, delete the secret. The site falls back to Meetup only.
 Cork Vegans membership is "contribute what you can": monthly (€5, €10, €15
 or another amount from €2 to €500) or yearly (€50, €100 or another amount
 from €50 to €500). Every member gets the same benefits: €5 off one ticket
-per paid event, early booking, and member events. The terms are on
-`/membership-terms/`; keep them in step with the Support page.
+per paid event, early booking, member events, a digital membership card,
+and discounts at partner businesses once there are some. Everything about
+membership is on `/membership/` (the Support page links there). The terms
+are on `/membership-terms/`; keep them in step with the Membership page.
 
 **How it works**
 
-1. On the Support page (`#membership`) the visitor picks an amount, enters
+1. On the Membership page (`#join`) the visitor picks an amount, enters
    their name and email, agrees to the terms and presses **Join**.
 2. The membership Worker (`worker/`, on Cloudflare) checks everything and
    creates a Stripe Checkout session. Stripe's checkout opens in a modal;
@@ -136,16 +138,42 @@ per paid event, early booking, and member events. The terms are on
    the **Members** ticket group, saves the code on the Stripe subscription,
    and sends the welcome email through Brevo.
 4. Meanwhile the modal says "Welcome to Cork Vegans!" and shows the code as
-   soon as it exists, with a Copy button. The code is remembered in the
-   browser, so Eventbrite links on our events list apply it automatically.
-   The welcome email's events link does the same on any device.
+   soon as it exists, with a Copy button and an "Open your membership card"
+   button. The code is remembered in the browser, so Eventbrite links on our
+   events list apply it automatically. The welcome email's events link does
+   the same on any device, and its card link opens the card.
 5. Each renewal (`invoice.paid`) moves the code's end date to the new period
    end plus 3 days. Cancelling keeps the code until the paid period ends.
    When the membership ends (`customer.subscription.deleted`) the code is
    deleted, or ended now if it's been used (Eventbrite can't delete used
    codes).
-6. "Lost your code?" on the Support page re-sends the welcome email to any
-   live membership under that email, and always shows the same message.
+6. "Lost your code?" on the Membership page re-sends the welcome email
+   (code and card link) to any live membership under that email, and always
+   shows the same message.
+
+**Membership card.** `/membership/card/#<token>` shows the member's first
+name, the current month and year in large type, a ticking clock (so a
+screenshot is easy to spot) and a QR code. The token is the subscription ID
+plus a signature made with `MEMBER_CODE_SECRET`, so it can't be guessed and
+nothing extra is stored; it isn't the member code, so a business never sees
+the Eventbrite discount. Each time the card opens it asks the Worker
+(`POST /membership/card`) whether the membership is live; once it ends, the
+card says so instead of showing the month. Offline, it shows the last answer
+from the same calendar month. The QR code opens `/membership/check/#<token>`
+on the business's phone: a green "Valid member" with the first name (and the
+end date if the member has cancelled), or a red "Not a current member". A
+member can't get a new token without changing `MEMBER_CODE_SECRET`, which
+would also change every future member code, so never change it.
+
+**Partner businesses.** Organisers add them in Pages CMS → **Partners**:
+name, discount, short description, area, website, logo and how to claim. New
+partners start **hidden**: untick Hidden to show one on the Membership page,
+and tick it again when the discount ends. Agree the wording with the business
+first. "Discounts at our partner businesses" only appears in the member
+benefits once at least one partner is shown. Businesses ask to join through
+**Become a partner**, which opens the contact form with the topic
+"Discount partnership". Files are `src/content/partners/*.yml`, logos
+`src/assets/partners/`.
 
 Every webhook step is safe to repeat (Stripe retries failures): the code and
 Eventbrite discount ID are saved on the subscription, and the code is worked
@@ -155,7 +183,10 @@ out from the subscription ID, so a member never gets two codes.
 
 | What | Where |
 | --- | --- |
+| Membership page | `src/pages/membership/index.astro` |
 | Join form, amounts and limits | `src/components/MembershipForm.astro`, `src/scripts/membership-form.ts`, `src/lib/membership.ts` |
+| Card and check pages | `src/components/MemberCard.astro`, `src/components/CardCheck.astro`, `src/scripts/card-api.ts`, `src/scripts/member-card.ts`, `worker/card.js` |
+| Partner businesses | `src/content/partners/`, `src/lib/partners.ts`, Pages CMS "Partners" |
 | On/off switch | `features.payments` in `src/config/site.ts` |
 | Publishable key, Worker address, Turnstile site key, portal link, €5 | `membership` in `src/config/site.ts` |
 | Worker routes and checkout | `worker/membership.js` (entry point `worker/index.js`, config `worker/wrangler.toml`) |
@@ -282,7 +313,7 @@ Stripe steps in live mode.
    It prints a signing secret (`whsec_…`): put it in `worker/.dev.vars` as
    `STRIPE_WEBHOOK_SECRET`.
 4. Run `npx wrangler dev` in `worker/` and `npm run dev` in the project,
-   open http://localhost:4321/support/#membership, and join with card
+   open http://localhost:4321/membership/#join, and join with card
    `4242 4242 4242 4242`, any future date and any CVC. `stripe listen`
    should show the events answered with 200; the modal shows the code, the
    email arrives, and the code appears under Eventbrite's promo codes.
@@ -294,8 +325,8 @@ Stripe steps in live mode.
 
 **Abuse protection.** The Worker only accepts requests from corkvegans.ie
 (and localhost while testing), checks every field itself, and rate limits
-per IP: 5 checkouts, 3 "Lost your code?" requests and 30 code checks a
-minute. Cloudflare Turnstile is optional: create a widget for
+per IP: 5 checkouts, 3 "Lost your code?" requests, 30 code checks and 30
+card checks a minute. Cloudflare Turnstile is optional: create a widget for
 `corkvegans.ie`, set the Worker's `TURNSTILE_SECRET_KEY` and
 `turnstileSiteKey` in `src/config/site.ts`. Set both or neither, otherwise
 every join is rejected.

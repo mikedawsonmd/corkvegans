@@ -2,19 +2,12 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import VolunteerForm from "../../components/VolunteerForm.astro";
-import MembershipForm from "../../components/MembershipForm.astro";
-import { features, links, membership } from "../../config/site";
+import { features, membership } from "../../config/site";
 import { animalSpot } from "../../lib/animals";
 
 const description = `Become a Cork Vegans member: €${membership.discountEur} off our paid events, early booking and member events. Contribute what you can, or volunteer with us.`;
 
-// Organisers should keep this in step with the membership terms page.
-const benefits = [
-    { icon: "sell", text: `€${membership.discountEur} off one ticket for each paid Cork Vegans event (subject to availability)` },
-    { icon: "schedule", text: "Book paid events early, before general release" },
-    { icon: "celebration", text: "Exclusive member events" },
-    { icon: "favorite", text: "Help keep our events going, whatever you pay" },
-];
+const perks = `€${membership.discountEur} off our paid events, early booking and member events`;
 
 const roles = [
     { icon: "event", title: "Event organisation", text: "Plan socials, dining nights, walks and potlucks." },
@@ -35,7 +28,7 @@ const roles = [
         eyebrowColor="#275d49"
     >
         <nav aria-label="On this page" class="flex flex-wrap justify-center gap-md pb-lg">
-            <a href="#membership" class="cv-btn cv-btn-sm cv-btn-secondary">
+            <a href="/membership/" class="cv-btn cv-btn-sm cv-btn-secondary">
                 <span class="material-symbols-outlined" aria-hidden="true">card_membership</span>Membership
             </a>
             <a href="#volunteer" class="cv-btn cv-btn-sm cv-btn-secondary">
@@ -44,54 +37,18 @@ const roles = [
         </nav>
     </PageHeader>
 
-    <!-- Membership -->
+    <!-- Membership: the details and join form are on /membership/ -->
     <section id="membership" class="relative pt-xl pb-xl bg-surface-container-lowest" aria-labelledby="membership-heading" {...animalSpot("floor", "membership-foot")}>
-        <div class="max-w-7xl mx-auto px-margin-mobile grid grid-cols-1 lg:grid-cols-2 gap-xl items-start">
-            <div class="flex flex-col gap-md">
-                <h2 id="membership-heading" class="font-headline-lg text-headline-lg text-on-surface">Membership</h2>
-                <p class="font-body-lg text-body-lg text-on-surface-variant">
-                    {features.payments ? "Become a Cork Vegans member and help keep our events going." : "Cork Vegans membership is on the way, to help keep our events going."}{" "}
-                    It's contribute what you can: pay monthly or yearly, and every member gets the same benefits, whatever they pay.
-                </p>
-                <p class="font-body-lg text-body-lg text-on-surface-variant">Members get:</p>
-                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-md">
-                    {
-                        benefits.map((b) => (
-                            <li class="flex items-start gap-sm p-md rounded-lg bg-surface-container-low border border-surface-variant">
-                                <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">{b.icon}</span>
-                                <span class="font-body-md text-body-md text-on-surface">{b.text}</span>
-                            </li>
-                        ))
-                    }
-                </ul>
-                <p class="font-body-md text-body-md text-on-surface-variant">
-                    Free events stay free and open to everyone. Read the{" "}
-                    <a href="/membership-terms/" class="font-label-bold text-primary underline underline-offset-2">membership terms</a>.
-                </p>
-            </div>
-
-            {
-                // With payments off the form isn't rendered, so no page loads its script or Stripe.js.
-                features.payments ? (
-                    <MembershipForm />
-                ) : (
-                    <div data-membership-soon class="relative flex flex-col items-start gap-md bg-surface border border-surface-variant rounded-lg p-lg md:p-xl shadow-sm" {...animalSpot("ledge", "membership", { size: 32, max: 2 })}>
-                        <h3 class="font-headline-md text-headline-md text-on-surface">Membership is on the way</h3>
-                        <p class="font-body-md text-body-md text-on-surface-variant">
-                            We're nearly ready. Follow us on{" "}
-                            <a class="font-label-bold text-primary underline underline-offset-2" href={links.facebook} target="_blank" rel="noopener noreferrer">
-                                Facebook<span class="sr-only"> (opens in a new tab)</span>
-                            </a>{" "}
-                            or{" "}
-                            <a class="font-label-bold text-primary underline underline-offset-2" href={links.instagram} target="_blank" rel="noopener noreferrer">
-                                Instagram<span class="sr-only"> (opens in a new tab)</span>
-                            </a>{" "}
-                            and we'll let you know as soon as it opens.
-                        </p>
-                        <p class="cv-btn cv-btn-md cv-btn-placeholder">Coming soon</p>
-                    </div>
-                )
-            }
+        <div class="max-w-3xl mx-auto px-margin-mobile flex flex-col items-start gap-md">
+            <h2 id="membership-heading" class="font-headline-lg text-headline-lg text-on-surface">Membership</h2>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">
+                {features.payments ? "Become a Cork Vegans member and help keep our events going." : "Cork Vegans membership is on the way, to help keep our events going."}{" "}
+                It's contribute what you can, and members get {perks}.
+            </p>
+            <a href="/membership/" class="cv-btn cv-btn-md cv-btn-primary">
+                {features.payments ? "Become a member" : "Find out more"}
+                <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+            </a>
         </div>
     </section>
 

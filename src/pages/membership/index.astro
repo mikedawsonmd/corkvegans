@@ -1,0 +1,200 @@
+---
+import { Image } from "astro:assets";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import MembershipForm from "../../components/MembershipForm.astro";
+import { features, links, membership } from "../../config/site";
+import { getPartnerLogo, getPartners } from "../../lib/content";
+import { animalSpot } from "../../lib/animals";
+
+const partners = getPartners().map((p) => ({ ...p, logoImage: getPartnerLogo(p.logo) }));
+
+const description = `Become a Cork Vegans member: €${membership.discountEur} off our paid events, early booking, member events${partners.length ? " and discounts at local businesses" : ""}. Contribute what you can.`;
+
+// Organisers should keep this in step with the membership terms page.
+const benefits = [
+    { icon: "sell", text: `€${membership.discountEur} off one ticket for each paid Cork Vegans event (subject to availability)` },
+    { icon: "schedule", text: "Book paid events early, before general release" },
+    { icon: "celebration", text: "Exclusive member events" },
+    // Only promised once there's a business to use it at.
+    ...(partners.length ? [{ icon: "storefront", text: "Discounts at our partner businesses" }] : []),
+    { icon: "favorite", text: "Help keep our events going, whatever you pay" },
+];
+
+const partnerLink = "/about/?topic=partner#contact";
+---
+
+<BaseLayout title="Membership" description={description}>
+    <PageHeader
+        eyebrow="Get involved"
+        title="Cork Vegans membership"
+        intro="Contribute what you can, enjoy member perks, and help keep Cork Vegans going."
+        accent="#417660"
+        eyebrowColor="#275d49"
+    >
+        <nav aria-label="On this page" class="flex flex-wrap justify-center gap-md pb-lg">
+            <a href="#join" class="cv-btn cv-btn-sm cv-btn-secondary">
+                <span class="material-symbols-outlined" aria-hidden="true">card_membership</span>Join
+            </a>
+            <a href="#partners" class="cv-btn cv-btn-sm cv-btn-secondary">
+                <span class="material-symbols-outlined" aria-hidden="true">storefront</span>Member discounts
+            </a>
+            {
+                features.payments && (
+                    <a href="#card" class="cv-btn cv-btn-sm cv-btn-secondary">
+                        <span class="material-symbols-outlined" aria-hidden="true">qr_code_2</span>Your card
+                    </a>
+                )
+            }
+        </nav>
+    </PageHeader>
+
+    <!-- Join -->
+    <section id="join" class="relative pt-xl pb-xl bg-surface-container-lowest" aria-labelledby="join-heading" {...animalSpot("floor", "membership-foot")}>
+        <div class="max-w-7xl mx-auto px-margin-mobile grid grid-cols-1 lg:grid-cols-2 gap-xl items-start">
+            <div class="flex flex-col gap-md">
+                <h2 id="join-heading" class="font-headline-lg text-headline-lg text-on-surface">What members get</h2>
+                <p class="font-body-lg text-body-lg text-on-surface-variant">
+                    {features.payments ? "Become a Cork Vegans member and help keep our events going." : "Cork Vegans membership is on the way, to help keep our events going."}{" "}
+                    It's contribute what you can: pay monthly or yearly, and every member gets the same benefits, whatever they pay.
+                </p>
+                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+                    {
+                        benefits.map((b) => (
+                            <li class="flex items-start gap-sm p-md rounded-lg bg-surface-container-low border border-surface-variant">
+                                <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">{b.icon}</span>
+                                <span class="font-body-md text-body-md text-on-surface">{b.text}</span>
+                            </li>
+                        ))
+                    }
+                </ul>
+                <p class="font-body-md text-body-md text-on-surface-variant">
+                    Free events stay free and open to everyone. Read the{" "}
+                    <a href="/membership-terms/" class="font-label-bold text-primary underline underline-offset-2">membership terms</a>.
+                </p>
+            </div>
+
+            {
+                // With payments off the form isn't rendered, so no page loads its script or Stripe.js.
+                features.payments ? (
+                    <MembershipForm />
+                ) : (
+                    <div data-membership-soon class="relative flex flex-col items-start gap-md bg-surface border border-surface-variant rounded-lg p-lg md:p-xl shadow-sm" {...animalSpot("ledge", "membership", { size: 32, max: 2 })}>
+                        <h3 class="font-headline-md text-headline-md text-on-surface">Membership is on the way</h3>
+                        <p class="font-body-md text-body-md text-on-surface-variant">
+                            We're nearly ready. Follow us on{" "}
+                            <a class="font-label-bold text-primary underline underline-offset-2" href={links.facebook} target="_blank" rel="noopener noreferrer">
+                                Facebook<span class="sr-only"> (opens in a new tab)</span>
+                            </a>{" "}
+                            or{" "}
+                            <a class="font-label-bold text-primary underline underline-offset-2" href={links.instagram} target="_blank" rel="noopener noreferrer">
+                                Instagram<span class="sr-only"> (opens in a new tab)</span>
+                            </a>{" "}
+                            and we'll let you know as soon as it opens.
+                        </p>
+                        <p class="cv-btn cv-btn-md cv-btn-placeholder">Coming soon</p>
+                    </div>
+                )
+            }
+        </div>
+    </section>
+
+    <!-- Partner discounts -->
+    <section id="partners" class="relative pt-xl pb-xl bg-surface" aria-labelledby="partners-heading">
+        <div class="max-w-7xl mx-auto px-margin-mobile flex flex-col gap-lg">
+            <div class="flex flex-col gap-sm max-w-3xl">
+                <h2 id="partners-heading" class="font-headline-lg text-headline-lg text-on-surface">Member discounts at local businesses</h2>
+                <p class="font-body-lg text-body-lg text-on-surface-variant">
+                    {
+                        partners.length
+                            ? "These local businesses give Cork Vegans members a discount. Show your membership card to claim it."
+                            : "We're talking to local businesses about discounts for Cork Vegans members. The first ones will be listed here soon."
+                    }
+                </p>
+            </div>
+
+            {
+                partners.length > 0 && (
+                    <ul data-partner-list class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+                        {partners.map((p) => (
+                            <li class="flex flex-col gap-sm p-lg rounded-lg bg-surface-container-lowest border border-surface-variant">
+                                <div class="flex items-center gap-md">
+                                    {p.logoImage ? (
+                                        <Image src={p.logoImage} alt={`${p.name} logo`} width={64} height={64} class="w-16 h-16 shrink-0 rounded-lg object-contain bg-surface" />
+                                    ) : (
+                                        <span class="w-16 h-16 shrink-0 rounded-lg bg-primary-fixed text-on-primary-fixed flex items-center justify-center" aria-hidden="true">
+                                            <span class="material-symbols-outlined">storefront</span>
+                                        </span>
+                                    )}
+                                    <div class="flex flex-col">
+                                        <h3 class="font-headline-md text-body-lg font-semibold text-on-surface">{p.name}</h3>
+                                        {p.area && (
+                                            <p class="flex items-center gap-xs text-label-sm text-on-surface-variant">
+                                                <span class="material-symbols-outlined text-[1rem]" aria-hidden="true">location_on</span>
+                                                {p.area}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                                <p class="font-label-bold text-label-bold text-primary">{p.discount}</p>
+                                {p.description && <p class="font-body-md text-body-md text-on-surface-variant">{p.description}</p>}
+                                <p class="text-label-sm text-on-surface-variant">{p.howToClaim}</p>
+                                {p.website && (
+                                    <a href={p.website} target="_blank" rel="noopener noreferrer" class="mt-auto font-label-bold text-primary underline underline-offset-2">
+                                        Visit {p.name}
+                                        <span class="sr-only"> (opens in a new tab)</span>
+                                    </a>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                )
+            }
+
+            <div data-become-partner class="relative flex flex-col md:flex-row md:items-center gap-md md:gap-lg p-lg md:p-xl rounded-lg bg-primary-fixed text-on-primary-fixed" {...animalSpot("ledge", "partners", { size: 32, max: 2 })}>
+                <div class="flex flex-col gap-xs grow">
+                    <h3 class="font-headline-md text-headline-md">Run a local business?</h3>
+                    <p class="font-body-md text-body-md">
+                        Offer Cork Vegans members a discount and we'll list you here, so our members know where to find you. Tell us about your business and the
+                        discount you have in mind.
+                    </p>
+                </div>
+                <a href={partnerLink} class="cv-btn cv-btn-md cv-btn-primary shrink-0">
+                    Become a partner
+                    <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {
+        features.payments && (
+            <section id="card" class="relative pt-xl pb-xl bg-surface-container-lowest" aria-labelledby="card-heading" {...animalSpot("floor", "card-foot")}>
+                <div class="max-w-3xl mx-auto px-margin-mobile flex flex-col items-start gap-md">
+                    <h2 id="card-heading" class="font-headline-lg text-headline-lg text-on-surface">
+                        Your membership card
+                    </h2>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant">
+                        Every member gets a digital membership card on their phone. It shows your first name, this month and year, and a QR code a business can
+                        scan to check your membership is current.
+                    </p>
+                    <p class="font-body-md text-body-md text-on-surface-variant">
+                        The link to your card is in your welcome email. Once it's open, add it to your home screen so it's always to hand. Lost the email? Use
+                        "Lost your code?" above and we'll send it again.
+                    </p>
+                    <a data-open-card href="/membership/card/" class="cv-btn cv-btn-md cv-btn-primary" hidden>
+                        <span class="material-symbols-outlined" aria-hidden="true">qr_code_2</span>Open my card
+                    </a>
+                </div>
+            </section>
+        )
+    }
+</BaseLayout>
+
+<script>
+    import { savedCardToken } from "../../scripts/member-card.ts";
+
+    // Members who've opened their card on this device get a shortcut back to it.
+    const link = document.querySelector<HTMLAnchorElement>("[data-open-card]");
+    if (link && savedCardToken()) link.hidden = false;
+</script>

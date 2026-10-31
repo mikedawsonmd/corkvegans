@@ -1,0 +1,158 @@
+---
+/**
+ * The member's digital membership card (/membership/card/#<token>): first
+ * name, this month and year in large type, a ticking clock so a screenshot
+ * stands out, and a QR code that opens the check page for businesses. It asks
+ * the Worker each time it opens, so a card stops showing the month once the
+ * membership ends. Only rendered when features.payments is on.
+ */
+import { membership, site } from "../config/site";
+
+const endpoint = membership.endpoint.trim().replace(/\/+$/, "");
+---
+
+<div data-member-card-root data-endpoint={endpoint} data-state="loading" class="w-full max-w-sm mx-auto flex flex-col items-center gap-lg">
+    <p data-show="loading" class="text-body-md text-on-surface-variant" role="status">Loading your card…</p>
+
+    <article
+        data-show="valid"
+        aria-labelledby="card-title"
+        data-surface="dark"
+        class="w-full rounded-[1.5rem] bg-primary text-on-primary shadow-lg overflow-hidden flex flex-col items-center text-center gap-md px-lg pt-lg pb-xl"
+        hidden
+    >
+        <header class="w-full flex items-center justify-between gap-sm">
+            <span class="flex items-center gap-sm">
+                <span class="w-10 h-10 rounded-full bg-on-primary flex items-center justify-center shrink-0">
+                    <img src={site.logo} alt="" width="32" height="32" class="w-8 h-8 object-contain" />
+                </span>
+                <span id="card-title" class="font-headline-md text-body-lg font-semibold">Cork Vegans member</span>
+            </span>
+            <span class="flex items-center gap-xs text-label-sm" aria-hidden="true">
+                <span class="cv-live-dot"></span><span data-card-clock class="tabular-nums"></span>
+            </span>
+        </header>
+
+        <p data-card-name class="font-headline-md text-headline-md break-words max-w-full" hidden></p>
+
+        <p class="flex flex-col leading-none">
+            <span class="sr-only">Valid for </span>
+            <span data-card-month class="font-headline-lg text-[3rem] sm:text-[3.5rem] font-bold tracking-wide uppercase"></span>
+            <span data-card-year class="font-headline-lg text-[4.5rem] sm:text-[5rem] font-bold"></span>
+        </p>
+
+        <figure class="flex flex-col items-center gap-xs">
+            <div data-card-qr class="w-48 h-48 rounded-lg bg-white p-sm" role="img" aria-label="QR code for businesses to check this card"></div>
+            <figcaption class="text-label-sm">Businesses: scan to check</figcaption>
+        </figure>
+
+        <p data-card-ends class="text-label-bold" hidden></p>
+        <p data-card-offline class="text-label-sm rounded-lg bg-primary-container px-md py-xs" hidden></p>
+    </article>
+
+    <div data-show="ended" class="w-full rounded-lg border border-surface-variant bg-surface-container-low p-lg flex flex-col items-start gap-sm" hidden>
+        <h2 class="font-headline-md text-headline-md text-on-surface">Your membership has ended</h2>
+        <p class="text-body-md text-on-surface-variant">This card isn't valid any more. We'd love to have you back.</p>
+        <a href="/membership/#join" class="cv-btn cv-btn-md cv-btn-primary">Join again</a>
+    </div>
+
+    <div data-show="missing" class="w-full rounded-lg border border-surface-variant bg-surface-container-low p-lg flex flex-col items-start gap-sm" hidden>
+        <h2 class="font-headline-md text-headline-md text-on-surface">Open your card from your welcome email</h2>
+        <p class="text-body-md text-on-surface-variant">
+            Your card has its own link, in the welcome email we sent when you joined. Lost it? Use "Lost your code?" on the Membership page and we'll send it
+            again.
+        </p>
+        <a href="/membership/#join" class="cv-btn cv-btn-md cv-btn-secondary">Go to Membership</a>
+    </div>
+
+    <div data-show="error" class="w-full rounded-lg border-2 border-error bg-error-container text-on-error-container p-lg flex flex-col items-start gap-sm" role="alert" hidden>
+        <h2 class="font-headline-md text-headline-md">We couldn't load your card</h2>
+        <p class="text-body-md">Check your internet connection and try again.</p>
+        <button type="button" data-card-retry class="cv-btn cv-btn-md cv-btn-secondary">Try again</button>
+    </div>
+
+    <p data-show="valid" class="text-label-sm text-on-surface-variant text-center" hidden>
+        Tip: add this page to your home screen so your card is always to hand.
+    </p>
+</div>
+
+<script>
+    import { renderSVG } from "uqr";
+    import { checkCard, formatEndsOn, tokenFromHash } from "../scripts/card-api.ts";
+    import { cachedCardStatus, saveCardStatus, saveCardToken, savedCardToken } from "../scripts/member-card.ts";
+
+    const ZONE = "Europe/Dublin";
+
+    function initCard(root: HTMLElement) {
+        const endpoint = root.dataset.endpoint ?? "";
+        const $ = <T extends HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
+        const show = (state: string) => {
+            root.dataset.state = state;
+            root.querySelectorAll<HTMLElement>("[data-show]").forEach((el) => (el.hidden = el.dataset.show !== state));
+        };
+
+        // The link carries the token, so a home-screen shortcut opens this card
+        // too (on iPhones those don't share the browser's saved data).
+        const token = tokenFromHash() ?? savedCardToken();
+        // Opening another card link in the same tab only changes the part after #.
+        window.addEventListener("hashchange", () => tokenFromHash() !== token && window.location.reload());
+        if (!token) return show("missing");
+        saveCardToken(token);
+        if (window.location.hash !== `#${token}`) history.replaceState(history.state, "", `${window.location.pathname}#${token}`);
+
+        $("[data-card-qr]").innerHTML = renderSVG(`${window.location.origin}/membership/check/#${token}`, { ecc: "M", border: 0 });
+        $("[data-card-qr] svg").setAttribute("aria-hidden", "true");
+        $("[data-card-qr] svg").classList.add("w-full", "h-full");
+
+        const tick = () => {
+            const now = new Date();
+            $("[data-card-month]").textContent = now.toLocaleDateString("en-IE", { month: "long", timeZone: ZONE });
+            $("[data-card-year]").textContent = now.toLocaleDateString("en-IE", { year: "numeric", timeZone: ZONE });
+            $("[data-card-clock]").textContent = now.toLocaleTimeString("en-IE", { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: ZONE });
+        };
+
+        const showValid = (firstName: string | undefined, endsOn: string | undefined, offlineSince?: string) => {
+            const name = $("[data-card-name]");
+            name.textContent = firstName ?? "";
+            name.hidden = !firstName;
+            const ends = $("[data-card-ends]");
+            ends.textContent = endsOn ? `Membership ends ${formatEndsOn(endsOn)}` : "";
+            ends.hidden = !endsOn;
+            const offline = $("[data-card-offline]");
+            offline.textContent = offlineSince
+                ? `Offline: last checked ${new Date(offlineSince).toLocaleString("en-IE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: ZONE })}`
+                : "";
+            offline.hidden = !offlineSince;
+            tick();
+            show("valid");
+        };
+
+        const load = async () => {
+            show("loading");
+            const answer = await checkCard(endpoint, token);
+            const checkedAt = new Date().toISOString();
+            if (answer.kind === "valid") {
+                saveCardStatus({ status: "valid", firstName: answer.firstName, endsOn: answer.endsOn, checkedAt });
+                return showValid(answer.firstName, answer.endsOn);
+            }
+            if (answer.kind === "ended") {
+                saveCardStatus({ status: "ended", checkedAt });
+                return show("ended");
+            }
+            if (answer.kind === "not_found") return show("missing");
+            // No signal: last month's answer isn't good enough for this month's card.
+            const cached = cachedCardStatus();
+            if (cached?.status === "valid") return showValid(cached.firstName, cached.endsOn, cached.checkedAt);
+            if (cached?.status === "ended") return show("ended");
+            show("error");
+        };
+
+        $("[data-card-retry]").addEventListener("click", load);
+        window.setInterval(() => root.dataset.state === "valid" && tick(), 1000);
+        // Coming back to the page (e.g. reopening the shortcut) checks again.
+        document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && root.dataset.state !== "loading" && load());
+        void load();
+    }
+
+    document.querySelectorAll<HTMLElement>("[data-member-card-root]").forEach(initCard);
+</script>

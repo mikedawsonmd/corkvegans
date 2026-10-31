@@ -35,3 +35,8 @@ simple = { limit = 30, period = 60 }
 name = "LOOKUP_RATE_LIMITER" # "Lost your code?"
 namespace_id = "1003"
 simple = { limit = 3, period = 60 }
+
+[[ratelimits]]
+name = "CARD_RATE_LIMITER" # membership cards and businesses checking them
+namespace_id = "1004"
+simple = { limit = 30, period = 60 }

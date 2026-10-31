@@ -4,14 +4,21 @@
 # stories in a visual editor. Every save is a commit to this repository,
 # which triggers the "Deploy site" GitHub Action.
 #
-# Only stories and story images are exposed here on purpose: editors cannot
-# change site settings, membership settings or code through the CMS.
+# Only stories, partner businesses and their images are exposed here on
+# purpose: editors cannot change site settings, membership settings or code
+# through the CMS.
 
 media:
   - name: stories
     label: Story images
     input: src/assets/stories
     output: /src/assets/stories
+    extensions: [jpg, jpeg, png, webp]
+    rename: safe
+  - name: partners
+    label: Partner logos
+    input: src/assets/partners
+    output: /src/assets/partners
     extensions: [jpg, jpeg, png, webp]
     rename: safe
 
@@ -169,6 +176,89 @@ content:
             options:
               media: stories
               extensions: [jpg, jpeg, png, webp]
+
+  # ── Partner businesses (Membership page, "Member discounts") ──
+  - name: partners
+    label: Partners
+    type: collection
+    path: src/content/partners
+    format: yaml
+    subfolders: false
+    exclude: [README.md, .gitkeep]
+    filename:
+      template: "{primary}.yml"
+      field: false
+    view:
+      primary: name
+      fields: [name, discount, hidden]
+      sort: [name]
+      search: [name, discount, area]
+      default:
+        sort: name
+        order: asc
+    commit:
+      templates:
+        create: "Add partner {filename} (via Pages CMS by {userName})"
+        update: "Update partner {filename} (via Pages CMS by {userName})"
+        delete: "Remove partner {filename} (via Pages CMS by {userName})"
+        rename: "Rename partner {oldFilename} to {newFilename} (via Pages CMS by {userName})"
+    fields:
+      - name: hidden
+        label: "Hidden: not shown on the website (untick to show)"
+        type: boolean
+        default: true
+        description: "Untick and save to show this business on the Membership page a few minutes later. Tick it again when the discount ends. Agree the discount with the business before showing it."
+
+      - name: name
+        label: Business name
+        type: string
+        required: true
+        options:
+          maxlength: 80
+
+      - name: discount
+        label: Member discount
+        type: string
+        required: true
+        description: "Short, e.g. \"10% off food\" or \"Free oat milk with any coffee\"."
+        options:
+          maxlength: 80
+
+      - name: description
+        label: About the business (optional)
+        type: text
+        description: "One or two sentences about what they offer."
+        options:
+          maxlength: 300
+
+      - name: area
+        label: Area (optional)
+        type: string
+        description: "e.g. Cork city centre, Douglas, Ballincollig."
+        options:
+          maxlength: 60
+
+      - name: website
+        label: Website (optional)
+        type: string
+        description: "Their website or Instagram, starting https://"
+        options:
+          maxlength: 300
+
+      - name: logo
+        label: Logo (optional)
+        type: image
+        description: "Square or wide, on a plain background. PNG, JPG or WebP."
+        options:
+          media: partners
+          extensions: [jpg, jpeg, png, webp]
+
+      - name: howToClaim
+        label: How members claim it (optional)
+        type: string
+        description: "Leave empty for \"Show your membership card when you pay.\""
+        options:
+          maxlength: 200
 
 settings:
   commit:

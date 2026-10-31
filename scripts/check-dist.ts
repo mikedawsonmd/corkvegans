@@ -58,7 +58,7 @@ if (!existsSync(outDir)) {
 }
 
 // ── 1. Expected routes ───────────────────────────────────────────────────
-for (const route of ["index.html", "events/index.html", "stories/index.html", "stories/feed.xml", "resources/index.html", "support/index.html", "about/index.html", "membership-terms/index.html", "privacy/index.html", "404.html", "sitemap.xml", "robots.txt", "events.json", "CNAME"]) {
+for (const route of ["index.html", "events/index.html", "stories/index.html", "stories/feed.xml", "resources/index.html", "support/index.html", "membership/index.html", "membership/card/index.html", "membership/check/index.html", "about/index.html", "membership-terms/index.html", "privacy/index.html", "404.html", "sitemap.xml", "robots.txt", "events.json", "CNAME"]) {
     if (!existsSync(join(outDir, route))) fail(`Missing expected file: ${route}`);
 }
 
@@ -156,12 +156,14 @@ for (const file of storyFiles) {
     if (sitemap.includes(`/stories/${slug}/`)) fail(`Unpublished story is in the sitemap: ${file}`);
 }
 
-// ── 5. Support page reflects the real payments / form configuration ──────
+// ── 5. Support and Membership pages reflect the real payments / form configuration
 const supportFile = join(outDir, "support/index.html");
 if (existsSync(supportFile)) {
     const html = readFileSync(supportFile, "utf8");
     const formTag = /<form[^>]*data-volunteer-form[^>]*>/.exec(html)?.[0] ?? "";
     if (!html.includes('id="membership"') || !html.includes('id="volunteer"')) fail("support page: missing #membership or #volunteer section");
+    if (!html.includes('href="/membership/"')) fail("support page: membership section must link to /membership/");
+    if (html.includes("data-membership-root")) fail("support page: the join form belongs on /membership/");
     if (volunteerForm.endpoint) {
         if (attr(formTag, "action") !== volunteerForm.endpoint) fail("support page: form does not post to the configured endpoint");
     } else {
@@ -169,25 +171,31 @@ if (existsSync(supportFile)) {
         if (attr(formTag, "action")) fail("support page: form has an action but no endpoint is configured");
         if (!/<fieldset[^>]*\sdisabled/.test(html)) fail("support page: unconfigured form should be disabled");
     }
+}
+const membershipFile = join(outDir, "membership/index.html");
+if (existsSync(membershipFile)) {
+    const html = readFileSync(membershipFile, "utf8");
+    if (!html.includes('id="join"') || !html.includes('id="partners"')) fail("membership page: missing #join or #partners section");
+    if (!html.includes('href="/about/?topic=partner#contact"')) fail('membership page: "Become a partner" must open the contact form on Discount partnership');
     const linkFor = (marker: string) => [...html.matchAll(new RegExp(`<a[^>]*${marker}[^>]*>`, "g"))].map((m) => attr(m[0], "href"));
     const root = /<div[^>]*data-membership-root[^>]*>/.exec(html)?.[0] ?? "";
     const endpoint = membership.endpoint.replace(/\/+$/, "");
     if (!features.payments) {
-        if (root || html.includes("data-membership-manage")) fail("support page: membership form or links shown although features.payments is off");
-        if (!html.includes("data-membership-soon")) fail('support page: "Membership is on the way" card missing');
+        if (root || html.includes("data-membership-manage")) fail("membership page: membership form or links shown although features.payments is off");
+        if (!html.includes("data-membership-soon")) fail('membership page: "Membership is on the way" card missing');
     } else if (membership.publishableKey && endpoint) {
-        if (!root) fail("support page: membership form missing although Stripe is configured");
+        if (!root) fail("membership page: membership form missing although Stripe is configured");
         else {
-            if (attr(root, "data-publishable-key") !== membership.publishableKey) fail("support page: membership form has the wrong publishable key");
-            if (attr(root, "data-endpoint") !== endpoint) fail("support page: membership form posts to the wrong endpoint");
+            if (attr(root, "data-publishable-key") !== membership.publishableKey) fail("membership page: membership form has the wrong publishable key");
+            if (attr(root, "data-endpoint") !== endpoint) fail("membership page: membership form posts to the wrong endpoint");
         }
-        if (/<input[^>]*autocomplete="cc-/.test(html)) fail("support page: card fields must only appear inside Stripe's frame");
-        if (!html.includes('href="/membership-terms/"')) fail("support page: the join form must link to the membership terms");
+        if (/<input[^>]*autocomplete="cc-/.test(html)) fail("membership page: card fields must only appear inside Stripe's frame");
+        if (!html.includes('href="/membership-terms/"')) fail("membership page: the join form must link to the membership terms");
     } else if (root) {
-        fail("support page: membership form shown but Stripe isn't configured");
+        fail("membership page: membership form shown but Stripe isn't configured");
     }
     if (features.payments && linkFor("data-membership-manage").some((href) => href !== membership.portalUrl)) {
-        fail(`support page: "Manage" link should point to ${membership.portalUrl}`);
+        fail(`membership page: "Manage" link should point to ${membership.portalUrl}`);
     }
 }
 
@@ -209,7 +217,7 @@ if (!features.payments) {
         const text = readFileSync(file, "utf8");
         for (const [what, pattern] of [
             ["Stripe", /stripe\.com/i],
-            ["the membership Worker", /\/membership\/(session|code|resend)/],
+            ["the membership Worker", /\/membership\/(session|code|resend)|\/membership\/card["'`]/],
         ] as const) {
             if (pattern.test(text)) fail(`${relative(outDir, file)}: references ${what} although features.payments is off`);
         }

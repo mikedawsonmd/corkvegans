@@ -1,0 +1,20 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import CardCheck from "../../../components/CardCheck.astro";
+import { features } from "../../../config/site";
+---
+
+<BaseLayout title="Check a membership card" description="Check a Cork Vegans membership card." noindex>
+    <section class="pt-xl pb-xl bg-surface">
+        <div class="max-w-7xl mx-auto px-margin-mobile flex flex-col items-center gap-lg">
+            <h1 class="font-headline-lg text-headline-lg text-on-surface text-center">Cork Vegans membership check</h1>
+            {
+                features.payments ? (
+                    <CardCheck />
+                ) : (
+                    <p data-membership-soon class="text-body-lg text-on-surface-variant text-center">Membership cards aren't in use yet.</p>
+                )
+            }
+        </div>
+    </section>
+</BaseLayout>

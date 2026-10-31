@@ -1,0 +1,89 @@
+---
+/**
+ * What a business sees after scanning a member's QR code
+ * (/membership/check/#<token>): valid with the first name, or not. Saves
+ * nothing on the business's phone. Only rendered when features.payments is on.
+ */
+import { membership } from "../config/site";
+
+const endpoint = membership.endpoint.trim().replace(/\/+$/, "");
+const panel = "w-full rounded-lg p-lg md:p-xl flex flex-col items-center text-center gap-sm";
+---
+
+<div data-card-check-root data-endpoint={endpoint} data-state="checking" class="w-full max-w-md mx-auto" aria-live="polite">
+    <p data-show="checking" class="text-body-lg text-on-surface-variant text-center">Checking this membership card…</p>
+
+    <div data-show="valid" data-surface="dark" class:list={[panel, "bg-primary text-on-primary"]} hidden>
+        <span class="material-symbols-outlined text-[5rem]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">check_circle</span>
+        <h2 class="font-headline-lg text-headline-lg">Valid member</h2>
+        <p data-check-name class="font-headline-md text-headline-md" hidden></p>
+        <p data-check-ends class="text-body-md" hidden></p>
+        <p data-check-time class="text-label-sm"></p>
+    </div>
+
+    <div data-show="ended" class:list={[panel, "bg-error-container text-on-error-container border-2 border-error"]} hidden>
+        <span class="material-symbols-outlined text-[5rem]" aria-hidden="true">cancel</span>
+        <h2 class="font-headline-lg text-headline-lg">Not a current member</h2>
+        <p class="text-body-md">This membership has ended, so the member discount doesn't apply.</p>
+        <p data-check-time class="text-label-sm"></p>
+    </div>
+
+    <div data-show="invalid" class:list={[panel, "bg-error-container text-on-error-container border-2 border-error"]} hidden>
+        <span class="material-symbols-outlined text-[5rem]" aria-hidden="true">cancel</span>
+        <h2 class="font-headline-lg text-headline-lg">Not a valid card</h2>
+        <p class="text-body-md">This isn't a Cork Vegans membership card, or the code didn't scan properly. Try scanning it again.</p>
+    </div>
+
+    <div data-show="error" class:list={[panel, "bg-surface-container-low border border-surface-variant text-on-surface"]} hidden>
+        <span class="material-symbols-outlined text-[4rem] text-on-surface-variant" aria-hidden="true">wifi_off</span>
+        <h2 class="font-headline-md text-headline-md">We couldn't check right now</h2>
+        <p class="text-body-md text-on-surface-variant">Check your internet connection and try again.</p>
+        <button type="button" data-check-retry class="cv-btn cv-btn-md cv-btn-secondary">Try again</button>
+    </div>
+
+    <p class="mt-lg text-label-sm text-on-surface-variant text-center">
+        Cork Vegans members get discounts at our <a href="/membership/#partners" class="font-label-bold text-primary underline underline-offset-2">partner businesses</a>.
+        Questions? <a href="/about/?topic=partner#contact" class="font-label-bold text-primary underline underline-offset-2">Contact us</a>.
+    </p>
+</div>
+
+<script>
+    import { checkCard, formatEndsOn, tokenFromHash } from "../scripts/card-api.ts";
+
+    function initCheck(root: HTMLElement) {
+        const endpoint = root.dataset.endpoint ?? "";
+        const show = (state: string) => {
+            root.dataset.state = state;
+            root.querySelectorAll<HTMLElement>("[data-show]").forEach((el) => (el.hidden = el.dataset.show !== state));
+        };
+        const stamp = () => {
+            const at = new Date().toLocaleString("en-IE", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "Europe/Dublin" });
+            root.querySelectorAll("[data-check-time]").forEach((el) => (el.textContent = `Checked ${at}`));
+        };
+
+        const check = async () => {
+            const token = tokenFromHash();
+            if (!token) return show("invalid");
+            show("checking");
+            const answer = await checkCard(endpoint, token);
+            stamp();
+            if (answer.kind === "valid") {
+                const name = root.querySelector<HTMLElement>("[data-check-name]")!;
+                name.textContent = answer.firstName ?? "";
+                name.hidden = !answer.firstName;
+                const ends = root.querySelector<HTMLElement>("[data-check-ends]")!;
+                ends.textContent = answer.endsOn ? `Membership ends ${formatEndsOn(answer.endsOn)}` : "";
+                ends.hidden = !answer.endsOn;
+                return show("valid");
+            }
+            show(answer.kind === "ended" ? "ended" : answer.kind === "not_found" ? "invalid" : "error");
+        };
+
+        root.querySelector("[data-check-retry]")!.addEventListener("click", check);
+        // Scanning the next card in the same tab only changes the part after #.
+        window.addEventListener("hashchange", check);
+        void check();
+    }
+
+    document.querySelectorAll<HTMLElement>("[data-card-check-root]").forEach(initCheck);
+</script>

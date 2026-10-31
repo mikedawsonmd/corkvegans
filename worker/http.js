@@ -74,7 +74,12 @@ export function rateLimit(binding, limit, windowMs = 60_000) {
     };
 }
 
-export class StripeError extends Error {}
+export class StripeError extends Error {
+    constructor(message, status) {
+        super(message);
+        this.status = status;
+    }
+}
 
 /**
  * Calls the Stripe API with the restricted key. Errors carry only the status,
@@ -93,7 +98,7 @@ export async function stripe(env, method, path, params = {}, { idempotencyKey } 
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
         const e = data?.error ?? {};
-        throw new StripeError(`Stripe ${method} ${path.replace(/\/(cs|sub|cus|in|price|prod)_[A-Za-z0-9_]+/g, "/$1_…")} responded ${res.status}${e.code ? ` ${e.code}` : ""}${e.param ? ` (${e.param})` : ""}`);
+        throw new StripeError(`Stripe ${method} ${path.replace(/\/(cs|sub|cus|in|price|prod)_[A-Za-z0-9_]+/g, "/$1_…")} responded ${res.status}${e.code ? ` ${e.code}` : ""}${e.param ? ` (${e.param})` : ""}`, res.status);
     }
     return data;
 }

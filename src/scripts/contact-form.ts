@@ -26,7 +26,12 @@ export const CONTACT_TOPICS: ContactTopic[] = [
         label: "Recommend a business, restaurant or product",
         hint: "What is it, where can we find it, and what do you like about it? Add a link below if there is one.",
     },
-    { id: "collaborate", label: "Collaboration or partnership", hint: "Tell us about your business or organisation and what you have in mind." },
+    {
+        id: "partner",
+        label: "Discount partnership",
+        hint: "Tell us about your business, where you are, and the discount you'd like to offer Cork Vegans members.",
+    },
+    { id: "collaborate", label: "Collaboration", hint: "Tell us about your business or organisation and what you have in mind." },
     { id: "press", label: "Press or media", hint: "Who you're writing for, what it's about, and any deadline." },
     { id: "feedback", label: "Website feedback", hint: "What did you notice, and on which page? Something broken, confusing or missing?" },
     { id: "other", label: "Something else", hint: "Tell us what's on your mind." },
