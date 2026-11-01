@@ -1,6 +1,6 @@
 /**
  * The membership card's token in this browser: saved when the member opens
- * the card link from their welcome email (/membership/card/#<token>) or the
+ * the card link from their welcome email (/membership/card/#<token>/<code>) or the
  * thank-you screen, so the card opens again from the Membership page or the
  * home screen. The last answer from the Worker is kept too, so the card still
  * shows without a signal, but only within the same calendar month.

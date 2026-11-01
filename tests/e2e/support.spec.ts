@@ -256,7 +256,7 @@ test.describe("join form", () => {
         await expect(welcome).toContainText("unlocks member tickets before general release");
         await expect(welcome.getByRole("link", { name: "Book with your member discount" })).toHaveAttribute("href", "/events/");
         expect(await page.evaluate(() => localStorage.getItem("cv-member-code"))).toBe("CV-7K3P9Q");
-        await expect(welcome.getByRole("link", { name: "Open your membership card" })).toHaveAttribute("href", `/membership/card/#${CARD_TOKEN}`);
+        await expect(welcome.getByRole("link", { name: "Open your membership card" })).toHaveAttribute("href", `/membership/card/#${CARD_TOKEN}/CV-7K3P9Q`);
         expect(await page.evaluate(() => localStorage.getItem("cv-card-token"))).toBe(CARD_TOKEN);
 
         if (!isMobile) {

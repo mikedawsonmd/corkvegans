@@ -4,7 +4,9 @@
  * name, this month and year in large type, a ticking clock so a screenshot
  * stands out, and a QR code that opens the check page for businesses. It asks
  * the Worker each time it opens, so a card stops showing the month once the
- * membership ends. With membership.googleWallet on, it also offers "Add to
+ * membership ends. Below the card, "Show my member code" reveals the Eventbrite
+ * code, which comes in the member's own card link (#<token>/<code>), never
+ * from the QR code. With membership.googleWallet on, it also offers "Add to
  * Google Wallet" (not on iPhones, which have no Google Wallet). Only rendered
  * when features.payments is on.
  */
@@ -73,6 +75,26 @@ const endpoint = membership.endpoint.trim().replace(/\/+$/, "");
         <button type="button" data-card-retry class="cv-btn cv-btn-md cv-btn-secondary">Try again</button>
     </div>
 
+    <div data-show="valid" hidden>
+        <div data-member-code-box class="flex flex-col items-center gap-sm" hidden>
+            <button type="button" data-show-code aria-expanded="false" aria-controls="card-member-code" class="cv-btn cv-btn-md cv-btn-secondary">
+                <span class="material-symbols-outlined" aria-hidden="true">confirmation_number</span>Show my member code
+            </button>
+            <div id="card-member-code" data-code-panel class="w-full rounded-lg bg-primary-fixed text-on-primary-fixed p-md flex flex-col items-center gap-sm text-center" hidden>
+                <p class="text-label-bold">Your member code, for booking on Eventbrite</p>
+                <p data-code-text class="font-mono text-[1.75rem] leading-tight font-bold tracking-[0.15em]"></p>
+                <div class="flex flex-wrap items-center justify-center gap-sm">
+                    <button type="button" data-copy-member-code class="cv-btn cv-btn-sm cv-btn-secondary">
+                        <span class="material-symbols-outlined" aria-hidden="true">content_copy</span>Copy code
+                    </button>
+                    <a href="/events/" class="cv-btn cv-btn-sm cv-btn-primary">Book with your member discount</a>
+                </div>
+                <p data-copy-member-status role="status" class="text-label-sm empty:hidden"></p>
+                <p class="text-label-sm">It's just for you: please don't show it to businesses or share it.</p>
+            </div>
+        </div>
+    </div>
+
     {
         membership.googleWallet && (
             <div data-show="valid" hidden>
@@ -93,8 +115,9 @@ const endpoint = membership.endpoint.trim().replace(/\/+$/, "");
 
 <script>
     import { renderSVG } from "uqr";
-    import { addToGoogleWallet, checkCard, formatEndsOn, tokenFromHash } from "../scripts/card-api.ts";
+    import { addToGoogleWallet, checkCard, codeFromHash, formatEndsOn, tokenFromHash } from "../scripts/card-api.ts";
     import { cachedCardStatus, saveCardStatus, saveCardToken, savedCardToken } from "../scripts/member-card.ts";
+    import { saveMemberCode, savedMemberCode } from "../scripts/member-code.ts";
 
     const ZONE = "Europe/Dublin";
 
@@ -113,7 +136,13 @@ const endpoint = membership.endpoint.trim().replace(/\/+$/, "");
         window.addEventListener("hashchange", () => tokenFromHash() !== token && window.location.reload());
         if (!token) return show("missing");
         saveCardToken(token);
-        if (window.location.hash !== `#${token}`) history.replaceState(history.state, "", `${window.location.pathname}#${token}`);
+        // The code comes with the member's own link; a card opened from the
+        // Membership page uses the one saved in this browser.
+        const fromLink = codeFromHash();
+        if (fromLink) saveMemberCode(fromLink);
+        const code = fromLink ?? savedMemberCode();
+        const hash = code ? `#${token}/${code}` : `#${token}`;
+        if (window.location.hash !== hash) history.replaceState(history.state, "", `${window.location.pathname}${hash}`);
 
         $("[data-card-qr]").innerHTML = renderSVG(`${window.location.origin}/membership/check/#${token}`, { ecc: "M", border: 0 });
         $("[data-card-qr] svg").setAttribute("aria-hidden", "true");
@@ -163,6 +192,26 @@ const endpoint = membership.endpoint.trim().replace(/\/+$/, "");
         };
 
         $("[data-card-retry]").addEventListener("click", load);
+
+        if (code) {
+            $("[data-member-code-box]").hidden = false;
+            $("[data-code-text]").textContent = code;
+            const reveal = $<HTMLButtonElement>("[data-show-code]");
+            const panel = $("[data-code-panel]");
+            reveal.addEventListener("click", () => {
+                panel.hidden = !panel.hidden;
+                reveal.setAttribute("aria-expanded", String(!panel.hidden));
+                reveal.lastChild!.textContent = panel.hidden ? "Show my member code" : "Hide my member code";
+            });
+            $("[data-copy-member-code]").addEventListener("click", async () => {
+                try {
+                    await navigator.clipboard.writeText(code);
+                    $("[data-copy-member-status]").textContent = "Copied";
+                } catch {
+                    $("[data-copy-member-status]").textContent = "Couldn't copy: select the code and copy it instead.";
+                }
+            });
+        }
 
         // Google Wallet isn't on iPhones and iPads (iPadOS reports itself as a Mac with touch).
         const apple = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);

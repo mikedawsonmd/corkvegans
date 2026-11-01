@@ -222,7 +222,7 @@ export function initMembershipForm(root: HTMLElement) {
             saveMemberCode(ready.code);
             if (ready.cardToken) {
                 saveCardToken(ready.cardToken);
-                cardLink.href = `/membership/card/#${ready.cardToken}`;
+                cardLink.href = `/membership/card/#${ready.cardToken}/${ready.code}`;
                 cardLink.hidden = false;
             }
         } else {

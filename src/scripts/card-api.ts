@@ -4,6 +4,7 @@
  * for the card's "Add to Google Wallet" link.
  */
 
+import { MEMBER_CODE } from "../lib/membership.ts";
 import { CARD_TOKEN } from "./member-card.ts";
 
 export type CardAnswer =
@@ -56,10 +57,16 @@ export async function addToGoogleWallet(endpoint: string, token: string): Promis
     }
 }
 
-/** The token after # in the address, if it looks like one. */
+/** The token after # in the address (#<token> or #<token>/<code>), if it looks like one. */
 export function tokenFromHash(hash = window.location.hash): string | null {
-    const token = hash.replace(/^#/, "").trim();
+    const token = hash.replace(/^#/, "").split("/")[0].trim();
     return CARD_TOKEN.test(token) ? token : null;
+}
+
+/** The member code after the token in the member's own card link, if there is one. */
+export function codeFromHash(hash = window.location.hash): string | null {
+    const code = hash.replace(/^#/, "").split("/")[1]?.trim().toUpperCase();
+    return code && MEMBER_CODE.test(code) ? code : null;
 }
 
 /** "15 January 2027" from "2027-01-15". */

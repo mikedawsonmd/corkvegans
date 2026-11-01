@@ -352,12 +352,12 @@ describe("membership Worker: membership cards", () => {
         expect(statuses[30]).toBe(429);
     });
 
-    it("puts the card link in the welcome email, with the token after #", async () => {
+    it("puts the card link in the welcome email, with the token and code after #", async () => {
         const member = subscription({ metadata: { ...subscription().metadata, member_code: "CV-7K3P9Q", eventbrite_discount_id: "d1", welcome_email_sent_at: "2026-01-01T00:00:00Z" } });
         const s = fakeServices({ subscriptions: [member] });
         vi.stubGlobal("fetch", s.fetchImpl);
         await handleMembership(post("/membership/resend", { email: "aoife@example.ie" }), workerEnv);
-        const link = `https://corkvegans.ie/membership/card/#${await cardTokenFor("sub_1", secret)}`;
+        const link = `https://corkvegans.ie/membership/card/#${await cardTokenFor("sub_1", secret)}/CV-7K3P9Q`;
         expect(s.emails[0].text).toContain(link);
         expect(s.emails[0].html).toContain(`href="${link}"`);
     });

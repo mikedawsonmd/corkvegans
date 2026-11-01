@@ -81,6 +81,34 @@ test.describe("membership card", () => {
         await expect(page.locator("[data-card-name]")).toHaveText("Aoife");
     });
 
+    test("shows the member their code from their own link", async ({ page, context, isMobile }) => {
+        await mockCard(page, () => ({ status: 200, json: { status: "valid", firstName: "Aoife" } }));
+        await page.goto(`/membership/card/#${TOKEN}/CV-7K3P9Q`);
+        const reveal = page.getByRole("button", { name: "Show my member code" });
+        const code = page.locator("[data-code-panel]");
+        await expect(code).toBeHidden();
+        await reveal.click();
+        await expect(code).toBeVisible();
+        await expect(code.locator("[data-code-text]")).toHaveText("CV-7K3P9Q");
+        await expect(page.getByRole("button", { name: "Hide my member code" })).toHaveAttribute("aria-expanded", "true");
+        await expect(code.getByRole("link", { name: "Book with your member discount" })).toHaveAttribute("href", "/events/");
+        if (!isMobile) {
+            await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+            await code.getByRole("button", { name: "Copy code" }).click();
+            expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("CV-7K3P9Q");
+        }
+        // Saved for the events page and kept in the link for home-screen shortcuts.
+        expect(await page.evaluate(() => localStorage.getItem("cv-member-code"))).toBe("CV-7K3P9Q");
+        await expect(page).toHaveURL(new RegExp(`#${TOKEN.replace(".", "\\.")}/CV-7K3P9Q$`));
+
+        // Opened without a code (e.g. an older link) and nothing saved: no button.
+        await page.evaluate(() => localStorage.removeItem("cv-member-code"));
+        await page.goto(`/membership/card/#${TOKEN}`);
+        await page.reload();
+        await expect(page.locator("[data-card-name]")).toHaveText("Aoife");
+        await expect(page.getByRole("button", { name: "Show my member code" })).toBeHidden();
+    });
+
     test("says when a cancelled membership ends, and stops showing the month once it has", async ({ page }) => {
         let status = "valid";
         await mockCard(page, () => ({ status: 200, json: status === "valid" ? { status, firstName: "Aoife", endsOn: "2027-01-15" } : { status } }));

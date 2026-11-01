@@ -156,7 +156,10 @@ name, the current month and year in large type, a ticking clock (so a
 screenshot is easy to spot) and a QR code. The token is the subscription ID
 plus a signature made with `MEMBER_CODE_SECRET`, so it can't be guessed and
 nothing extra is stored; it isn't the member code, so a business never sees
-the Eventbrite discount. Each time the card opens it asks the Worker
+the Eventbrite discount. The member's own card link (welcome email,
+thank-you screen) adds their code after the token, `#<token>/CV-XXXXXX`, so
+the card can offer "Show my member code"; the QR code never includes it.
+Each time the card opens it asks the Worker
 (`POST /membership/card`) whether the membership is live; once it ends, the
 card says so instead of showing the month. Offline, it shows the last answer
 from the same calendar month. The QR code opens `/membership/check/#<token>`
@@ -168,7 +171,8 @@ would also change every future member code, so never change it.
 **Google Wallet** (built; **needs owner setup** before it's switched on).
 Members can add their card to Google Wallet from the card page (not on
 iPhones). The pass shows the first name, the month and year, and the same
-QR code. The Worker updates it when the member renews, cancels or leaves,
+QR code. The member code and a "Book events with your member discount" link
+are in the pass's details, which open when the member taps it. The Worker updates it when the member renews, cancels or leaves,
 and an hourly cron on the 1st to the 3rd of each month moves every pass on
 to the new month, 20 at a time (the free Workers plan allows 50 outside
 requests per run). Each pass also expires on its own 3 days after the paid

@@ -65,6 +65,21 @@ describe("Google Wallet: the pass", () => {
         expect(JSON.stringify(pass)).not.toMatch(/Murphy|CV-|example\.ie/);
     });
 
+    it("keeps the member code and a booking link in the details, not on the front or in the QR code", async () => {
+        const member = subscription({ id: "sub_1abcdefgh", metadata: { ...subscription().metadata, member_code: "CV-7K3P9Q" } });
+        const pass = await passObject(env, member, NOV);
+        const token = await cardTokenFor("sub_1abcdefgh", workerEnv.MEMBER_CODE_SECRET);
+        expect(pass.textModulesData).toContainEqual({ id: "code", header: "Your member code (for Eventbrite)", body: "CV-7K3P9Q" });
+        expect(pass.linksModuleData.uris).toEqual([
+            { id: "book", uri: "https://corkvegans.ie/events/?member=CV-7K3P9Q", description: "Book events with your member discount" },
+            { id: "card", uri: `https://corkvegans.ie/membership/card/#${token}/CV-7K3P9Q`, description: "Your card online" },
+            { id: "partners", uri: "https://corkvegans.ie/membership/#partners", description: "Member discounts" },
+        ]);
+        expect(JSON.stringify([pass.header, pass.subheader, pass.cardTitle, pass.barcode])).not.toContain("CV-7K3P9Q");
+        const ended = await passObject(env, { ...member, status: "canceled" }, NOV);
+        expect(JSON.stringify(ended)).not.toContain("CV-7K3P9Q");
+    });
+
     it("shows the end date once cancelled, and expires when the membership ends", async () => {
         const cancelled = { ...subscription({ id: "sub_1abcdefgh" }), cancel_at_period_end: true };
         expect((await passObject(env, cancelled as ReturnType<typeof subscription>, NOV)).textModulesData).toEqual([{ id: "status", header: "Membership", body: "Ends 15 January 2027" }]);
@@ -160,7 +175,7 @@ describe("Google Wallet: keeping passes up to date", () => {
         const sub = services.subscriptions.get("sub_1abcdefgh")!;
 
         expect(await handleStripeEvent(env, { type: "customer.subscription.updated", data: { object: sub } }, NOV)).toBe("unchanged");
-        expect(services.passes.get("3388000000001.sub_1abcdefgh")).toMatchObject({ textModulesData: [{ body: "Ends 15 January 2027" }] });
+        expect(services.passes.get("3388000000001.sub_1abcdefgh")).toMatchObject({ textModulesData: [{ body: "Ends 15 January 2027" }, { id: "code", body: "CV-7K3P9Q" }] });
 
         await handleStripeEvent(env, { type: "invoice.paid", data: { object: { billing_reason: "subscription_cycle", parent: { subscription_details: { subscription: "sub_1abcdefgh" } } } } }, NOV);
         expect(services.passes.get("3388000000001.sub_1abcdefgh")).toMatchObject({ state: "ACTIVE" });

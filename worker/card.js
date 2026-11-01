@@ -4,6 +4,9 @@
  * can't be guessed or made up and needs nothing stored. It's in the card
  * link in the welcome email and in the card's QR code. It isn't the member
  * code: a business scanning the card never sees the Eventbrite discount.
+ * The card link itself also carries the member code after the token
+ * (#<token>/<code>), so the card can show it to the member; the QR code
+ * (#<token> on the check page) never does.
  *
  * POST /membership/card { token } answers whether the membership is live,
  * for the card page (to show this month) and the check page a business
@@ -28,6 +31,9 @@ async function signature(subscriptionId, secret) {
 export async function cardTokenFor(subscriptionId, secret) {
     return `${subscriptionId}.${await signature(subscriptionId, secret)}`;
 }
+
+/** The member's own card link: the token, then their code if they have one. */
+export const cardLink = (siteUrl, token, code) => `${siteUrl}/membership/card/#${token}${code ? `/${code}` : ""}`;
 
 /** The subscription ID in a genuine token, or null. */
 export async function subscriptionForCard(token, secret) {

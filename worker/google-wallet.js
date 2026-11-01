@@ -20,9 +20,9 @@
  * nothing else happens. Setup: docs/ADMIN-GUIDE.md, "Membership".
  */
 
-import { cardTokenFor } from "./card.js";
+import { cardLink, cardTokenFor } from "./card.js";
 import { StripeError, stripe } from "./http.js";
-import { LIVE, codeEndDate } from "./members.js";
+import { CODE_PATTERN, LIVE, codeEndDate } from "./members.js";
 import { SITE_URL } from "./welcome-email.js";
 
 const API = "https://walletobjects.googleapis.com/walletobjects/v1";
@@ -135,6 +135,8 @@ export async function passObject(env, subscription, now = new Date()) {
     const live = LIVE.has(subscription.status);
     const firstName = subscription.metadata?.first_name;
     const endsAt = subscription.cancel_at ?? (subscription.cancel_at_period_end ? subscription.items?.data?.[0]?.current_period_end : null);
+    // In the pass's details (shown when the member taps it), not on the front a business sees.
+    const code = live && CODE_PATTERN.test(subscription.metadata?.member_code ?? "") ? subscription.metadata.member_code : null;
     return {
         id: passObjectId(env, subscription.id),
         classId: passClassId(env),
@@ -145,10 +147,14 @@ export async function passObject(env, subscription, now = new Date()) {
         hexBackgroundColor: "#275d49",
         logo: { sourceUri: { uri: `${SITE_URL}/images/wallet-logo.png` }, contentDescription: text("Cork Vegans logo") },
         barcode: { type: "QR_CODE", value: `${SITE_URL}/membership/check/#${token}`, alternateText: "Businesses: scan to check" },
-        textModulesData: [{ id: "status", header: "Membership", body: !live ? "Ended" : Number.isInteger(endsAt) ? `Ends ${longDate(endsAt)}` : "Active" }],
+        textModulesData: [
+            { id: "status", header: "Membership", body: !live ? "Ended" : Number.isInteger(endsAt) ? `Ends ${longDate(endsAt)}` : "Active" },
+            ...(code ? [{ id: "code", header: "Your member code (for Eventbrite)", body: code }] : []),
+        ],
         linksModuleData: {
             uris: [
-                { id: "card", uri: `${SITE_URL}/membership/card/#${token}`, description: "Your card online" },
+                ...(code ? [{ id: "book", uri: `${SITE_URL}/events/?member=${code}`, description: "Book events with your member discount" }] : []),
+                { id: "card", uri: cardLink(SITE_URL, token, code), description: "Your card online" },
                 { id: "partners", uri: `${SITE_URL}/membership/#partners`, description: "Member discounts" },
             ],
         },

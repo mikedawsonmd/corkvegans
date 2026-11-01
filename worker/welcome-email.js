@@ -8,6 +8,8 @@
  * customer portal login link), MEMBER_DISCOUNT_EUR (default 5).
  */
 
+import { cardLink as cardLinkFor } from "./card.js";
+
 export const SITE_URL = "https://corkvegans.ie";
 export const EVENTBRITE_URL = "https://www.eventbrite.ie/o/cork-vegans-91797524863";
 export const CONTACT_EMAIL = "crkvgns@gmail.com";
@@ -31,7 +33,7 @@ export function membershipPrice(subscription) {
 export function welcomeEmail({ firstName, code, price, discountEur, portalUrl, cardToken, googleWallet = false }) {
     const hello = firstName ? `Hi ${firstName},` : "Hi there,";
     // In the #fragment, so the token never reaches a server log.
-    const cardLink = cardToken ? `${SITE_URL}/membership/card/#${cardToken}` : "";
+    const cardLink = cardToken ? cardLinkFor(SITE_URL, cardToken, code) : "";
     const cardText = `Your membership card: open it on your phone to show you're a member, for example at our partner businesses.${googleWallet ? " You can add it to Google Wallet from there." : ""}`;
     const eventsLink = `${SITE_URL}/events/?member=${encodeURIComponent(code)}`;
     const termsLink = `${SITE_URL}/membership-terms/`;
