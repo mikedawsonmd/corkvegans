@@ -1,5 +1,5 @@
 /**
- * Fake Stripe, Eventbrite and Brevo APIs for the membership Worker's tests.
+ * Fake Stripe, Eventbrite, Brevo and Google Wallet APIs for the membership Worker's tests.
  * They keep state like the real services (subscription metadata, discount
  * codes, sent emails), so retries and duplicates can be tested end to end.
  */
@@ -60,6 +60,8 @@ export function fakeServices(options: { subscriptions?: FakeSubscription[]; cust
     const subscriptions = new Map((options.subscriptions ?? [subscription()]).map((s) => [s.id, structuredClone(s)]));
     const customers = new Map((options.customers ?? [{ id: "cus_1", email: "aoife@example.ie" }]).map((c) => [c.id, { ...c, name: "", metadata: {} as Record<string, string> }]));
     const discounts = new Map<string, FakeDiscount>();
+    const passes = new Map<string, Record<string, unknown>>();
+    const passClasses = new Set<string>();
     const emails: { to: string[]; from: { name?: string; email: string }; replyTo: string; subject: string; text: string; html: string }[] = [];
     const calls: Call[] = [];
     let nextDiscount = 1;
@@ -83,6 +85,15 @@ export function fakeServices(options: { subscriptions?: FakeSubscription[]; cust
                 if (!sub) return ok({ error: { code: "resource_missing" } }, 404);
                 if (method === "POST") Object.assign(sub.metadata, metadataOf());
                 return ok(sub);
+            }
+            if (url.pathname === "/v1/subscriptions/search" && method === "GET") {
+                // Just the query the wallet's monthly run makes.
+                const query = url.searchParams.get("query") ?? "";
+                const month = /-metadata\['wallet_month'\]:'([^']+)'/.exec(query)?.[1];
+                const found = [...subscriptions.values()].filter(
+                    (s) => s.metadata.google_wallet === "yes" && s.metadata.wallet_month !== month && !(query.includes("-status:'canceled'") && s.status === "canceled"),
+                );
+                return ok({ data: found.slice(0, Number(url.searchParams.get("limit") ?? 10)) });
             }
             if (url.pathname === "/v1/subscriptions" && method === "GET") {
                 return ok({ data: [...subscriptions.values()].filter((s) => s.customer === url.searchParams.get("customer")) });
@@ -126,6 +137,34 @@ export function fakeServices(options: { subscriptions?: FakeSubscription[]; cust
             }
         }
 
+        if (url.hostname === "oauth2.googleapis.com" && url.pathname === "/token") {
+            const form = new URLSearchParams(body);
+            if (form.get("grant_type") !== "urn:ietf:params:oauth:grant-type:jwt-bearer" || !form.get("assertion")) return ok({ error: "invalid_grant" }, 400);
+            return ok({ access_token: "google-access-token", expires_in: 3600 });
+        }
+
+        if (url.hostname === "walletobjects.googleapis.com") {
+            if (headers.Authorization !== "Bearer google-access-token") return ok({ error: { code: 401 } }, 401);
+            const path = url.pathname.replace("/walletobjects/v1", "");
+            let m: RegExpExecArray | null;
+            if ((m = /^\/genericClass\/(.+)$/.exec(path))) return passClasses.has(m[1]) ? ok({ id: m[1] }) : ok({ error: { code: 404 } }, 404);
+            if (path === "/genericClass" && method === "POST") {
+                passClasses.add(JSON.parse(body).id);
+                return ok(JSON.parse(body));
+            }
+            if ((m = /^\/genericObject\/(.+)$/.exec(path)) && method === "PUT") {
+                if (!passes.has(m[1])) return ok({ error: { code: 404 } }, 404);
+                passes.set(m[1], JSON.parse(body));
+                return ok(JSON.parse(body));
+            }
+            if (path === "/genericObject" && method === "POST") {
+                const object = JSON.parse(body);
+                if (!passClasses.has(object.classId)) return ok({ error: { code: 400, message: "class not found" } }, 400);
+                passes.set(object.id, object);
+                return ok(object);
+            }
+        }
+
         if (url.hostname === "api.brevo.com" && url.pathname === "/v3/smtp/email") {
             if (headers["api-key"] !== workerEnv.BREVO_API_KEY) return ok({ code: "unauthorized", message: "Key not found" }, 401);
             const body = JSON.parse(String(init.body));
@@ -136,5 +175,5 @@ export function fakeServices(options: { subscriptions?: FakeSubscription[]; cust
         return ok({ error: `unexpected ${method} ${url.href}` }, 500);
     };
 
-    return { fetchImpl, subscriptions, customers, discounts, emails, calls };
+    return { fetchImpl, subscriptions, customers, discounts, emails, calls, passes, passClasses };
 }

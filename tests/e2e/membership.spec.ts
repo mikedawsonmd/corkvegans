@@ -132,6 +132,45 @@ test.describe("membership card", () => {
         }
     });
 
+    test("adds the card to Google Wallet through the Worker's save link", async ({ page }) => {
+        await mockCard(page, () => ({ status: 200, json: { status: "valid", firstName: "Aoife" } }));
+        let walletReply: Reply = { status: 200, json: { saveUrl: "https://pay.google.com/gp/v/save/eyJhbGciOiJSUzI1NiJ9.e30.c2ln" } };
+        const asked: string[] = [];
+        await page.route(`${WORKER}/membership/wallet/google`, (route) => {
+            asked.push(route.request().postDataJSON().token);
+            return route.fulfill({ status: walletReply.status, json: walletReply.json, headers: { "Access-Control-Allow-Origin": "*" } });
+        });
+        await page.route("https://pay.google.com/**", (route) => route.fulfill({ contentType: "text/html", body: "<title>Google Wallet</title><h1>Save to Google Wallet</h1>" }));
+
+        await page.goto(`/membership/card/#${TOKEN}`);
+        const button = page.getByRole("button", { name: "Add to Google Wallet" });
+        await expect(button).toBeVisible();
+        const box = await button.boundingBox();
+        expect(box!.height).toBeGreaterThanOrEqual(48); // Google's minimum
+
+        walletReply = { status: 409, json: { error: "ended" } };
+        await button.click();
+        await expect(page.getByRole("status").filter({ hasText: "Your membership has ended" })).toBeVisible();
+        walletReply = { status: 502, json: { error: "unavailable" } };
+        await button.click();
+        await expect(page.getByRole("status").filter({ hasText: "couldn't add your card to Google Wallet" })).toBeVisible();
+
+        walletReply = { status: 200, json: { saveUrl: "https://pay.google.com/gp/v/save/eyJhbGciOiJSUzI1NiJ9.e30.c2ln" } };
+        await button.click();
+        await expect(page).toHaveURL("https://pay.google.com/gp/v/save/eyJhbGciOiJSUzI1NiJ9.e30.c2ln");
+        expect(asked.every((t) => t === TOKEN)).toBe(true);
+    });
+
+    test("doesn't offer Google Wallet on iPhones", async ({ browser }) => {
+        const iphone = await browser.newContext({ userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1" });
+        const page = await iphone.newPage();
+        await mockCard(page, () => ({ status: 200, json: { status: "valid", firstName: "Aoife" } }));
+        await page.goto(`/membership/card/#${TOKEN}`);
+        await expect(page.locator("[data-card-name]")).toHaveText("Aoife");
+        await expect(page.getByRole("button", { name: "Add to Google Wallet" })).toBeHidden();
+        await iphone.close();
+    });
+
     test("the check page tells a business whether the card is valid", async ({ page }) => {
         let reply: Reply = { status: 200, json: { status: "valid", firstName: "Aoife" } };
         await mockCard(page, () => reply);

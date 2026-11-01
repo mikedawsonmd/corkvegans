@@ -217,7 +217,7 @@ if (!features.payments) {
         const text = readFileSync(file, "utf8");
         for (const [what, pattern] of [
             ["Stripe", /stripe\.com/i],
-            ["the membership Worker", /\/membership\/(session|code|resend)|\/membership\/card["'`]/],
+            ["the membership Worker", /\/membership\/(session|code|resend|wallet\/)|\/membership\/card["'`]/],
         ] as const) {
             if (pattern.test(text)) fail(`${relative(outDir, file)}: references ${what} although features.payments is off`);
         }

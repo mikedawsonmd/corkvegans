@@ -135,6 +135,7 @@ export const membership = fixtures
           endpoint: "https://membership.example",
           turnstileSiteKey: "",
           portalUrl: "https://billing.example/login",
+          googleWallet: true,
           discountEur: 5,
           eventbriteCodeParam: "discount",
       }
@@ -147,6 +148,11 @@ export const membership = fixtures
           turnstileSiteKey: env("PUBLIC_TURNSTILE_SITE_KEY") || "",
           /** Stripe customer portal login link (Settings → Billing → Customer portal). Empty: no "manage" link. */
           portalUrl: env("PUBLIC_STRIPE_PORTAL_URL") || "",
+          /**
+           * "Add to Google Wallet" on the membership card: change false to true
+           * once the Worker has GOOGLE_WALLET_ISSUER_ID and GOOGLE_WALLET_KEY.
+           */
+          googleWallet: env("PUBLIC_GOOGLE_WALLET") === "true" || false,
           /** Euros off a member ticket. Keep in step with the Worker's MEMBER_DISCOUNT_EUR. */
           discountEur: 5,
           /** The query parameter that makes Eventbrite apply a code from an event link. */

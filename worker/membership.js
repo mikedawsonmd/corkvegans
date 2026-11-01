@@ -6,6 +6,8 @@
  *                             thank-you screen
  *   POST /membership/resend   "Lost your code?": re-sends the welcome email
  *   POST /membership/card     whether a membership card is valid (card.js)
+ *   POST /membership/wallet/google  the card's "Add to Google Wallet" link
+ *                             (google-wallet.js; 404 until it's set up)
  *   POST /stripe/webhook      Stripe events (stripe-webhook.js)
  *   /donate/session           retired: 410 Gone
  *
@@ -26,9 +28,10 @@
  *                          (rate limit bindings, optional) see wrangler.toml
  */
 
-import { cors, json, passesTurnstile, preflight, rateLimit, readJson, safeMessage, stripe } from "./http.js";
-import { cardStatus, cardTokenFor } from "./card.js";
-import { CODE_PATTERN, SOURCE, resendMemberCodes } from "./members.js";
+import { StripeError, cors, json, passesTurnstile, preflight, rateLimit, readJson, safeMessage, stripe } from "./http.js";
+import { cardStatus, cardTokenFor, subscriptionForCard } from "./card.js";
+import { addToGoogleWallet, googleWalletEnabled } from "./google-wallet.js";
+import { CODE_PATTERN, LIVE, SOURCE, resendMemberCodes } from "./members.js";
 import { handleStripeWebhook } from "./stripe-webhook.js";
 
 // Whole euros. Keep in step with src/lib/membership.ts (a unit test checks).
@@ -63,8 +66,9 @@ export async function handleMembership(request, env, ctx) {
     if (path === "/donate/session") return json({ error: "gone" }, 410);
     if (path === "/stripe/webhook") return env.STRIPE_WEBHOOK_SECRET ? handleStripeWebhook(request, env) : new Response("Not found", { status: 404 });
 
-    const route = { "/membership/session": join, "/membership/code": code, "/membership/resend": resend, "/membership/card": card }[path];
+    const route = { "/membership/session": join, "/membership/code": code, "/membership/resend": resend, "/membership/card": card, "/membership/wallet/google": googleWallet }[path];
     if (!route) return null;
+    if (route === googleWallet && !googleWalletEnabled(env)) return new Response("Not found", { status: 404 });
     // Switched off unless explicitly enabled (as on the site).
     if (env.PAYMENTS_ENABLED !== "true") return new Response("Not found", { status: 404 });
 
@@ -243,6 +247,26 @@ async function card(request, env, { ip, headers }) {
         return status ? json(status, 200, { ...headers, "Cache-Control": "no-store" }) : json({ error: "not_found" }, 404, headers);
     } catch (err) {
         console.error(`membership: could not check a membership card (${safeMessage(err)})`);
+        return json({ error: "unavailable" }, 502, headers);
+    }
+}
+
+// ── POST /membership/wallet/google ────────────────────────────────────────
+
+/** { saveUrl } for a live membership's card token; 404 for a token that isn't ours, 409 once it's ended. */
+async function googleWallet(request, env, { ip, headers }) {
+    if (!(await cardLimit(env, ip))) return json({ error: "rate_limited" }, 429, { ...headers, "Retry-After": "60" });
+    const body = await readJson(request, 512);
+    if (!body || typeof body.token !== "string" || Object.keys(body).length !== 1) return json({ error: "invalid_request" }, 400, headers);
+    try {
+        const id = await subscriptionForCard(body.token, env.MEMBER_CODE_SECRET);
+        const subscription = id ? await stripe(env, "GET", `/v1/subscriptions/${id}`).catch((err) => (err instanceof StripeError && err.status === 404 ? null : Promise.reject(err))) : null;
+        if (subscription?.metadata?.source !== SOURCE) return json({ error: "not_found" }, 404, headers);
+        if (!LIVE.has(subscription.status)) return json({ error: "ended" }, 409, headers);
+        const saveUrl = await addToGoogleWallet(env, subscription, headers["Access-Control-Allow-Origin"]);
+        return json({ saveUrl }, 200, { ...headers, "Cache-Control": "no-store" });
+    } catch (err) {
+        console.error(`membership: could not make a Google Wallet pass (${safeMessage(err)})`);
         return json({ error: "unavailable" }, 502, headers);
     }
 }

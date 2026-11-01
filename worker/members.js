@@ -11,6 +11,7 @@
  */
 
 import { cardTokenFor } from "./card.js";
+import { googleWalletEnabled, updateWalletPass } from "./google-wallet.js";
 import { createMemberDiscount, removeMemberDiscount, setMemberDiscountEnd } from "./eventbrite.js";
 import { stripe } from "./http.js";
 import { membershipPrice, sendEmail, welcomeEmail } from "./welcome-email.js";
@@ -55,6 +56,7 @@ async function sendWelcome(env, subscription, to) {
         discountEur: discountEur(env),
         portalUrl: env.STRIPE_PORTAL_URL,
         cardToken: await cardTokenFor(subscription.id, env.MEMBER_CODE_SECRET),
+        googleWallet: googleWalletEnabled(env),
     });
     await sendEmail(env, to, content);
 }
@@ -89,8 +91,8 @@ export async function memberJoined(env, session, now = new Date()) {
     return "joined";
 }
 
-/** invoice.paid: a renewal (or tier change) moves the code's end date to the new period end. */
-export async function membershipRenewed(env, invoice) {
+/** invoice.paid: a renewal (or tier change) moves the code's end date to the new period end, and updates any wallet pass. */
+export async function membershipRenewed(env, invoice, now = new Date()) {
     // The first invoice is handled by memberJoined, which makes the code.
     if (invoice.billing_reason === "subscription_create") return "ignored";
     const id = invoice.parent?.subscription_details?.subscription ?? invoice.subscription;
@@ -100,12 +102,15 @@ export async function membershipRenewed(env, invoice) {
     // No code yet: memberJoined (or its retry) makes it with the current period end.
     if (!subscription.metadata.eventbrite_discount_id) return "no code yet";
     await setMemberDiscountEnd(env, subscription.metadata.eventbrite_discount_id, codeEndDate(subscription, env));
+    await updateWalletPass(env, subscription, now);
     return "extended";
 }
 
-/** customer.subscription.deleted: the membership has ended, so the code goes. */
+/** customer.subscription.deleted: the membership has ended, so the code goes and any wallet pass expires. */
 export async function membershipEnded(env, subscription, now = new Date()) {
-    if (subscription.metadata?.source !== SOURCE || !subscription.metadata.eventbrite_discount_id) return "ignored";
+    if (subscription.metadata?.source !== SOURCE) return "ignored";
+    await updateWalletPass(env, subscription, now);
+    if (!subscription.metadata.eventbrite_discount_id) return "ignored";
     return removeMemberDiscount(env, subscription.metadata.eventbrite_discount_id, now);
 }
 

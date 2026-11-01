@@ -4,14 +4,16 @@
  * name, this month and year in large type, a ticking clock so a screenshot
  * stands out, and a QR code that opens the check page for businesses. It asks
  * the Worker each time it opens, so a card stops showing the month once the
- * membership ends. Only rendered when features.payments is on.
+ * membership ends. With membership.googleWallet on, it also offers "Add to
+ * Google Wallet" (not on iPhones, which have no Google Wallet). Only rendered
+ * when features.payments is on.
  */
 import { membership, site } from "../config/site";
 
 const endpoint = membership.endpoint.trim().replace(/\/+$/, "");
 ---
 
-<div data-member-card-root data-endpoint={endpoint} data-state="loading" class="w-full max-w-sm mx-auto flex flex-col items-center gap-lg">
+<div data-member-card-root data-endpoint={endpoint} data-google-wallet={membership.googleWallet ? "" : undefined} data-state="loading" class="w-full max-w-sm mx-auto flex flex-col items-center gap-lg">
     <p data-show="loading" class="text-body-md text-on-surface-variant" role="status">Loading your card…</p>
 
     <article
@@ -71,6 +73,19 @@ const endpoint = membership.endpoint.trim().replace(/\/+$/, "");
         <button type="button" data-card-retry class="cv-btn cv-btn-md cv-btn-secondary">Try again</button>
     </div>
 
+    {
+        membership.googleWallet && (
+            <div data-show="valid" hidden>
+                <div data-wallet-google class="flex flex-col items-center gap-sm" hidden>
+                    <button type="button" data-add-google-wallet class="rounded-full focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] disabled:opacity-60">
+                        <img src="/images/add-to-google-wallet.svg" alt="Add to Google Wallet" width="272" height="48" class="h-12 w-auto" />
+                    </button>
+                    <p data-wallet-status role="status" class="text-label-sm text-on-surface-variant text-center empty:hidden"></p>
+                </div>
+            </div>
+        )
+    }
+
     <p data-show="valid" class="text-label-sm text-on-surface-variant text-center" hidden>
         Tip: add this page to your home screen so your card is always to hand.
     </p>
@@ -78,7 +93,7 @@ const endpoint = membership.endpoint.trim().replace(/\/+$/, "");
 
 <script>
     import { renderSVG } from "uqr";
-    import { checkCard, formatEndsOn, tokenFromHash } from "../scripts/card-api.ts";
+    import { addToGoogleWallet, checkCard, formatEndsOn, tokenFromHash } from "../scripts/card-api.ts";
     import { cachedCardStatus, saveCardStatus, saveCardToken, savedCardToken } from "../scripts/member-card.ts";
 
     const ZONE = "Europe/Dublin";
@@ -148,6 +163,24 @@ const endpoint = membership.endpoint.trim().replace(/\/+$/, "");
         };
 
         $("[data-card-retry]").addEventListener("click", load);
+
+        // Google Wallet isn't on iPhones and iPads (iPadOS reports itself as a Mac with touch).
+        const apple = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+        const wallet = root.querySelector<HTMLElement>("[data-wallet-google]");
+        if (wallet && "googleWallet" in root.dataset && !apple) {
+            wallet.hidden = false;
+            const button = $<HTMLButtonElement>("[data-add-google-wallet]");
+            const status = $("[data-wallet-status]");
+            button.addEventListener("click", async () => {
+                button.disabled = true;
+                status.textContent = "Getting your card ready for Google Wallet…";
+                const result = await addToGoogleWallet(endpoint, token);
+                if (result.kind === "ready") return window.location.assign(result.saveUrl);
+                button.disabled = false;
+                status.textContent =
+                    result.kind === "ended" ? "Your membership has ended, so this card can't be added." : "Sorry, we couldn't add your card to Google Wallet just now. Please try again.";
+            });
+        }
         window.setInterval(() => root.dataset.state === "valid" && tick(), 1000);
         // Coming back to the page (e.g. reopening the shortcut) checks again.
         document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && root.dataset.state !== "loading" && load());

@@ -9,6 +9,7 @@
  */
 
 import { json, safeMessage } from "./http.js";
+import { updateWalletPass } from "./google-wallet.js";
 import { memberJoined, membershipEnded, membershipRenewed } from "./members.js";
 
 /** How old a signed event may be, as in Stripe's SDKs. */
@@ -44,10 +45,12 @@ export async function handleStripeEvent(env, event, now = new Date()) {
         case "checkout.session.completed":
             return memberJoined(env, object, now);
         case "invoice.paid":
-            return membershipRenewed(env, object);
+            return membershipRenewed(env, object, now);
         case "customer.subscription.updated":
             // Cancelling keeps the code until the paid period ends (it then
             // expires, or is removed on .deleted); tier changes don't touch it.
+            // A wallet pass shows the end date once the member cancels.
+            await updateWalletPass(env, object, now);
             return "unchanged";
         case "customer.subscription.deleted":
             return membershipEnded(env, object, now);

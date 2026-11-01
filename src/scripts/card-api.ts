@@ -1,6 +1,7 @@
 /**
  * Asks the membership Worker whether a card is valid (POST /membership/card),
- * for the card page and the check page a business opens from the QR code.
+ * for the card page and the check page a business opens from the QR code, and
+ * for the card's "Add to Google Wallet" link.
  */
 
 import { CARD_TOKEN } from "./member-card.ts";
@@ -34,6 +35,22 @@ export async function checkCard(endpoint: string, token: string): Promise<CardAn
             ...(typeof data.firstName === "string" && NAME.test(data.firstName) ? { firstName: data.firstName } : {}),
             ...(typeof data.endsOn === "string" && DATE.test(data.endsOn) ? { endsOn: data.endsOn } : {}),
         };
+    } catch {
+        return { kind: "error" };
+    }
+}
+
+/** The "Add to Google Wallet" link for this card, made by the Worker. */
+export async function addToGoogleWallet(endpoint: string, token: string): Promise<{ kind: "ready"; saveUrl: string } | { kind: "ended" } | { kind: "error" }> {
+    try {
+        const res = await fetch(`${endpoint}/membership/wallet/google`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token }),
+        });
+        if (res.status === 409) return { kind: "ended" };
+        const data = (await res.json()) as { saveUrl?: unknown };
+        return res.ok && typeof data.saveUrl === "string" && data.saveUrl.startsWith("https://pay.google.com/gp/v/save/") ? { kind: "ready", saveUrl: data.saveUrl } : { kind: "error" };
     } catch {
         return { kind: "error" };
     }

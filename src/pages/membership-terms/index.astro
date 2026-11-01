@@ -38,8 +38,9 @@ const euros = (amounts: number[]) => amounts.map((a) => `€${a}`).join(", ");
                 <h2>Your membership card</h2>
                 <p>
                     You also get a digital membership card, through a link in your welcome email. While your membership is active it shows
-                    your first name, the current month and a QR code. A business can scan the code to check your membership is current. Like
-                    your member code, the card is for you only, so please don't share it.
+                    your first name, the current month and a QR code. A business can scan the code to check your membership is current.
+                    {membership.googleWallet && " You can also add it to Google Wallet, where it moves on to the new month each month while your membership is active."}{" "}
+                    Like your member code, the card is for you only, so please don't share it.
                 </p>
 
                 <h2>Partner discounts</h2>

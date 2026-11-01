@@ -165,6 +165,40 @@ end date if the member has cancelled), or a red "Not a current member". A
 member can't get a new token without changing `MEMBER_CODE_SECRET`, which
 would also change every future member code, so never change it.
 
+**Google Wallet** (built; **needs owner setup** before it's switched on).
+Members can add their card to Google Wallet from the card page (not on
+iPhones). The pass shows the first name, the month and year, and the same
+QR code. The Worker updates it when the member renews, cancels or leaves,
+and an hourly cron on the 1st to the 3rd of each month moves every pass on
+to the new month, 20 at a time (the free Workers plan allows 50 outside
+requests per run). Each pass also expires on its own 3 days after the paid
+period, in case an update is missed. Setup:
+
+1. Go to the Google Pay & Wallet Console (pay.google.com/business/console),
+   sign in with the Cork Vegans Google account, open **Google Wallet API**
+   and note the **Issuer ID**.
+2. In Google Cloud (console.cloud.google.com), create a project, enable the
+   **Google Wallet API**, then IAM & Admin → Service accounts → create one
+   (no roles needed) → Keys → Add key → JSON. Keep the file safe; it's a
+   password.
+3. Back in the Wallet console → **Users**, invite the service account's
+   email address as a **Developer**.
+4. Put the Issuer ID in `worker/wrangler.toml` as `GOOGLE_WALLET_ISSUER_ID`
+   (done: 3388000000023233601). In `worker/`: `npx wrangler secret put
+   GOOGLE_WALLET_KEY` (paste the whole JSON file), then `npx wrangler deploy`.
+5. In `src/config/site.ts` → `membership`, set `googleWallet` to `true` and
+   commit. The privacy notice and terms then mention Google Wallet.
+6. The account starts in **demo mode**: only people added as test users in
+   the Wallet console can save passes, and passes say "[TEST ONLY]". Once
+   it works, click **Request publishing access**; Google reviews the pass
+   and your business profile.
+
+The button is Google's official badge (`public/images/add-to-google-wallet.svg`,
+from Google's brand guidelines; don't restyle it). The pass logo is
+`public/images/wallet-logo.png` (660 × 660, as Google requires). Apple
+Wallet isn't built yet: it needs the Apple Developer Program (about €99 a
+year), a Pass Type ID and its certificate.
+
 **Partner businesses.** Organisers add them in Pages CMS → **Partners**:
 name, discount, short description, area, website, logo and how to claim. New
 partners start **hidden**: untick Hidden to show one on the Membership page,
@@ -186,6 +220,7 @@ out from the subscription ID, so a member never gets two codes.
 | Membership page | `src/pages/membership/index.astro` |
 | Join form, amounts and limits | `src/components/MembershipForm.astro`, `src/scripts/membership-form.ts`, `src/lib/membership.ts` |
 | Card and check pages | `src/components/MemberCard.astro`, `src/components/CardCheck.astro`, `src/scripts/card-api.ts`, `src/scripts/member-card.ts`, `worker/card.js` |
+| Google Wallet | `worker/google-wallet.js`, `googleWallet` in `src/config/site.ts` |
 | Partner businesses | `src/content/partners/`, `src/lib/partners.ts`, Pages CMS "Partners" |
 | On/off switch | `features.payments` in `src/config/site.ts` |
 | Publishable key, Worker address, Turnstile site key, portal link, €5 | `membership` in `src/config/site.ts` |
