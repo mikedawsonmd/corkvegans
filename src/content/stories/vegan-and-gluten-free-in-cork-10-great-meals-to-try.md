@@ -22,7 +22,7 @@ social:
 ---
 Eating vegan and gluten free in Cork used to mean a lot of questions and a side salad. That’s changing. Plenty of places around the city now do proper meals that are both, and we want to make them easier to find.
 
-**New on our food map:** we’re adding a gluten free note to places on the Cork vegan food map that have good GF vegan options. Look for the note when you’re picking somewhere to eat.
+**New on our food map:** we’re adding a gluten free note to places on the Cork vegan food map that have great GF vegan options. Look for the note when you’re picking somewhere to eat.
 
 **A quick word for coeliacs:** “gluten free” on a menu doesn’t always mean coeliac safe. Shared fryers and kitchens are common, so always tell staff and ask about cross contamination. Menus change too, so check before you go.
 
@@ -30,7 +30,7 @@ Eating vegan and gluten free in Cork used to mean a lot of questions and a side 
 
 **1. My Goodness, English Market.** Fully vegan, with a large share of the menu gluten free. Salads, hot plates and treats, and a reliable lunch stop in town.
 
-**2. Quay Co-op, Sullivan’s Quay.** Cork’s veggie institution. Ask for the vegan dish of the day with a GF option, and leave room for one of their gluten free vegan desserts.
+**2. My Goodness @ The Co-op, Sullivan’s Quay.** Cork’s vegan institution. Ask for the vegan dish of the day with a GF option, and leave room for one of their gluten free vegan desserts.
 
 **3. Liberty Grill, Washington Street.** A vegan burger on a gluten free bun with rustic potatoes. They have a good reputation with coeliac diners.
 
