@@ -21,7 +21,11 @@ const button = "cv-btn cv-btn-md cv-btn-primary";
 
 <BaseLayout
     image={{ src: "/images/bio.jpg", width: 1500, height: 1261, alt: "Smiling Cork Vegans members gathered around a sheep in a field" }}
-    jsonLd={[{ "@context": "https://schema.org", "@type": "WebSite", name: site.name, url: `${site.url}/` }, organizationJsonLd()]}
+    jsonLd={[
+        // Google's site name in search results: "Cork Vegans", not the domain. The url must match the canonical homepage.
+        { "@context": "https://schema.org", "@type": "WebSite", name: site.name, alternateName: ["corkvegans.ie", "Cork Vegans Community"], url: `${site.url}/` },
+        organizationJsonLd(),
+    ]}
 >
     <!-- Hero Section -->
     <section class="relative min-h-[751px] flex items-center overflow-hidden" data-surface="dark" {...animalSpot("floor", "hero", { size: 60 })}>

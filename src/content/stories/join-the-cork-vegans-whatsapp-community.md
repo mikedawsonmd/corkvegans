@@ -7,7 +7,7 @@ category: Community
 author: Cork Vegans
 publishedAt: 2026-10-31
 featuredImage: /src/assets/stories/whatsappmain.jpg
-featuredImageAlt: Cork vegans logo next to Whatsapp logo
+featuredImageAlt: Cork Vegans logo next to the WhatsApp logo
 imageFocus: centre
 social:
   - summary: Hear about events first, swap tips and meet other vegans in Cork! 🌱
