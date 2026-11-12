@@ -105,7 +105,7 @@ export const headerCta = { href: "/support/", label: "Support us" };
  * Test builds (CV_FIXTURES=1) switch it on so the browser tests cover the form.
  */
 export const features = {
-    payments: fixtures,
+    payments: true,
 };
 
 /**
@@ -141,13 +141,13 @@ export const membership = fixtures
       }
     : {
           /** Stripe publishable key: pk_live_… (or pk_test_… while testing). Never a secret key. */
-          publishableKey: env("PUBLIC_STRIPE_PUBLISHABLE_KEY") || "",
+          publishableKey: env("PUBLIC_STRIPE_PUBLISHABLE_KEY") || "pk_live_51UQlKz8WEuFYic5dU7jN0PH2v4EFZ10fVjq078L6NVWDN2hjSFBLENvJK196wY7Zplc0VRmhHsVWpCV6YxqJyrQS00GJqWx2wI",
           /** The Worker's address, e.g. https://corkvegans-membership.<subdomain>.workers.dev (no path). */
-          endpoint: env("PUBLIC_MEMBERSHIP_ENDPOINT") || "",
+          endpoint: env("PUBLIC_MEMBERSHIP_ENDPOINT") || "https://corkvegans-membership.mikedawsonmd.workers.dev",
           /** Cloudflare Turnstile site key. Leave empty unless the Worker has TURNSTILE_SECRET_KEY. */
           turnstileSiteKey: env("PUBLIC_TURNSTILE_SITE_KEY") || "",
           /** Stripe customer portal login link (Settings → Billing → Customer portal). Empty: no "manage" link. */
-          portalUrl: env("PUBLIC_STRIPE_PORTAL_URL") || "",
+          portalUrl: env("PUBLIC_STRIPE_PORTAL_URL") || "https://billing.stripe.com/p/login/7sY28lc4ocjoaBR6uz0co00",
           /**
            * "Add to Google Wallet" on the membership card: change false to true
            * once the Worker has GOOGLE_WALLET_ISSUER_ID and GOOGLE_WALLET_KEY.
