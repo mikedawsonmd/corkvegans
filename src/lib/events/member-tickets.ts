@@ -6,10 +6,15 @@
  *
  * A member ticket is a hidden ticket whose name mentions "member" or
  * "members" (but not "non-member"), e.g. "Member ticket" or "Member discount".
+ *
+ * It then re-saves every member code (unchanged), because a code only
+ * discounts the tickets that were in the group when it was last saved.
  */
 
 const API_BASE = "https://www.eventbriteapi.com/v3";
 const MAX_PAGES = 5;
+/** Member codes, 50 a page: room for 2,000 members. */
+const MAX_CODE_PAGES = 40;
 
 export interface TicketClass {
     id?: string;
@@ -48,7 +53,7 @@ export async function syncMemberTickets(options: {
     ticketGroupId: string;
     fetchImpl?: typeof fetch;
     log?: (line: string) => void;
-}): Promise<{ added: { event: string; ticket: string }[] }> {
+}): Promise<{ added: { event: string; ticket: string }[]; refreshed: number }> {
     const doFetch = options.fetchImpl ?? fetch;
     const log = options.log ?? console.log;
 
@@ -68,10 +73,10 @@ export async function syncMemberTickets(options: {
         return (await res.json()) as T;
     }
 
-    async function pages<T>(path: string, key: string, params: Record<string, string> = {}): Promise<T[]> {
+    async function pages<T>(path: string, key: string, params: Record<string, string> = {}, maxPages = MAX_PAGES): Promise<T[]> {
         const items: T[] = [];
         let continuation: string | undefined;
-        for (let page = 0; page < MAX_PAGES; page++) {
+        for (let page = 0; page < maxPages; page++) {
             const query = new URLSearchParams(params);
             if (continuation) query.set("continuation", continuation);
             const body = await call<Record<string, unknown> & { pagination?: { has_more_items?: boolean; continuation?: string } }>(`${path}?${query}`);
@@ -102,14 +107,42 @@ export async function syncMemberTickets(options: {
     const group = await call<{ name?: string; event_ticket_ids?: Record<string, string[]> | null }>(`/ticket_groups/${encodeURIComponent(options.ticketGroupId)}/`);
     const current = group.event_ticket_ids ?? {};
     const merged = mergeTicketIds(current, found);
+    let added: { event: string; ticket: string }[] = [];
     if (!merged) {
         log(`Member tickets: ${Object.values(found).flat().length} found, all already in the ${group.name ?? "Members"} group`);
-        return { added: [] };
+    } else {
+        await call(`/ticket_groups/${encodeURIComponent(options.ticketGroupId)}/`, { method: "POST", body: { ticket_group: { event_ticket_ids: merged } } });
+        added = Object.entries(found)
+            .flatMap(([eventId, ids]) => ids.filter((id) => !current[eventId]?.includes(id)))
+            .map((id) => names.get(id)!);
+        for (const a of added) log(`Member tickets: added "${a.ticket}" (${a.event}) to the ${group.name ?? "Members"} group`);
     }
-    await call(`/ticket_groups/${encodeURIComponent(options.ticketGroupId)}/`, { method: "POST", body: { ticket_group: { event_ticket_ids: merged } } });
-    const added = Object.entries(found)
-        .flatMap(([eventId, ids]) => ids.filter((id) => !current[eventId]?.includes(id)))
-        .map((id) => names.get(id)!);
-    for (const a of added) log(`Member tickets: added "${a.ticket}" (${a.event}) to the ${group.name ?? "Members"} group`);
-    return { added };
+
+    // A code only takes its discount off at checkout for the tickets that were
+    // in the group when it was created or last saved (found November 2026:
+    // the event page showed the discount, checkout charged full price). So
+    // every run re-saves each member code, unchanged, to pick up any new
+    // tickets; doing it every time also retries any that failed before.
+    if (!Object.keys(found).length) return { added, refreshed: 0 };
+    const codes = await pages<{ id?: string; amount_off?: string | null; end_date?: string | null }>(
+        `/organizations/${encodeURIComponent(options.organizationId)}/discounts/`,
+        "discounts",
+        { scope: "multi_events", ticket_group_id: options.ticketGroupId },
+        MAX_CODE_PAGES,
+    );
+    let refreshed = 0;
+    let failed = 0;
+    for (const code of codes) {
+        if (!code.id) continue;
+        const discount = { ...(code.amount_off ? { amount_off: code.amount_off } : {}), ...(code.end_date ? { end_date: code.end_date } : {}) };
+        try {
+            await call(`/discounts/${encodeURIComponent(code.id)}/`, { method: "POST", body: { discount } });
+            refreshed++;
+        } catch {
+            failed++;
+        }
+    }
+    log(`Member tickets: re-saved ${refreshed} member code${refreshed === 1 ? "" : "s"} so they cover every member ticket${failed ? ` (${failed} failed; the next run tries again)` : ""}`);
+    if (failed) throw new Error(`${failed} member code${failed === 1 ? "" : "s"} could not be re-saved`);
+    return { added, refreshed };
 }

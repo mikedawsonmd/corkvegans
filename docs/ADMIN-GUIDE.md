@@ -317,7 +317,11 @@ Stripe steps in live mode.
    - Eventbrite's editor doesn't show ticket groups, hence the deploy step
      (`scripts/sync-member-tickets.ts`). It reads the group, adds any
      missing member tickets and sends the whole list back with
-     `POST /v3/ticket_groups/<group id>/`. Names with "non-member" are
+     `POST /v3/ticket_groups/<group id>/`. It then re-saves every member
+     code, unchanged: a code only takes its discount off at checkout for the
+     tickets that were in the group when it was last saved (found November
+     2026: a member who joined before an event's Member ticket existed saw
+     the discount on the event page but paid full price at checkout). Names with "non-member" are
      ignored, and so are tickets that aren't hidden.
    - Private events never appear on the site's events page.
 6. **Brevo.** Senders, domains & dedicated IPs → Domains: add
