@@ -113,7 +113,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     } else {
         console.log(`Stripe ${mode} mode\n`);
         setUpCatalogue(key).then(
-            () => console.log("\nDone. Next: add the five preset products to the customer portal (docs/ADMIN-GUIDE.md, \"Membership\")."),
+            () => console.log("\nDone. Next: add the three monthly products (not the yearly ones) to the customer portal (docs/ADMIN-GUIDE.md, \"Membership\")."),
             (err) => {
                 console.error(err instanceof Error ? err.message : String(err));
                 process.exitCode = 1;
