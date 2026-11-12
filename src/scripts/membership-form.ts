@@ -99,15 +99,33 @@ export async function waitForMemberCode(
 }
 
 /** Stops the page behind a modal scrolling (including iOS) and puts it back where it was. */
+/**
+ * Stops the page behind the dialog scrolling. It only hides the page's
+ * overflow: the page stays exactly where it is (no jump to the top, so the
+ * header doesn't change size behind the dialog), and html's
+ * scrollbar-gutter keeps the width steady.
+ */
 function lockScroll() {
-    const { body } = document;
-    const scrollY = window.scrollY;
-    const scrollbar = window.innerWidth - document.documentElement.clientWidth;
-    Object.assign(body.style, { position: "fixed", top: `-${scrollY}px`, left: "0", right: "0", paddingRight: scrollbar ? `${scrollbar}px` : "" });
+    const root = document.documentElement;
+    root.style.overflow = "hidden";
     return () => {
-        Object.assign(body.style, { position: "", top: "", left: "", right: "", paddingRight: "" });
-        window.scrollTo({ top: scrollY, behavior: "instant" });
+        root.style.overflow = "";
     };
+}
+
+/** Resolves once the dialog's opening slide has finished, so heavy work (Stripe's iframe) doesn't make it stutter. */
+function afterOpening(dialog: HTMLDialogElement): Promise<void> {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return Promise.resolve();
+    return new Promise((resolve) => {
+        const done = () => {
+            dialog.removeEventListener("transitionend", onEnd);
+            clearTimeout(timer);
+            resolve();
+        };
+        const onEnd = (event: TransitionEvent) => event.target === dialog && (event.propertyName === "translate" || event.propertyName === "opacity") && done();
+        const timer = setTimeout(done, 450);
+        dialog.addEventListener("transitionend", onEnd);
+    });
 }
 
 export function initMembershipForm(root: HTMLElement) {
@@ -317,7 +335,10 @@ export function initMembershipForm(root: HTMLElement) {
                 },
             });
             openDialog(`Join for ${formatAmount(value, freq)}`);
-            checkout.mount(mountPoint);
+            // Let the dialog finish sliding in before Stripe's iframe loads and resizes.
+            const opening = checkout;
+            await afterOpening(dialog);
+            if (checkout === opening && dialog.open) checkout.mount(mountPoint);
         } catch (err) {
             closeCheckout();
             if (dialog.open) dialog.close();

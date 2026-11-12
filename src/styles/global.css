@@ -218,6 +218,21 @@ html {
     min-height: 100%;
 }
 
+/* While Stripe's checkout loads (it's mounted once the dialog has slid in),
+   the space it will fill keeps a steady size with a quiet note. Nothing
+   moves, so it can't compete with the dialog's slide. */
+[data-checkout]:empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: min(36rem, 75dvh);
+}
+
+[data-checkout]:empty::before {
+    content: "Loading secure checkout…";
+    @apply font-label-bold text-label-bold text-on-primary opacity-80;
+}
+
 @media screen(sm) {
     .cv-dialog {
         padding: 2rem 1rem;
@@ -232,14 +247,16 @@ html {
 }
 
 @media (prefers-reduced-motion: no-preference) {
+    /* A quick start that settles gently, like a phone's own sheets. Only
+       translate, scale and opacity move, which phones animate smoothly. */
     .cv-dialog,
     .cv-dialog::backdrop {
         transition:
-            translate 0.3s ease,
-            scale 0.2s ease,
-            opacity 0.2s ease,
-            overlay 0.3s allow-discrete,
-            display 0.3s allow-discrete;
+            translate 0.35s cubic-bezier(0.32, 0.72, 0, 1),
+            scale 0.35s cubic-bezier(0.32, 0.72, 0, 1),
+            opacity 0.25s ease,
+            overlay 0.35s allow-discrete,
+            display 0.35s allow-discrete;
     }
 
     .cv-dialog:not([open]) {
