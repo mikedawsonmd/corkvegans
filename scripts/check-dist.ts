@@ -269,6 +269,20 @@ for (const file of files.filter((f) => /\.(html|js|json|xml|txt|css)$/.test(f)))
     for (const s of literalSecrets) if (text.includes(s)) fail(`${relative(outDir, file)}: contains the Eventbrite token`);
 }
 
+// ── 7. Every icon is in the cut-down icon font ───────────────────────────
+// The font only holds the icons in src/lib/icons.ts; any other name would
+// show as a blank square.
+const { ICONS } = await import("../src/lib/icons.ts");
+const iconFont = new Set<string>(ICONS);
+const missingIcons = new Map<string, string>();
+for (const file of htmlFiles) {
+    const html = readFileSync(file, "utf8");
+    for (const m of html.matchAll(/<span[^>]*class="[^"]*\bmaterial-symbols-outlined\b[^"]*"[^>]*>\s*([^<]*?)\s*<\/span>/g)) {
+        if (!iconFont.has(m[1])) missingIcons.set(m[1], relative(outDir, file));
+    }
+}
+for (const [name, file] of missingIcons) fail(`${file}: icon "${name}" isn't in the icon font. Add it to src/lib/icons.ts`);
+
 // ── Report ───────────────────────────────────────────────────────────────
 const summary =
     `### Site checks\n\n- ${htmlFiles.length} HTML pages checked, ${linkChecks.length} internal links/assets verified\n` +

@@ -58,18 +58,16 @@ and a run every 6 hours build and publish the site via
 In order of value:
 
 1. **Connect the volunteer form** (owner setup; see the admin guide). Payments are switched off until membership launches.
-2. **Self-host the fonts** (Karla, Material Symbols) to stop sending
-   visitors' IP addresses to Google and speed up the first load.
-3. **Optimise the hero and about photos** (currently 1–1.5 MB JPEGs) with
+2. **Optimise the hero and about photos** (currently 1–1.5 MB JPEGs) with
    Astro's image pipeline. Keep `/images/bio.jpg` for existing share links.
-4. **Draft previews** on a separate free preview host (e.g. a `preview`
+3. **Draft previews** on a separate free preview host (e.g. a `preview`
    branch deployed to Cloudflare Pages with `noindex`), so editors can see a
    draft on the real layout before publishing.
-5. **Category filter pages** for stories, once there are enough stories to
+4. **Category filter pages** for stories, once there are enough stories to
    justify them.
-6. **Upgrade to Tailwind CSS v4** with a visual regression check, to clear
+5. **Upgrade to Tailwind CSS v4** with a visual regression check, to clear
    the build-time `npm audit` advisories.
-7. **Simple event source filter** (Meetup / Eventbrite) if Eventbrite becomes a
+6. **Simple event source filter** (Meetup / Eventbrite) if Eventbrite becomes a
    regular source.
 
 ## License

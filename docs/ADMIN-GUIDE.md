@@ -669,9 +669,10 @@ Re-check these terms once a year.
     editor account could publish unwanted stories. Mitigate by only inviting
     trusted people, removing leavers promptly, and reverting via Git history.
   - Drafts are publicly readable in the GitHub repository.
-  - Fonts (Karla, Material Symbols) are still loaded from Google Fonts, as
-    before. This sends visitors' IP addresses to Google. Self-hosting the
-    fonts is recommended (see README "Next improvements").
+  - Fonts (Karla, Material Symbols) are downloaded at build time and served
+    from corkvegans.ie (`fonts` in `astro.config.mjs`), so visitors never
+    contact Google for them. The icon font only holds the icons listed in
+    `src/lib/icons.ts`; the build fails if a page uses one that isn't there.
   - `npm audit` reports build-time-only advisories in Tailwind CSS v3's file
     scanning dependencies. They don't affect the published site (no runtime
     code) and only process this repository's own files. Upgrading to
