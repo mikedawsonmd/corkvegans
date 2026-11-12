@@ -1,6 +1,6 @@
 ---
 draft: true
-title: Become a Cork Vegans partner business
+title: Become a Cork Vegans partner business 📣
 description: "Local businesses can now partner with Cork Vegans: offer our
   members a perk and get featured on our website and socials."
 category: Community
