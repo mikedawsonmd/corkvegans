@@ -144,8 +144,12 @@ export const membership = fixtures
           publishableKey: env("PUBLIC_STRIPE_PUBLISHABLE_KEY") || "pk_live_51UQlKz8WEuFYic5dU7jN0PH2v4EFZ10fVjq078L6NVWDN2hjSFBLENvJK196wY7Zplc0VRmhHsVWpCV6YxqJyrQS00GJqWx2wI",
           /** The Worker's address, e.g. https://corkvegans-membership.<subdomain>.workers.dev (no path). */
           endpoint: env("PUBLIC_MEMBERSHIP_ENDPOINT") || "https://corkvegans-membership.mikedawsonmd.workers.dev",
-          /** Cloudflare Turnstile site key. Leave empty unless the Worker has TURNSTILE_SECRET_KEY. */
-          turnstileSiteKey: env("PUBLIC_TURNSTILE_SITE_KEY") || "",
+          /**
+           * Cloudflare Turnstile site key. Publish it before setting the Worker's
+           * TURNSTILE_SECRET_KEY (the Worker ignores tokens until then); a secret
+           * without this key would reject every join.
+           */
+          turnstileSiteKey: env("PUBLIC_TURNSTILE_SITE_KEY") || "0x4AAAAAAF-VfRSAZdMQj7JR",
           /** Stripe customer portal login link (Settings → Billing → Customer portal). Empty: no "manage" link. */
           portalUrl: env("PUBLIC_STRIPE_PORTAL_URL") || "https://billing.stripe.com/p/login/7sY28lc4ocjoaBR6uz0co00",
           /**
