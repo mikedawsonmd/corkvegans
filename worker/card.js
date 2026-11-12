@@ -35,6 +35,13 @@ export async function cardTokenFor(subscriptionId, secret) {
 /** The member's own card link: the token, then their code if they have one. */
 export const cardLink = (siteUrl, token, code) => `${siteUrl}/membership/card/#${token}${code ? `/${code}` : ""}`;
 
+/**
+ * The same card link, asking the card page to start "Add to Google Wallet"
+ * straight away (the email's Wallet badge). The query has nothing secret in
+ * it; the token stays in the #fragment.
+ */
+export const walletLink = (siteUrl, token, code) => cardLink(siteUrl, token, code).replace("/membership/card/#", "/membership/card/?add=google-wallet#");
+
 /** The subscription ID in a genuine token, or null. */
 export async function subscriptionForCard(token, secret) {
     const match = typeof token === "string" ? CARD_TOKEN_PATTERN.exec(token) : null;

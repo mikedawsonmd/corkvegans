@@ -23,7 +23,7 @@
 import { cardLink, cardTokenFor } from "./card.js";
 import { StripeError, stripe } from "./http.js";
 import { CODE_PATTERN, LIVE, codeEndDate } from "./members.js";
-import { SITE_URL } from "./welcome-email.js";
+import { SITE_URL } from "./site.js";
 
 const API = "https://walletobjects.googleapis.com/walletobjects/v1";
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
@@ -41,6 +41,13 @@ export class GoogleWalletError extends Error {
 }
 
 export const googleWalletEnabled = (env) => Boolean(env.GOOGLE_WALLET_ISSUER_ID && env.GOOGLE_WALLET_KEY);
+/**
+ * Whether emails offer "Add to Google Wallet". Until Google grants publishing
+ * access only test accounts can save a pass, so this waits for
+ * GOOGLE_WALLET_PUBLISHED = "true" (wrangler.toml), switched on together with
+ * membership.googleWallet in src/config/site.ts.
+ */
+export const googleWalletInEmails = (env) => googleWalletEnabled(env) && env.GOOGLE_WALLET_PUBLISHED === "true";
 export const passClassId = (env) => `${env.GOOGLE_WALLET_ISSUER_ID}.cork_vegans_membership`;
 export const passObjectId = (env, subscriptionId) => `${env.GOOGLE_WALLET_ISSUER_ID}.${subscriptionId}`;
 

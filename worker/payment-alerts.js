@@ -13,6 +13,7 @@
 
 import { stripe } from "./http.js";
 import { SOURCE } from "./members.js";
+import { emailPage, h2, link, p } from "./email-layout.js";
 import { CONTACT_EMAIL, PER, escape, membershipPrice, sendEmail } from "./welcome-email.js";
 
 const WEEK_MS = 7 * 86_400_000;
@@ -39,8 +40,8 @@ function describe(subscription) {
 export function paymentAlertEmail(failing, ended) {
     const rows = (list, note) =>
         list.map((s) => {
-            const { name, amount, link } = describe(s);
-            return { text: `- ${name}, ${amount} (${note(s)}): ${link}`, html: `<li>${escape(name)}, ${escape(amount)} (${escape(note(s))}): <a href="${link}">open in Stripe</a></li>` };
+            const { name, amount, link: stripeLink } = describe(s);
+            return { text: `- ${name}, ${amount} (${note(s)}): ${stripeLink}`, html: `<li>${escape(name)}, ${escape(amount)} (${escape(note(s))}): ${link(stripeLink, "open in Stripe")}</li>` };
         });
     const failingRows = rows(failing, () => "Stripe is retrying the payment");
     const endedRows = rows(ended, (s) => `ended ${dublinDate(s.ended_at)}`);
@@ -54,7 +55,16 @@ export function paymentAlertEmail(failing, ended) {
     return {
         subject,
         text: [...sections.flatMap((s) => [s.title, ...s.rows.map((r) => r.text), ""]), footer].join("\n"),
-        html: [...sections.map((s) => `<p>${escape(s.title)}</p><ul>${s.rows.map((r) => r.html).join("")}</ul>`), `<p>${escape(footer)}</p>`].join(""),
+        html: emailPage({
+            title: subject,
+            preheader: subject,
+            body: [
+                p(`<span style="font-size:24px;line-height:32px;font-weight:700">${escape(subject.replace("Cork Vegans: ", ""))}</span>`),
+                ...sections.map((s) => `${h2(s.title)}<ul style="margin:0 0 16px;padding-left:20px">${s.rows.map((r) => r.html.replace("<li>", '<li style="margin:0 0 8px">')).join("")}</ul>`),
+                p(escape(footer), "margin:0"),
+            ].join("\n"),
+            footer: "Sent every Monday by the membership service, only when payments fail.",
+        }),
     };
 }
 

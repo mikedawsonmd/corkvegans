@@ -6,17 +6,16 @@
  * "Cork Vegans <members@corkvegans.ie>", on a domain verified in Brevo),
  * EMAIL_REPLY_TO (default crkvgns@gmail.com), STRIPE_PORTAL_URL (the
  * customer portal login link), MEMBER_DISCOUNT_EUR (default 5).
+ * The look comes from email-layout.js.
  */
 
-import { cardLink as cardLinkFor } from "./card.js";
+import { cardLink as cardLinkFor, walletLink as walletLinkFor } from "./card.js";
+import { BRAND, FONT, button, emailPage, escape, h2, link, p } from "./email-layout.js";
+import { CONTACT_EMAIL, EVENTBRITE_URL, SITE_URL } from "./site.js";
 
-export const SITE_URL = "https://corkvegans.ie";
-export const EVENTBRITE_URL = "https://www.eventbrite.ie/o/cork-vegans-91797524863";
-export const CONTACT_EMAIL = "crkvgns@gmail.com";
+export { CONTACT_EMAIL, EVENTBRITE_URL, SITE_URL, escape };
 
 export const PER = { month: "a month", year: "a year" };
-
-export const escape =(text) => String(text).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
 /** What the member pays, from their subscription's current price (it changes if they switch tier). */
 export function membershipPrice(subscription) {
@@ -34,7 +33,8 @@ export function welcomeEmail({ firstName, code, price, discountEur, portalUrl, c
     const hello = firstName ? `Hi ${firstName},` : "Hi there,";
     // In the #fragment, so the token never reaches a server log.
     const cardLink = cardToken ? cardLinkFor(SITE_URL, cardToken, code) : "";
-    const cardText = `Your membership card: open it on your phone to show you're a member, for example at our partner businesses.${googleWallet ? " You can add it to Google Wallet from there." : ""}`;
+    const cardText = "Your membership card: open it on your phone to show you're a member, for example at our partner businesses.";
+    const walletText = cardToken && googleWallet ? `Add it to Google Wallet (Android phones): ${walletLinkFor(SITE_URL, cardToken, code)}` : "";
     const eventsLink = `${SITE_URL}/events/?member=${encodeURIComponent(code)}`;
     const termsLink = `${SITE_URL}/membership-terms/`;
     const paying = price ? `You're paying €${Number.isInteger(price.amount) ? price.amount : price.amount.toFixed(2)} ${PER[price.interval]}. Every member gets the same benefits, whatever they pay.` : "";
@@ -63,7 +63,7 @@ export function welcomeEmail({ firstName, code, price, discountEur, portalUrl, c
         `Book from our events page and your code is added for you: ${eventsLink}`,
         `All our events on Eventbrite: ${EVENTBRITE_URL}`,
         "",
-        ...(cardLink ? [`${cardText} ${cardLink}`, ""] : []),
+        ...(cardLink ? [`${cardText} ${cardLink}`, ...(walletText ? [walletText] : []), ""] : []),
         "Your membership",
         ...(paying ? [paying] : []),
         ...(portalUrl ? [`Manage or cancel your membership: ${portalUrl}`, changing] : []),
@@ -75,35 +75,41 @@ export function welcomeEmail({ firstName, code, price, discountEur, portalUrl, c
         "Cork Vegans",
     ].join("\n");
 
-    const p = (html) => `<p style="margin:0 0 16px">${html}</p>`;
-    const link = (href, label) => `<a href="${escape(href)}" style="color:#275d49;font-weight:bold">${escape(label)}</a>`;
-    const html = `<!doctype html>
-<html lang="en-IE">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Welcome to Cork Vegans</title></head>
-<body style="margin:0;padding:0;background:#fff8f3">
-<div style="max-width:560px;margin:0 auto;padding:24px 16px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.5;color:#1d1b1c">
-${p(escape(hello))}
+    // The pig and chicken stand on the top edge of the code box, like the animals on the site.
+    const codeBox = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 24px">
+<tr><td align="right" style="padding:0 24px;line-height:0;font-size:0"><img src="${SITE_URL}/images/email/animals-pig-chicken.png" width="135" height="64" alt="" style="display:inline-block;width:135px;height:64px;border:0"></td></tr>
+<tr><td align="center" style="background:${BRAND.primaryFixed};border-radius:24px;padding:20px 16px;color:${BRAND.onPrimaryFixed}">
+<p style="margin:0 0 4px;font-family:${FONT};font-size:14px;line-height:20px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Your member code</p>
+<p style="margin:0;font-family:${FONT};font-size:36px;line-height:44px;font-weight:700;letter-spacing:4px">${escape(code)}</p>
+</td></tr>
+</table>`;
+    const walletLink = cardToken && googleWallet ? walletLinkFor(SITE_URL, cardToken, code) : "";
+    const walletBadge = walletLink
+        ? `<a href="${escape(walletLink)}" style="display:inline-block;margin:4px 0 8px"><img src="${SITE_URL}/images/email/add-to-google-wallet.png" width="226" height="40" alt="Add to Google Wallet" style="display:block;width:226px;height:40px;border:0"></a>
+${p("On an Android phone. On an iPhone, open your card and add it to your home screen instead.", `font-size:14px;line-height:20px;color:${BRAND.muted}`)}`
+        : "";
+    const body = `${p(`<span style="font-size:24px;line-height:32px;font-weight:700">${escape(hello)}</span>`)}
 ${p("Welcome to Cork Vegans, and thank you for joining!")}
-<div style="margin:0 0 24px;padding:16px;border-radius:12px;background:#d6f0e1;text-align:center">
-<p style="margin:0 0 4px;font-size:14px">Your member code</p>
-<p style="margin:0;font-size:32px;font-weight:bold;letter-spacing:4px;font-family:'Courier New',monospace">${escape(code)}</p>
-</div>
-<h2 style="margin:0 0 8px;font-size:18px">How to use your code</h2>
+${codeBox}
+${h2("How to use your code")}
 <ul style="margin:0 0 16px;padding-left:20px">${uses.map((u) => `<li style="margin:0 0 8px">${escape(u)}</li>`).join("")}</ul>
-${p(`${link(eventsLink, "Book with your member discount")}: your code is added for you on our events page.`)}
-${p(`All our events are also on ${link(EVENTBRITE_URL, "Eventbrite")}.`)}
-${cardLink ? `<h2 style="margin:0 0 8px;font-size:18px">Your membership card</h2>
-${p(`Open it on your phone to show you're a member, for example at our partner businesses. It shows this month and a QR code they can scan to check it. ${googleWallet ? "You can add it to Google Wallet from there, or add the page to your home screen." : "Tip: add it to your home screen."}`)}
-${p(link(cardLink, "Open your membership card"))}` : ""}
-<h2 style="margin:0 0 8px;font-size:18px">Your membership</h2>
+${button(eventsLink, "Book with your member discount")}
+${p(`Your code is added for you on our events page. All our events are also on ${link(EVENTBRITE_URL, "Eventbrite")}.`)}
+${
+    cardLink
+        ? `${h2("Your membership card")}
+${p(`Open it on your phone to show you're a member, for example at our partner businesses. It shows this month and a QR code they can scan to check it.${googleWallet ? "" : " Tip: add it to your home screen."}`)}
+${button(cardLink, "Open your membership card", { outlined: true })}
+${walletBadge}`
+        : ""
+}
+${h2("Your membership")}
 ${paying ? p(escape(paying)) : ""}
 ${portalUrl ? p(`${link(portalUrl, "Manage or cancel your membership")}. ${escape(changing)}`) : ""}
 ${p(link(termsLink, "Membership terms"))}
 ${p("Any questions? Just reply to this email.")}
-${p("See you soon,<br>Cork Vegans")}
-</div>
-</body>
-</html>`;
+${p("See you soon,<br>Cork Vegans", "margin:0")}`;
+    const html = emailPage({ title: "Welcome to Cork Vegans", preheader: `Your member code is ${code}. Here's how to use it.`, body, footer: "You're getting this because you joined Cork Vegans." });
 
     return { subject: "Welcome to Cork Vegans! Here's your member code", text, html };
 }

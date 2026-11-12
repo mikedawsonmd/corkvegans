@@ -204,9 +204,17 @@ period, in case an update is missed. Setup:
    the Wallet console can save passes, and passes say "[TEST ONLY]". Once
    it works, click **Request publishing access**; Google reviews the pass
    and your business profile.
+7. **When Google grants publishing access**, switch on both together:
+   `googleWallet: true` in `src/config/site.ts` (the card page's button),
+   and `GOOGLE_WALLET_PUBLISHED = "true"` in `worker/wrangler.toml` (the
+   welcome email's "Add to Google Wallet" badge). Push the site first, then
+   `npx wrangler deploy` in `worker/`. The email's badge opens the member's
+   card page with `?add=google-wallet`, which starts adding the card at once.
 
 The button is Google's official badge (`public/images/add-to-google-wallet.svg`,
-from Google's brand guidelines; don't restyle it). The pass logo is
+from Google's brand guidelines; don't restyle it). Emails use a PNG copy
+(`public/images/email/`, made by `node scripts/build-email-images.ts`),
+because Gmail doesn't show SVG images. The pass logo is
 `public/images/wallet-logo.png` (660 × 660, as Google requires). Apple
 Wallet isn't built yet: it needs the Apple Developer Program (about €99 a
 year), a Pass Type ID and its certificate.

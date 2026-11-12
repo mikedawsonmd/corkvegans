@@ -11,7 +11,7 @@
  */
 
 import { cardTokenFor } from "./card.js";
-import { googleWalletEnabled, updateWalletPass } from "./google-wallet.js";
+import { googleWalletInEmails, updateWalletPass } from "./google-wallet.js";
 import { createMemberDiscount, removeMemberDiscount, setMemberDiscountEnd } from "./eventbrite.js";
 import { stripe } from "./http.js";
 import { membershipPrice, sendEmail, welcomeEmail } from "./welcome-email.js";
@@ -56,7 +56,7 @@ async function sendWelcome(env, subscription, to) {
         discountEur: discountEur(env),
         portalUrl: env.STRIPE_PORTAL_URL,
         cardToken: await cardTokenFor(subscription.id, env.MEMBER_CODE_SECRET),
-        googleWallet: googleWalletEnabled(env),
+        googleWallet: googleWalletInEmails(env),
     });
     await sendEmail(env, to, content);
 }

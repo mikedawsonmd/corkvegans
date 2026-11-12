@@ -24,6 +24,10 @@ EMAIL_REPLY_TO = "crkvgns@gmail.com"
 # Google Pay & Wallet Console → Google Wallet API. Not secret; the key is
 # the GOOGLE_WALLET_KEY secret (google-wallet.js).
 GOOGLE_WALLET_ISSUER_ID = "3388000000023233601"
+# "true" once Google grants publishing access: emails then offer "Add to
+# Google Wallet". Switch it on together with membership.googleWallet in
+# src/config/site.ts (google-wallet.js, googleWalletInEmails).
+GOOGLE_WALLET_PUBLISHED = "false"
 
 # Per-IP limits. If you merge membership.js into another Worker, copy these
 # blocks into its config.

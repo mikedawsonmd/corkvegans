@@ -230,6 +230,15 @@ const endpoint = membership.endpoint.trim().replace(/\/+$/, "");
                     result.kind === "ended" ? "Your membership has ended, so this card can't be added." : "Sorry, we couldn't add your card to Google Wallet just now. Please try again.";
             });
         }
+        // The welcome email's "Add to Google Wallet" badge links here with ?add=google-wallet:
+        // start adding straight away, once, and drop the query so a reload doesn't repeat it.
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("add") === "google-wallet") {
+            params.delete("add");
+            history.replaceState(history.state, "", `${window.location.pathname}${params.size ? `?${params}` : ""}${window.location.hash}`);
+            const button = root.querySelector<HTMLButtonElement>("[data-add-google-wallet]");
+            if (wallet && !wallet.hidden && button) button.click();
+        }
         window.setInterval(() => root.dataset.state === "valid" && tick(), 1000);
         // Coming back to the page (e.g. reopening the shortcut) checks again.
         document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && root.dataset.state !== "loading" && load());

@@ -125,6 +125,35 @@ describe("welcome email", () => {
         }
     });
 
+    it("looks like Cork Vegans: logo, Karla, brand colours, the animals on the code box", () => {
+        const { html } = welcomeEmail({ firstName: "Aoife", code: "CV-7K3P9Q", price, discountEur: 5, cardToken: "sub_1abc.sig" });
+        expect(html).toContain('src="https://corkvegans.ie/images/logo.png"');
+        expect(html).toContain('alt="Cork Vegans"');
+        expect(html).toContain("family=Karla");
+        expect(html).toContain("font-family:Karla");
+        expect(html).toContain("#275d49");
+        expect(html).toContain("https://corkvegans.ie/images/email/animals-pig-chicken.png");
+        // Gmail and Outlook don't show SVG images.
+        expect(html).not.toMatch(/src="[^"]+\.svg"/);
+        expect(html).toContain("Your member code is CV-7K3P9Q");
+    });
+
+    it("offers Add to Google Wallet only once it's published, linking to the card page that starts it", () => {
+        const details = { firstName: "Aoife", code: "CV-7K3P9Q", price, discountEur: 5, cardToken: "sub_1abc.sig" };
+        const off = welcomeEmail(details);
+        expect(off.html).not.toContain("add-to-google-wallet");
+        expect(off.text).not.toContain("Google Wallet");
+
+        const on = welcomeEmail({ ...details, googleWallet: true });
+        const walletLink = "https://corkvegans.ie/membership/card/?add=google-wallet#sub_1abc.sig/CV-7K3P9Q";
+        expect(on.html).toContain(`href="${walletLink}"`);
+        expect(on.html).toContain('src="https://corkvegans.ie/images/email/add-to-google-wallet.png"');
+        expect(on.html).toContain('alt="Add to Google Wallet"');
+        expect(on.text).toContain(`Add it to Google Wallet (Android phones): ${walletLink}`);
+        // The plain card link stays as it was.
+        expect(on.html).toContain('href="https://corkvegans.ie/membership/card/#sub_1abc.sig/CV-7K3P9Q"');
+    });
+
     it("escapes names in the HTML", () => {
         expect(welcomeEmail({ firstName: "<b>Aoife</b>", code: "CV-7K3P9Q", price, discountEur: 5 }).html).toContain("&lt;b&gt;Aoife&lt;/b&gt;");
     });

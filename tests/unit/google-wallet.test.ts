@@ -1,6 +1,6 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { cardTokenFor } from "../../worker/card.js";
-import { MONTHLY_CRON, REFRESH_BATCH, passObject, refreshWalletPasses, signJwt } from "../../worker/google-wallet.js";
+import { MONTHLY_CRON, REFRESH_BATCH, googleWalletInEmails, passObject, refreshWalletPasses, signJwt } from "../../worker/google-wallet.js";
 import { handleMembership } from "../../worker/membership.js";
 import { handleStripeEvent } from "../../worker/stripe-webhook.js";
 import { fakeServices, subscription, workerEnv } from "./fake-membership-services.ts";
@@ -90,6 +90,13 @@ describe("Google Wallet: the pass", () => {
 });
 
 describe("Google Wallet: Add to Google Wallet", () => {
+    it("only offers Wallet in emails once publishing access is switched on", () => {
+        expect(googleWalletInEmails(workerEnv)).toBe(false);
+        expect(googleWalletInEmails(env)).toBe(false);
+        expect(googleWalletInEmails({ ...env, GOOGLE_WALLET_PUBLISHED: "true" })).toBe(true);
+        expect(googleWalletInEmails({ ...workerEnv, GOOGLE_WALLET_PUBLISHED: "true" })).toBe(false);
+    });
+
     it("answers 404 until the Worker has the Google Wallet settings", async () => {
         useServices();
         const token = await cardTokenFor("sub_1abcdefgh", workerEnv.MEMBER_CODE_SECRET);
