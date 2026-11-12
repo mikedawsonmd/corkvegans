@@ -30,7 +30,8 @@ const endpoint = membership.endpoint.trim().replace(/\/+$/, "");
                 <span class="w-10 h-10 rounded-full bg-on-primary flex items-center justify-center shrink-0">
                     <img src={site.logo} alt="" width="32" height="32" class="w-8 h-8 object-contain" />
                 </span>
-                <span id="card-title" class="font-headline-md text-body-lg font-semibold">Cork Vegans member</span>
+                <!-- The logo says "Cork Vegans" on screen; screen readers, which skip the logo, still hear it. -->
+                <span id="card-title" class="font-headline-md text-body-lg font-semibold"><span class="sr-only">Cork Vegans </span>Member</span>
             </span>
             <span class="flex items-center gap-xs text-label-sm" aria-hidden="true">
                 <span class="cv-live-dot"></span><span data-card-clock class="tabular-nums"></span>
