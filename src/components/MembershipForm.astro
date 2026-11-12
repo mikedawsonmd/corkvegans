@@ -179,8 +179,8 @@ const optional = "font-body-md text-on-surface-variant";
                             </button>
                         </div>
                         <div>
-                            <!-- bg matches the Stripe Checkout branding colour, so the padding reads as part of the checkout -->
-                            <div data-checkout class="bg-primary-container sm:rounded-b-lg pb-[calc(theme(spacing.xl)+env(safe-area-inset-bottom))]"></div>
+                            <!-- bg matches the Stripe Checkout branding colour, so the padding reads as part of the checkout; on phones the side padding keeps Stripe's white form off the screen edges -->
+                            <div data-checkout class="bg-primary-container max-sm:px-md sm:rounded-b-lg pb-[calc(theme(spacing.xl)+env(safe-area-inset-bottom))]"></div>
                             <div data-membership-success tabindex="-1" class="flex flex-col items-start gap-md px-lg pt-lg pb-[calc(theme(spacing.xl)+env(safe-area-inset-bottom))] focus:outline-none" hidden>
                                 <h3 class="font-headline-md text-headline-md text-on-surface">Welcome to Cork Vegans!</h3>
 
