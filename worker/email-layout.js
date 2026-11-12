@@ -16,9 +16,9 @@ export const BRAND = {
     onPrimary: "#ffffff",
     primaryFixed: "#b6efd4",
     onPrimaryFixed: "#002115",
-    background: "#fef8f9",
+    background: "#f9f9f9",
     card: "#ffffff",
-    text: "#1d1b1c",
+    text: "#1c1c1c",
     muted: "#404944",
     outline: "#c0c9c2",
 };

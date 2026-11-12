@@ -67,7 +67,7 @@ body {
 }
 
 .cv-skeleton {
-    background: linear-gradient(90deg, #ece7e8 25%, #e0dada 50%, #ece7e8 75%);
+    background: linear-gradient(90deg, #e8e8e8 25%, #dbdbdb 50%, #e8e8e8 75%);
     background-size: 200% 100%;
     animation: cv-shimmer 1.4s infinite;
     border-radius: 1rem;
@@ -92,7 +92,7 @@ html {
 
 /* ── Visible keyboard focus (WCAG 2.4.7 / 2.4.11) ───────────────────────── */
 :focus-visible {
-    outline: 3px solid #1d1b1c;
+    outline: 3px solid #1c1c1c;
     outline-offset: 3px;
 }
 
@@ -157,7 +157,7 @@ html {
     }
 
     .cv-choice:focus-visible + .cv-btn {
-        outline: 3px solid #1d1b1c;
+        outline: 3px solid #1c1c1c;
         outline-offset: 3px;
     }
 
@@ -280,7 +280,7 @@ html {
 
 /* ── Article typography ──────────────────────────────────────────────────── */
 .cv-prose {
-    color: #1d1b1c;
+    color: #1c1c1c;
     font-size: 18px;
     line-height: 30px;
     max-width: 68ch;
@@ -346,7 +346,7 @@ html {
 
 .cv-prose blockquote {
     border-left: 4px solid #417660;
-    background: #f8f2f3;
+    background: #f3f3f3;
     border-radius: 0 1rem 1rem 0;
     padding: 16px 24px;
     font-style: italic;
@@ -374,14 +374,14 @@ html {
 }
 
 .cv-prose code {
-    background: #f2eced;
+    background: #ededed;
     border-radius: 6px;
     padding: 0.1em 0.35em;
     font-size: 0.9em;
 }
 
 .cv-prose pre {
-    background: #f2eced;
+    background: #ededed;
     border-radius: 1rem;
     padding: 16px;
     overflow-x: auto;
