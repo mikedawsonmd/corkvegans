@@ -1,6 +1,10 @@
 ---
 /** "Community first, plants always." — the original homepage about section. */
+import { Picture } from "astro:assets";
 import { animalSpot } from "../lib/animals";
+// Optimised by Astro (AVIF/WebP in several sizes). /images/bio.jpg stays in
+// public/ for share links that already point at it.
+import bioPhoto from "../assets/photos/bio.jpg";
 interface Props {
     level?: "h1" | "h2";
     showMoreLink?: boolean;
@@ -25,12 +29,14 @@ const activities = [
                     aria-hidden="true"
                 >
                 </div>
-                <img
+                <Picture
+                    src={bioPhoto}
+                    formats={["avif", "webp"]}
+                    widths={[400, 600, 800, 1200]}
+                    sizes="(min-width: 1280px) 600px, (min-width: 1024px) 46vw, calc(100vw - 32px)"
                     alt="Smiling Cork Vegans members gathered around a sheep in a field"
                     class="rounded-lg shadow-2xl relative z-10 w-full aspect-[1.4] object-cover"
-                    src="/images/bio.jpg"
-                    width="1500"
-                    height="1261"
+                    pictureAttributes={{ class: "block w-full" }}
                     loading="lazy"
                     decoding="async"
                 />

@@ -10,6 +10,9 @@ import { getStories } from "../lib/content";
 import { organizationJsonLd } from "../lib/seo";
 import { site } from "../config/site";
 import { animalSpot } from "../lib/animals";
+import { Picture } from "astro:assets";
+// Optimised by Astro (AVIF/WebP in several sizes); the share image stays /images/bio.jpg.
+import heroPhoto from "../assets/photos/hero.jpg";
 
 const events = getUpcomingEvents();
 const latestStories = getStories().slice(0, 3);
@@ -23,7 +26,17 @@ const button = "cv-btn cv-btn-md cv-btn-primary";
     <!-- Hero Section -->
     <section class="relative min-h-[751px] flex items-center overflow-hidden" data-surface="dark" {...animalSpot("floor", "hero", { size: 60 })}>
         <div class="absolute inset-0 z-0">
-            <img alt="" class="w-full h-full object-cover" src="/images/hero.jpg" width="2000" height="1363" fetchpriority="high" />
+            <Picture
+                src={heroPhoto}
+                formats={["avif", "webp"]}
+                widths={[640, 960, 1280, 1600, 2000]}
+                sizes="100vw"
+                alt=""
+                class="w-full h-full object-cover"
+                pictureAttributes={{ class: "block w-full h-full" }}
+                loading="eager"
+                fetchpriority="high"
+            />
             <div class="absolute inset-0 bg-black/50"></div>
         </div>
         <div class="relative z-10 w-full max-w-7xl mx-auto px-margin-mobile flex flex-col items-start gap-lg">
