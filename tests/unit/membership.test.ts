@@ -111,7 +111,8 @@ describe("welcome email", () => {
             const waits: Promise<unknown>[] = [];
             const entry = (await import("../../worker/index.js")).default;
             await entry.scheduled({}, { BREVO_API_KEY: "xkeysib-dummy" }, { waitUntil: (p: Promise<unknown>) => waits.push(p) });
-            expect(await Promise.all(waits)).toEqual(["ok"]);
+            // The weekly cron also runs the failed-payment alert, which skips without payments on.
+            expect(await Promise.all(waits)).toEqual(["ok", "skipped"]);
             const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
             expect(url).toBe("https://api.brevo.com/v3/smtp/statistics/aggregatedReport");
             expect(init.method ?? "GET").toBe("GET");

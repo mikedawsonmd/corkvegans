@@ -14,9 +14,9 @@ export const SITE_URL = "https://corkvegans.ie";
 export const EVENTBRITE_URL = "https://www.eventbrite.ie/o/cork-vegans-91797524863";
 export const CONTACT_EMAIL = "crkvgns@gmail.com";
 
-const PER = { month: "a month", year: "a year" };
+export const PER = { month: "a month", year: "a year" };
 
-const escape = (text) => String(text).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+export const escape =(text) => String(text).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
 /** What the member pays, from their subscription's current price (it changes if they switch tier). */
 export function membershipPrice(subscription) {

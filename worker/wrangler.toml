@@ -9,7 +9,8 @@ compatibility_date = "2026-10-01"
 # (and the other secrets) with: npx wrangler secret put PAYMENTS_ENABLED
 
 # Mondays 06:17 UTC: one read-only Brevo call, because Brevo deletes an API
-# key after 90 days without use (welcome-email.js, keepBrevoKeyAlive).
+# key after 90 days without use (welcome-email.js, keepBrevoKeyAlive); and the
+# failed-payment alert to the organisers (payment-alerts.js, sendPaymentAlert).
 # Hourly on the 1st to the 3rd: Google Wallet passes move on to the new month
 # (google-wallet.js, refreshWalletPasses; keep in step with MONTHLY_CRON).
 [triggers]

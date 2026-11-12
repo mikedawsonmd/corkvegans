@@ -150,6 +150,14 @@ are on `/membership-terms/`; keep them in step with the Membership page.
 6. "Lost your code?" on the Membership page re-sends the welcome email
    (code and card link) to any live membership under that email, and always
    shows the same message.
+7. When a renewal payment fails, Stripe emails the member and retries
+   (Smart Retries, up to 8 times in 2 weeks); the membership and code stay
+   valid meanwhile. If every retry fails, Stripe cancels the subscription
+   and step 5 removes the code. Every Monday morning the Worker emails
+   crkvgns@gmail.com (`EMAIL_REPLY_TO`) a list of memberships whose payment
+   is failing and those that ended that week after failed retries, with a
+   Stripe link for each, in case you want to get in touch. No failures, no
+   email (`worker/payment-alerts.js`).
 
 **Membership card.** `/membership/card/#<token>` shows the member's first
 name, the current month and year in large type, a ticking clock (so a

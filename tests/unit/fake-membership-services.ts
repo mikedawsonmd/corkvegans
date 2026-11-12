@@ -24,6 +24,9 @@ export interface FakeSubscription {
     id: string;
     customer: string;
     status: string;
+    livemode?: boolean;
+    ended_at?: number;
+    cancellation_details?: { reason: string | null };
     metadata: Record<string, string>;
     items: { data: { current_period_end: number; price: { unit_amount: number; recurring: { interval: string }; lookup_key: string | null } }[] };
 }
@@ -87,8 +90,14 @@ export function fakeServices(options: { subscriptions?: FakeSubscription[]; cust
                 return ok(sub);
             }
             if (url.pathname === "/v1/subscriptions/search" && method === "GET") {
-                // Just the query the wallet's monthly run makes.
                 const query = url.searchParams.get("query") ?? "";
+                // The failed-payment alert: one status, from this site.
+                const status = /^status:'(\w+)' AND metadata\['source'\]:'([^']+)'$/.exec(query);
+                if (status) {
+                    const found = [...subscriptions.values()].filter((s) => s.status === status[1] && s.metadata.source === status[2]);
+                    return ok({ data: found.slice(0, Number(url.searchParams.get("limit") ?? 10)) });
+                }
+                // The wallet's monthly run.
                 const month = /-metadata\['wallet_month'\]:'([^']+)'/.exec(query)?.[1];
                 const found = [...subscriptions.values()].filter(
                     (s) => s.metadata.google_wallet === "yes" && s.metadata.wallet_month !== month && !(query.includes("-status:'canceled'") && s.status === "canceled"),
