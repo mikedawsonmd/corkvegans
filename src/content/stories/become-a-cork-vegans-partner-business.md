@@ -3,9 +3,9 @@ draft: true
 title: Become a Cork Vegans partner business 📣
 description: "Local businesses can now partner with Cork Vegans: offer our
   members a perk and get featured on our website and socials."
-category: Community
+category: News
 author: Cork Vegans
-publishedAt: 2026-11-12
+publishedAt: 2026-11-13
 featuredImage: /src/assets/stories/website-4.jpg
 featuredImageAlt: Bullhorn and text calling for businesses
 imageFocus: centre
