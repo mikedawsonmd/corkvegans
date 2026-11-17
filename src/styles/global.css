@@ -29,29 +29,37 @@
 /* ── Material icons default style ──────────────────────────────────────────
    The font is self-hosted and cut down to src/lib/icons.ts (astro.config.mjs).
    Each icon is a 1em square that clips its contents, so before the font
-   loads the icon's name (e.g. "restaurant") can't show or shift the layout. */
-.material-symbols-outlined {
-    font-family: var(--font-material-symbols);
-    font-weight: normal;
-    font-style: normal;
-    font-size: 24px;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    overflow: hidden;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    font-feature-settings: "liga";
-    -webkit-font-smoothing: antialiased;
-    font-variation-settings:
-        "FILL" 0,
-        "wght" 400,
-        "GRAD" 0,
-        "opsz" 24;
+   loads the icon's name (e.g. "restaurant") can't show or shift the layout.
+   flex-shrink: 0 matters: with overflow hidden, a flex item may shrink to 0
+   wide, so an icon beside wrapping text (an event's venue, a button label)
+   was squeezed and its glyph cut off.
+   It sits in the base layer so size classes such as text-[20px] or
+   text-[5rem] on an icon override the 24px default.                      */
+@layer base {
+    .material-symbols-outlined {
+        flex-shrink: 0;
+        font-family: var(--font-material-symbols);
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        overflow: hidden;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        font-feature-settings: "liga";
+        -webkit-font-smoothing: antialiased;
+        font-variation-settings:
+            "FILL" 0,
+            "wght" 400,
+            "GRAD" 0,
+            "opsz" 24;
+    }
 }
 
 /* ── Utility classes ─────────────────────────────────────────────────────── */
@@ -186,6 +194,30 @@ html {
 
     .cv-btn .material-symbols-outlined {
         font-size: 20px;
+    }
+}
+
+/* ── Icon + text rows ──────────────────────────────────────────────────────
+   Small grey "meta" lines such as an event's time and venue, or a partner's
+   area: <p class="cv-meta"><span class="material-symbols-outlined">…</span>
+   <span>text</span></p>. When the text wraps, the icon stays beside its first
+   line (not the middle of the block) and the text's other lines run on below;
+   one line looks just as it did with the icon centred. The icon is 20px;
+   for another size set the variable, e.g. class="cv-meta [--cv-meta-icon:16px]". */
+@layer components {
+    .cv-meta {
+        --cv-meta-icon: 20px;
+        @apply flex items-start gap-xs text-label-sm;
+    }
+
+    .cv-meta > .material-symbols-outlined {
+        font-size: var(--cv-meta-icon);
+    }
+
+    /* Centre the first line of text (16px tall) on the icon; none for an
+       icon 16px or smaller. */
+    .cv-meta > .material-symbols-outlined + * {
+        padding-top: max(0px, calc((var(--cv-meta-icon) - 16px) / 2));
     }
 }
 

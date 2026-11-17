@@ -89,19 +89,19 @@ const location = event.location.online ? "Online event" : [event.location.name, 
                         {event.title}<span class="sr-only">{cancelled ? " (cancelled)" : ""} — {cta} (opens in a new tab)</span>
                     </a>
                 </Heading>
-                <p class="flex items-center gap-xs text-on-surface-variant">
-                    <span class="material-symbols-outlined text-[20px]" aria-hidden="true">schedule</span>
-                    <span class="text-label-sm">
+                <p class="cv-meta text-on-surface-variant">
+                    <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
+                    <span>
                         <time datetime={event.start}>{formatEventDate(event.start)} · {formatEventTimeRange(event)}</time>
                     </span>
                 </p>
                 {
                     location && (
-                        <p class="flex items-center gap-xs text-on-surface-variant">
-                            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">
+                        <p class="cv-meta text-on-surface-variant">
+                            <span class="material-symbols-outlined" aria-hidden="true">
                                 {event.location.online ? "videocam" : "location_on"}
                             </span>
-                            <span class="text-label-sm">{location}</span>
+                            <span>{location}</span>
                         </p>
                     )
                 }
