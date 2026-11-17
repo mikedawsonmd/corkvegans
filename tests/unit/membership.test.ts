@@ -10,9 +10,9 @@ describe("membership amounts", () => {
         ["15", "monthly", 15],
         [" 15 ", "monthly", 15],
         ["€15", "monthly", 15],
-        ["€ 2", "monthly", 2],
+        ["€ 5", "monthly", 5],
         ["500", "monthly", 500],
-        ["50", "yearly", 50],
+        ["60", "yearly", 60],
         ["€75", "yearly", 75],
     ] as const)("accepts %j %s", (raw, frequency, amount) => {
         expect(parseAmount(raw, frequency)).toEqual({ amount });
@@ -24,10 +24,10 @@ describe("membership amounts", () => {
         ["15,5", "monthly", /whole number/],
         ["-5", "monthly", /whole number/],
         ["ten", "monthly", /whole number/],
-        ["1", "monthly", /smallest monthly amount is €2 a month/],
+        ["4", "monthly", /smallest monthly amount is €5 a month/],
         ["0", "monthly", /smallest/],
         ["501", "monthly", /most we can take online is €500 a month/],
-        ["49", "yearly", /smallest yearly amount is €50 a year/],
+        ["59", "yearly", /smallest yearly amount is €60 a year/],
         ["501", "yearly", /most we can take online is €500 a year/],
     ] as const)("rejects %j %s", (raw, frequency, message) => {
         const result = parseAmount(raw, frequency);
@@ -42,8 +42,8 @@ describe("membership amounts", () => {
 
     it("formats amounts for people", () => {
         expect(formatAmount(10, "monthly")).toBe("€10 a month");
-        expect(formatAmount(50, "yearly")).toBe("€50 a year");
-        expect(amountHint("yearly")).toBe("Whole euros, from €50 to €500 a year.");
+        expect(formatAmount(60, "yearly")).toBe("€60 a year");
+        expect(amountHint("yearly")).toBe("Whole euros, from €60 to €500 a year.");
     });
 });
 
@@ -166,7 +166,7 @@ describe("welcome email", () => {
 
 describe("Stripe catalogue script", () => {
     it("defines the five preset prices with lookup keys", () => {
-        expect(presetPrices().map((p) => p.lookupKey)).toEqual(["membership_monthly_5", "membership_monthly_10", "membership_monthly_15", "membership_yearly_50", "membership_yearly_100"]);
+        expect(presetPrices().map((p) => p.lookupKey)).toEqual(["membership_monthly_5", "membership_monthly_10", "membership_monthly_15", "membership_yearly_60", "membership_yearly_100"]);
     });
 
     it("matches the Worker's product for custom amounts", () => {
@@ -203,7 +203,7 @@ describe("Stripe catalogue script", () => {
         expect(posts.filter((p) => p.path === "/v1/products").map((p) => p.body.id)).toEqual([CUSTOM_PRODUCT_ID, ...presetPrices().map((p) => p.productId)]);
         const created = posts.filter((p) => p.path === "/v1/prices").map((p) => p.body);
         expect(created.map((c) => c.lookup_key)).toEqual(presetPrices().map((p) => p.lookupKey));
-        expect(created[3]).toEqual({ product: "cv_membership_yearly_50", currency: "eur", unit_amount: "5000", "recurring[interval]": "year", lookup_key: "membership_yearly_50", nickname: "€50 a year" });
+        expect(created[3]).toEqual({ product: "cv_membership_yearly_60", currency: "eur", unit_amount: "6000", "recurring[interval]": "year", lookup_key: "membership_yearly_60", nickname: "€60 a year" });
     });
 
     it("changes nothing when everything exists", async () => {

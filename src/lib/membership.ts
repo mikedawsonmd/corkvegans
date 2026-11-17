@@ -14,16 +14,16 @@ export const FREQUENCIES: { value: Frequency; label: string }[] = [
 /** Preset amounts in whole euros; each has a catalogue price in Stripe (lookup key membership_<frequency>_<amount>). */
 export const PRESETS: Record<Frequency, number[]> = {
     monthly: [5, 10, 15],
-    yearly: [50, 100],
+    yearly: [60, 100],
 };
 
 /** Selected when the form loads, or when switching frequency. */
-export const DEFAULT_AMOUNT: Record<Frequency, number> = { monthly: 10, yearly: 50 };
+export const DEFAULT_AMOUNT: Record<Frequency, number> = { monthly: 10, yearly: 60 };
 
 /** "Other" amounts, in whole euros. */
 export const LIMITS: Record<Frequency, { min: number; max: number }> = {
-    monthly: { min: 2, max: 500 },
-    yearly: { min: 50, max: 500 },
+    monthly: { min: 5, max: 500 },
+    yearly: { min: 60, max: 500 },
 };
 
 const PER: Record<Frequency, string> = { monthly: "a month", yearly: "a year" };

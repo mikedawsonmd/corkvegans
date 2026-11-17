@@ -21,7 +21,7 @@ const PRICES: Record<string, { id: string; product: string }> = {
     membership_monthly_5: { id: "price_m5", product: "cv_membership_monthly_5" },
     membership_monthly_10: { id: "price_m10", product: "cv_membership_monthly_10" },
     membership_monthly_15: { id: "price_m15", product: "cv_membership_monthly_15" },
-    membership_yearly_50: { id: "price_y50", product: "cv_membership_yearly_50" },
+    membership_yearly_60: { id: "price_y60", product: "cv_membership_yearly_60" },
     membership_yearly_100: { id: "price_y100", product: "cv_membership_yearly_100" },
 };
 
@@ -98,9 +98,9 @@ describe("membership Worker: routing and CORS", () => {
 
 describe("membership Worker: validation", () => {
     it.each([
-        join({ amount: 2 }),
+        join({ amount: 5 }),
         join({ amount: 500 }),
-        join({ frequency: "yearly", amount: 50 }),
+        join({ frequency: "yearly", amount: 60 }),
         join({ frequency: "yearly", amount: 500 }),
         join({ heardAbout: undefined }),
         join({ heardAbout: "" }),
@@ -115,11 +115,11 @@ describe("membership Worker: validation", () => {
     });
 
     it.each([
-        join({ amount: 1 }),
+        join({ amount: 4 }),
         join({ amount: 501 }),
-        join({ amount: 2.5 }),
+        join({ amount: 5.5 }),
         join({ amount: "10" }),
-        join({ frequency: "yearly", amount: 49 }),
+        join({ frequency: "yearly", amount: 59 }),
         join({ frequency: "yearly", amount: 501 }),
         join({ frequency: "once", amount: 10 }),
         join({ frequency: "__proto__" }),

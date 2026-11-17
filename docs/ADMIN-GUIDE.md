@@ -118,8 +118,8 @@ To remove Eventbrite, delete the secret. The site falls back to Meetup only.
 ### 2.6 Membership (**switched off** until set up)
 
 Cork Vegans membership is "contribute what you can": monthly (€5, €10, €15
-or another amount from €2 to €500) or yearly (€50, €100 or another amount
-from €50 to €500). Every member gets the same benefits: €5 off one ticket
+or another amount from €5 to €500) or yearly (€60, €100 or another amount
+from €60 to €500). Every member gets the same benefits: €5 off one ticket
 per paid event, early booking, member events, a digital membership card,
 and discounts at partner businesses once there are some. Everything about
 membership is on `/membership/` (the Support page links there). The terms
@@ -264,7 +264,7 @@ Stripe steps in live mode.
    ```
    It creates one product per preset amount (**Cork Vegans membership: €5 a
    month** and so on), each with one price whose lookup key is
-   `membership_monthly_5`, `_10`, `_15`, `membership_yearly_50` or `_100`,
+   `membership_monthly_5`, `_10`, `_15`, `membership_yearly_60` or `_100`,
    plus **Cork Vegans membership** (ID `cv_membership_custom`) for amounts
    members choose themselves. Running it again changes nothing. Each preset
    needs its own product because the customer portal only allows one

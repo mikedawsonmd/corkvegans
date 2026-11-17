@@ -35,8 +35,8 @@ import { CODE_PATTERN, LIVE, SOURCE, resendMemberCodes } from "./members.js";
 import { handleStripeWebhook } from "./stripe-webhook.js";
 
 // Whole euros. Keep in step with src/lib/membership.ts (a unit test checks).
-export const PRESETS = { monthly: [5, 10, 15], yearly: [50, 100] };
-export const LIMITS = { monthly: { min: 2, max: 500 }, yearly: { min: 50, max: 500 } };
+export const PRESETS = { monthly: [5, 10, 15], yearly: [60, 100] };
+export const LIMITS = { monthly: { min: 5, max: 500 }, yearly: { min: 60, max: 500 } };
 const INTERVAL = { monthly: "month", yearly: "year" };
 export const lookupKey = (frequency, amount) => `membership_${frequency}_${amount}`;
 /** Amounts members choose themselves. Keep in step with scripts/stripe-membership-catalogue.ts (a unit test checks). */
