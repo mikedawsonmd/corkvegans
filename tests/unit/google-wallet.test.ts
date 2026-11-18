@@ -44,7 +44,12 @@ describe("Google Wallet: the pass", () => {
         const jwt = await signJwt({ hello: "world" }, JSON.parse(env.GOOGLE_WALLET_KEY).private_key);
         expect(decode(jwt.split(".")[0])).toEqual({ alg: "RS256", typ: "JWT" });
         expect(await verifies(jwt)).toBe(true);
-        expect(await verifies(jwt.slice(0, -2) + "xx")).toBe(false);
+        // Flip one bit of the signature. (Swapping its last characters for "xx"
+        // left it unchanged about 1 run in 256, as base64url ignores the spare bits.)
+        const [head, body, sig] = jwt.split(".");
+        const bytes = Buffer.from(sig, "base64url");
+        bytes[0] ^= 1;
+        expect(await verifies(`${head}.${body}.${bytes.toString("base64url")}`)).toBe(false);
     });
 
     it("shows the first name, this month in large type and the same QR code as the web card", async () => {
