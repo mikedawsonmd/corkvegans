@@ -2,8 +2,8 @@
 draft: true
 title: "Join our Veganuary 2027 campaign: calling all Cork businesses"
 description: "Cork businesses: sign up to our Veganuary campaign for free
-  promotion, menu support and dish feedback. Join our business evening at My
-  Goodness on 12 December."
+  promotion, menu support and dish feedback. Join our business evening at the
+  Night Time Co-op on 12 December."
 category: Events
 author: Cork Vegans
 publishedAt: 2026-11-18
@@ -35,11 +35,11 @@ We’re inviting local businesses to sign up as participating businesses in our 
 
 **Ways to take part**
 
-**Label your options or offer a small discount.** Label your vegan options clearly, or drop the oat milk surcharge for January. We’ll promote you.
+**Label your options or offer a small discount.** Improve the labelling of your vegan options, or drop the oat milk surcharge for January. We’ll promote you.
 
-**Create a vegan menu.** Put your vegan options on a separate menu. We’ll help with menu design and give feedback.
+**Create a vegan menu.** Create a dedicated vegan menu. We’ll help with menu design and give feedback. We'll also promote and host an event with you!
 
-**Offer a bigger discount.** Something worth €2 or more, like a free coffee with a pastry. You’ll get extra promotion.
+**Offer a bigger discount.** Something worth €2 or more, like a free coffee with a pastry. You’ll get extra promotion. Get added to our Cork Vegans Food Map!
 
 **Launch a new dish.** Try something new, like a vegan pepperoni pizza. We’ll give feedback on the dish and help with a launch event.
 
