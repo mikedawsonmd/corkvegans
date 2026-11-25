@@ -42,7 +42,7 @@
 <main>
   <section id="form-view">
     <h1>Cheese night orders</h1>
-    <p class="lead">Cheese is <strong id="disc-label">15%</strong> off tonight. Extras are full price. <span id="ship-label">€3</span> shipping per order.</p>
+    <p class="lead">Cheese is <strong id="disc-label">15%</strong> off tonight. Extras are full price. <span id="ship-label">€2</span> shipping per person.</p>
     <div id="status" class="msg">Loading products…</div>
 
     <div id="cheese-wrap" hidden>
@@ -165,7 +165,7 @@ async function load() {
     shipping = data.shipping || 0;
     discount = data.discount || 0;
     $('disc-label').textContent = Math.round(discount * 100) + '%';
-    $('ship-label').textContent = eur(shipping);
+    $('ship-label').textContent = Number.isInteger(shipping) ? '€' + shipping : eur(shipping);
     if (!data.ordersOpen) { $('status').textContent = 'Orders are closed. Thanks for coming!'; return; }
     if (!products.length) { $('status').textContent = 'No products yet.'; return; }
     $('status').hidden = true;
