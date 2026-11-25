@@ -35,7 +35,6 @@
   .error { color:#a12a1a; margin-top:8px; font-size:.9rem; }
   .done h1 { margin-bottom:12px; }
   .done .big { font-size:2rem; font-weight:700; margin:8px 0; }
-  .pay { white-space:pre-wrap; background:#fff; border:1px solid var(--line); border-radius:10px; padding:14px; }
   [hidden] { display:none !important; }
 </style>
 </head>
@@ -78,7 +77,6 @@
     <a class="btn" id="revolut" href="#" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">Pay with Revolut</a>
     <button class="btn secondary" id="copy">Copy amount</button>
     <p class="lead" style="margin-top:12px">Enter <strong id="d-total2"></strong> and add <strong id="d-ref"></strong> as the note so we can match your payment.</p>
-    <div class="pay" id="d-pay"></div>
     <button class="btn secondary" id="again">Take another order</button>
   </section>
 </main>
@@ -92,7 +90,7 @@
       <div><span>Shipping</span><span id="s-ship">€0.00</span></div>
       <div class="total"><span>Total</span><span id="s-total">€0.00</span></div>
     </div>
-    <button class="btn" id="submit" disabled>Place order</button>
+    <button class="btn" id="submit" disabled>Continue to payment</button>
     <div class="error" id="error" hidden></div>
   </div>
 </div>
@@ -146,7 +144,7 @@ function totals() {
   $('s-total').textContent = eur(cheese - disc + other + ship);
   const named = $('name').value.trim().length > 0;
   $('submit').disabled = !any || !named;
-  $('submit').textContent = !any ? 'Add items to order' : (!named ? 'Add your name to order' : 'Place order');
+  $('submit').textContent = !any ? 'Add items to order' : (!named ? 'Add your name to order' : 'Continue to payment');
 }
 
 $('name').addEventListener('input', totals);
@@ -201,8 +199,6 @@ $('submit').onclick = async () => {
     $('d-other').textContent = eur(r.other);
     $('d-ship').textContent = eur(r.shipping);
     $('d-total').textContent = eur(r.total);
-    $('d-pay').textContent = r.paymentInfo;
-    $('d-pay').hidden = !r.paymentInfo;
     $('d-total2').textContent = eur(r.total);
     $('d-ref').textContent = r.orderNo + ' ' + name;
     $('revolut').href = REVOLUT_URL;
