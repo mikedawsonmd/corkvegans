@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cheese night orders | Cork Vegans</title>
+<style>
+  :root { --ink:#1d2a1f; --muted:#5d6b60; --line:#dfe5df; --bg:#f6f8f5; --accent:#2f6b3a; --accent-ink:#fff; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:560px; margin:0 auto; padding:20px 16px 140px; }
+  h1 { font-size:1.5rem; margin:0 0 4px; }
+  h2 { font-size:1rem; margin:24px 0 8px; }
+  p.lead { margin:0 0 8px; color:var(--muted); }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; }
+  .item { display:flex; align-items:center; gap:12px; padding:12px 14px; border-top:1px solid var(--line); }
+  .item:first-child { border-top:0; }
+  .item .info { flex:1; min-width:0; }
+  .item .name { font-weight:600; }
+  .item .price { color:var(--muted); font-size:.9rem; }
+  .qty { display:flex; align-items:center; gap:6px; }
+  .qty button { width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:#fff; font-size:1.2rem; cursor:pointer; }
+  .qty button:disabled { opacity:.35; cursor:default; }
+  .qty span { min-width:22px; text-align:center; font-weight:600; }
+  label { display:block; font-weight:600; margin:14px 0 6px; }
+  input { width:100%; padding:12px; border:1px solid var(--line); border-radius:10px; font-size:1rem; }
+  .bar { position:fixed; left:0; right:0; bottom:0; background:#fff; border-top:1px solid var(--line); }
+  .bar-inner { max-width:560px; margin:0 auto; padding:12px 16px; }
+  .rows div { display:flex; justify-content:space-between; font-size:.9rem; color:var(--muted); }
+  .rows .total { color:var(--ink); font-weight:700; font-size:1.1rem; margin-top:4px; }
+  .btn { width:100%; margin-top:10px; padding:14px; border:0; border-radius:10px; background:var(--accent); color:var(--accent-ink); font-size:1rem; font-weight:600; cursor:pointer; }
+  .btn:disabled { opacity:.5; cursor:default; }
+  .btn.secondary { background:#fff; color:var(--accent); border:1px solid var(--accent); }
+  .msg { padding:14px; border-radius:10px; background:#fff4e5; margin:12px 0; }
+  .error { color:#a12a1a; margin-top:8px; font-size:.9rem; }
+  .done h1 { margin-bottom:12px; }
+  .done .big { font-size:2rem; font-weight:700; margin:8px 0; }
+  .pay { white-space:pre-wrap; background:#fff; border:1px solid var(--line); border-radius:10px; padding:14px; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<main>
+  <section id="form-view">
+    <h1>Cheese night orders</h1>
+    <p class="lead">Cheese is <strong id="disc-label">15%</strong> off tonight. Extras are full price. <span id="ship-label">€3</span> shipping per order.</p>
+    <div id="status" class="msg">Loading products…</div>
+
+    <div id="cheese-wrap" hidden>
+      <h2>Cheese</h2>
+      <div id="cheese-list" class="card"></div>
+    </div>
+    <div id="other-wrap" hidden>
+      <h2>Extras</h2>
+      <div id="other-list" class="card"></div>
+    </div>
+
+    <div id="details" hidden>
+      <h2>Your details</h2>
+      <label for="name">Name <span style="color:#a12a1a">*</span></label>
+      <input id="name" autocomplete="name" placeholder="Name for the label" required>
+      <label for="contact">Phone or email</label>
+      <input id="contact" autocomplete="tel" placeholder="In case we need to reach you">
+    </div>
+  </section>
+
+  <section id="done-view" class="done" hidden>
+    <h1>Order <span id="d-no"></span> placed</h1>
+    <p id="d-items"></p>
+    <div class="rows card" style="padding:14px">
+      <div><span>Cheese</span><span id="d-cheese"></span></div>
+      <div><span>Discount</span><span id="d-disc"></span></div>
+      <div><span>Extras</span><span id="d-other"></span></div>
+      <div><span>Shipping</span><span id="d-ship"></span></div>
+    </div>
+    <p>Please pay</p>
+    <div class="big" id="d-total"></div>
+    <a class="btn" id="revolut" href="#" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">Pay with Revolut</a>
+    <button class="btn secondary" id="copy">Copy amount</button>
+    <p class="lead" style="margin-top:12px">Enter <strong id="d-total2"></strong> and add <strong id="d-ref"></strong> as the note so we can match your payment.</p>
+    <div class="pay" id="d-pay"></div>
+    <button class="btn secondary" id="again">Take another order</button>
+  </section>
+</main>
+
+<div class="bar" id="bar" hidden>
+  <div class="bar-inner">
+    <div class="rows">
+      <div><span>Cheese</span><span id="s-cheese">€0.00</span></div>
+      <div><span>Discount</span><span id="s-disc">−€0.00</span></div>
+      <div><span>Extras</span><span id="s-other">€0.00</span></div>
+      <div><span>Shipping</span><span id="s-ship">€0.00</span></div>
+      <div class="total"><span>Total</span><span id="s-total">€0.00</span></div>
+    </div>
+    <button class="btn" id="submit" disabled>Place order</button>
+    <div class="error" id="error" hidden></div>
+  </div>
+</div>
+
+<script>
+// Paste the Apps Script web app URL here
+const REVOLUT_URL = 'https://revolut.me/mikedawson/pocket/lCCfYRoUv3';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxLqsix5RfTo3V0h6qrtq09xDlJN2QrP1FZeuzEhveLr8Qra0TAO4d28SwhhC0Ea-Q8/exec';
+
+const $ = id => document.getElementById(id);
+const eur = n => '€' + n.toFixed(2);
+let products = [], shipping = 0, discount = 0, qty = {}, lastTotal = '';
+
+function render() {
+  const cheese = products.filter(p => p.discounted), other = products.filter(p => !p.discounted);
+  $('cheese-wrap').hidden = !cheese.length;
+  $('other-wrap').hidden = !other.length;
+  $('cheese-list').innerHTML = ''; $('other-list').innerHTML = '';
+  products.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = '<div class="info"><div class="name"></div><div class="price"></div></div>' +
+      '<div class="qty"><button aria-label="Remove one">−</button><span>0</span><button aria-label="Add one">+</button></div>';
+    row.querySelector('.name').textContent = p.name;
+    row.querySelector('.price').textContent = p.discounted
+      ? eur(p.price) + ' → ' + eur(p.price * (1 - discount)) + ' tonight'
+      : eur(p.price);
+    const [minus, plus] = row.querySelectorAll('button');
+    const count = row.querySelector('span');
+    const update = () => { count.textContent = qty[i] || 0; minus.disabled = !qty[i]; totals(); };
+    minus.onclick = () => { qty[i] = Math.max(0, (qty[i] || 0) - 1); update(); };
+    plus.onclick = () => { qty[i] = (qty[i] || 0) + 1; update(); };
+    update();
+    (p.discounted ? $('cheese-list') : $('other-list')).appendChild(row);
+  });
+}
+
+function totals() {
+  let cheese = 0, other = 0, any = false;
+  products.forEach((p, i) => {
+    const q = qty[i] || 0;
+    if (q) any = true;
+    if (p.discounted) cheese += p.price * q; else other += p.price * q;
+  });
+  const disc = Math.round(cheese * discount * 100) / 100;
+  const ship = any ? shipping : 0;
+  $('s-cheese').textContent = eur(cheese);
+  $('s-disc').textContent = '−' + eur(disc);
+  $('s-other').textContent = eur(other);
+  $('s-ship').textContent = eur(ship);
+  $('s-total').textContent = eur(cheese - disc + other + ship);
+  const named = $('name').value.trim().length > 0;
+  $('submit').disabled = !any || !named;
+  $('submit').textContent = !any ? 'Add items to order' : (!named ? 'Add your name to order' : 'Place order');
+}
+
+$('name').addEventListener('input', totals);
+
+async function load() {
+  if (!API_URL.startsWith('https://script.google.com/')) {
+    $('status').textContent = 'API_URL is not set. Paste the web app URL (ending in /exec) into index.html.';
+    return;
+  }
+  let text = '';
+  try {
+    const res = await fetch(API_URL);
+    text = await res.text();
+    let data;
+    try { data = JSON.parse(text); }
+    catch (_) { throw new Error('Got a page instead of data (status ' + res.status + '): ' + text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').slice(0, 200)); }
+    products = data.products || [];
+    shipping = data.shipping || 0;
+    discount = data.discount || 0;
+    $('disc-label').textContent = Math.round(discount * 100) + '%';
+    $('ship-label').textContent = eur(shipping);
+    if (!data.ordersOpen) { $('status').textContent = 'Orders are closed. Thanks for coming!'; return; }
+    if (!products.length) { $('status').textContent = 'No products yet.'; return; }
+    $('status').hidden = true;
+    $('details').hidden = false;
+    $('bar').hidden = false;
+    render();
+  } catch (e) {
+    $('status').textContent = 'Could not load products. ' + (e.message || e);
+  }
+}
+
+$('submit').onclick = async () => {
+  const name = $('name').value.trim();
+  if (!name) { showError('Please add a name.'); $('name').focus(); return; }
+  const items = products.map((p, i) => ({ name: p.name, qty: qty[i] || 0 })).filter(x => x.qty > 0);
+  $('submit').disabled = true;
+  $('submit').textContent = 'Placing order…';
+  $('error').hidden = true;
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ name, contact: $('contact').value.trim(), items }),
+    });
+    const r = await res.json();
+    if (!r.ok) throw new Error(r.error || 'Something went wrong.');
+    $('d-no').textContent = r.orderNo;
+    $('d-items').textContent = r.items;
+    $('d-cheese').textContent = eur(r.cheese);
+    $('d-disc').textContent = '−' + eur(r.discount);
+    $('d-other').textContent = eur(r.other);
+    $('d-ship').textContent = eur(r.shipping);
+    $('d-total').textContent = eur(r.total);
+    $('d-pay').textContent = r.paymentInfo;
+    $('d-pay').hidden = !r.paymentInfo;
+    $('d-total2').textContent = eur(r.total);
+    $('d-ref').textContent = r.orderNo + ' ' + name;
+    $('revolut').href = REVOLUT_URL;
+    $('revolut').textContent = 'Pay ' + eur(r.total) + ' with Revolut';
+    lastTotal = r.total.toFixed(2);
+    $('form-view').hidden = true; $('bar').hidden = true; $('done-view').hidden = false;
+    window.scrollTo(0, 0);
+  } catch (e) {
+    showError(e.message);
+    $('submit').disabled = false;
+  }
+  totals();
+};
+
+function showError(m) { $('error').textContent = m; $('error').hidden = false; }
+
+$('copy').onclick = async () => {
+  try { await navigator.clipboard.writeText(lastTotal); $('copy').textContent = 'Copied ' + lastTotal; }
+  catch (_) { $('copy').textContent = 'Amount: ' + lastTotal; }
+  setTimeout(() => { $('copy').textContent = 'Copy amount'; }, 2500);
+};
+
+$('again').onclick = () => {
+  qty = {}; $('name').value = ''; $('contact').value = '';
+  $('done-view').hidden = true; $('form-view').hidden = false; $('bar').hidden = false;
+  render(); window.scrollTo(0, 0);
+};
+
+// Keep page content clear of the fixed totals bar
+function padForBar() {
+  const bar = $('bar');
+  document.querySelector('main').style.paddingBottom = (bar.hidden ? 20 : bar.offsetHeight + 24) + 'px';
+}
+new ResizeObserver(padForBar).observe($('bar'));
+window.addEventListener('resize', padForBar);
+new MutationObserver(padForBar).observe($('bar'), { attributes: true, attributeFilter: ['hidden'] });
+
+load();
+</script>
+</body>
+</html>

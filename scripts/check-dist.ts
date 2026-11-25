@@ -75,10 +75,15 @@ const canonicals = new Map<string, string>();
 const idsByFile = new Map<string, Set<string>>();
 const linkChecks: { from: string; href: string }[] = [];
 
+// One-off pages copied as they are from public/, not built with the site's
+// layout, so they skip the page checks below. Remove each with its folder.
+const ONE_OFF_PAGES = ["cheese/index.html"]; // cheese night order form, Sat 28 Nov 2026
+
 for (const file of htmlFiles) {
     const rel = relative(outDir, file);
     const html = readFileSync(file, "utf8");
     idsByFile.set(file, new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1])));
+    if (ONE_OFF_PAGES.includes(rel)) continue;
 
     const is404 = rel === "404.html";
     if (!/<title>[^<]+<\/title>/.test(html)) fail(`${rel}: missing <title>`);
