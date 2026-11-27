@@ -153,10 +153,11 @@ export const membership = fixtures
           /** Stripe customer portal login link (Settings → Billing → Customer portal). Empty: no "manage" link. */
           portalUrl: env("PUBLIC_STRIPE_PORTAL_URL") || "https://billing.stripe.com/p/login/7sY28lc4ocjoaBR6uz0co00",
           /**
-           * "Add to Google Wallet" on the membership card: change false to true
-           * once the Worker has GOOGLE_WALLET_ISSUER_ID and GOOGLE_WALLET_KEY.
+           * "Add to Google Wallet" on the membership card. On since Google granted
+           * publishing access (27 Nov 2026); PUBLIC_GOOGLE_WALLET=false hides it
+           * for a single build. Keep in step with the Worker's GOOGLE_WALLET_PUBLISHED.
            */
-          googleWallet: env("PUBLIC_GOOGLE_WALLET") === "true" || false,
+          googleWallet: env("PUBLIC_GOOGLE_WALLET") !== "false",
           /** Euros off a member ticket. Keep in step with the Worker's MEMBER_DISCOUNT_EUR. */
           discountEur: 5,
           /** The query parameter that makes Eventbrite apply a code from an event link. */
