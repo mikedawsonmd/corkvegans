@@ -37,7 +37,7 @@ Simple, generous perks like a free coffee or a free side work best. They’re ea
 **What you get**
 
 - Your business featured on [corkvegans.ie](http://corkvegans.ie), with your perk, location and a link to your site
-- Mentions in our stories and on our social channels
+- Mentions in our stories and on our social channels (we're on Instagram, Facebook, and WhatsApp with a combined engagement of 4000+ per month)
 - New customers from a growing community of people who actively look for vegan-friendly places to eat and shop
 - You can change your perk once a month if you like. Just let us know.
 
